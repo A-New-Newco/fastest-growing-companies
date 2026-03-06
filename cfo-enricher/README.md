@@ -1,6 +1,6 @@
 # CFO Enricher
 
-Arricchisce il dataset [Leader della Crescita](https://lab24.ilsole24ore.com/leader-crescita) con il nominativo CFO/DAF per ogni azienda, usando un orchestratore ad agenti Claude con WebSearch/WebFetch.
+Enriches the [Leader della Crescita](https://lab24.ilsole24ore.com/leader-crescita) dataset with CFO/Head of Finance names for each company, using a Claude agent orchestrator with WebSearch/WebFetch.
 
 ## Quickstart
 
@@ -11,15 +11,15 @@ claude auth login
 uv run python agent_enricher.py
 ```
 
-## Requisiti
+## Requirements
 
 - Python `>=3.14`
 - `uv`
-- Login Claude attivo (`claude auth login`)
+- Active Claude login (`claude auth login`)
 
-## Configurazione Run
+## Run configuration
 
-Imposta i parametri in `agent_enricher.py`:
+Set these parameters in `agent_enricher.py`:
 
 ```python
 RUN_YEAR = 2026
@@ -35,51 +35,51 @@ RUN_THROTTLE_RECOVERY_BATCHES = 2
 DELAY_BETWEEN_BATCHES = 1.0
 ```
 
-Note operative:
-- Il processamento e' a batch concorrenti.
-- In caso di rate-limit (`429`, `rate limit`, `too many requests`) il sistema fa retry con backoff esponenziale + jitter.
-- Se `RUN_AUTO_THROTTLE=True`, i worker si riducono automaticamente su errori e risalgono dopo batch puliti.
+Operational notes:
+- Processing runs in concurrent batches.
+- On rate-limit signals (`429`, `rate limit`, `too many requests`), the system retries with exponential backoff + jitter.
+- If `RUN_AUTO_THROTTLE=True`, workers scale down automatically on errors and scale back up after clean batches.
 
 ## Input
 
 - Default: `data/{RUN_YEAR}.csv`
-- Colonne attese: almeno `RANK`, `AZIENDA`, `SITO WEB`
+- Expected columns: at least `RANK`, `AZIENDA`, `SITO WEB`
 
 ## Output
 
-I file vengono creati in `output/{year}/`:
+Files are created in `output/{year}/`:
 
-- `enriched.csv`: dataset originale + colonne di enrichment
-- `enrichment_progress.jsonl`: checkpoint append-only per resume
+- `enriched.csv`: original dataset + enrichment columns
+- `enrichment_progress.jsonl`: append-only checkpoint for resume
 
-Colonne aggiunte su `enriched.csv`:
+Columns added to `enriched.csv`:
 
-| Colonna | Descrizione |
+| Column | Description |
 |---|---|
-| `CFO_NOME` | Nome e cognome trovati |
-| `CFO_RUOLO` | Titolo esatto trovato |
-| `CFO_LINKEDIN` | URL profilo LinkedIn se disponibile |
-| `FONTE` | `agent` o `not_found` |
+| `CFO_NOME` | Full name found |
+| `CFO_RUOLO` | Exact title found |
+| `CFO_LINKEDIN` | LinkedIn profile URL when available |
+| `FONTE` | `agent` or `not_found` |
 | `CONFIDENZA` | `high` / `medium` / `low` |
-| `DATA_RICERCA` | Data run (`YYYY-MM-DD`) |
+| `DATA_RICERCA` | Run date (`YYYY-MM-DD`) |
 
-## Resume e Coerenza
+## Resume and consistency
 
-- Se il run si interrompe, rilancia lo stesso comando: riprende dal checkpoint.
-- Il commit su `enrichment_progress.jsonl` e' seriale e ordinato per `RANK` anche con esecuzione parallela.
+- If the run is interrupted, rerun the same command: it resumes from checkpoint.
+- Writes to `enrichment_progress.jsonl` are serial and ordered by `RANK` even with parallel execution.
 
-## Validazione Rapida
+## Quick validation
 
 ```bash
 uv run python -m py_compile agent_enricher.py
 ```
 
-## Vincoli e Best Practice
+## Constraints and best practices
 
-- No scraping diretto LinkedIn.
-- Riesaminare manualmente i risultati con `CONFIDENZA=low` e campionare i `medium`.
-- `enricher.py` resta legacy/backup per confronto.
+- No direct LinkedIn scraping.
+- Manually review results with `CONFIDENZA=low` and sample-check `medium`.
+- `enricher.py` remains as legacy/backup for comparison.
 
-## Documentazione
+## Documentation
 
-- Architettura: `docs/architecture.md`
+- Architecture: `docs/architecture.md`

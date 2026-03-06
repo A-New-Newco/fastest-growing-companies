@@ -1,89 +1,87 @@
-# CFO Enricher — Architecture
+# CFO Enricher - Architecture
 
-## Scopo
+## Purpose
 
-Arricchisce il dataset `data/{year}.csv` con informazioni sul CFO o Direttore Finanziario
-(DAF) di ogni azienda: nome, ruolo esatto, LinkedIn URL.
+Enriches the `data/{year}.csv` dataset with CFO or Finance Director
+information for each company: name, exact role, LinkedIn URL.
 
-## Vincoli di progetto
+## Project constraints
 
-- Auth via `claude auth login` (piano Pro) — incluso nell'abbonamento, nessun costo API separato
-- Nessun accesso diretto a LinkedIn (rischio blocco account, GDPR)
-- Checkpoint/resume obbligatorio (run di ~500 aziende = ore di elaborazione)
+- Auth via `claude auth login` (Pro plan) - included in subscription, no separate API cost
+- No direct LinkedIn access (account block risk, GDPR)
+- Mandatory checkpoint/resume (a run of ~500 companies takes hours)
 
 ---
 
-## Struttura del progetto
+## Project structure
 
 ```
 cfo-enricher/
-├── pyproject.toml
-├── .python-version
-├── agent_enricher.py     # entrypoint principale — agent-based (claude-agent-sdk)
-├── enricher.py           # legacy — pipeline scriptata a 5 layer (backup)
-├── docs/
-│   └── architecture.md   # questo file
-├── data/
-│   └── {year}.csv        # input: aziende da processare
-└── output/
-    └── {year}/
-        ├── enriched.csv                  # risultati finali
-        └── enrichment_progress.jsonl     # checkpoint append-only
+|-- pyproject.toml
+|-- .python-version
+|-- agent_enricher.py     # main entrypoint - agent-based (claude-agent-sdk)
+|-- enricher.py           # legacy - scripted 5-layer pipeline (backup)
+|-- docs/
+|   \-- architecture.md   # this file
+|-- data/
+|   \-- {year}.csv        # input: companies to process
+\-- output/
+    \-- {year}/
+        |-- enriched.csv                  # final results
+        \-- enrichment_progress.jsonl     # append-only checkpoint
 ```
 
 ---
 
-## Approccio agent-based (`agent_enricher.py`)
+## Agent-based approach (`agent_enricher.py`)
 
-Il processo orchestratore lancia più agenti Claude in parallelo (batch concorrenti) e ogni
-agente riceve nome + sito web di una singola azienda, usando `WebSearch` e `WebFetch` per
-trovare autonomamente il responsabile finanziario. Non esistono layer fissi o regex di
-estrazione: Claude ragiona liberamente su cosa cercare, come interpretare i risultati e con
-quale confidenza riportarli.
+The orchestrator launches multiple Claude agents in parallel (concurrent batches), and each
+agent receives company name + website for a single company, using `WebSearch` and `WebFetch`
+to autonomously identify the finance lead. There are no fixed extraction layers or regexes:
+Claude freely decides what to search, how to interpret results, and which confidence to assign.
 
-### Strategia di ricerca (guidata dal prompt)
+### Search strategy (prompt-driven)
 
-Claude segue questa sequenza, fermandosi al primo risultato utile:
+Claude follows this sequence and stops at the first useful result:
 
 ```
-1. WebSearch  — query generica: "{azienda}" CFO OR "direttore finanziario" OR DAF OR "finance director"
-2. WebFetch   — sito aziendale (prova /chi-siamo, /team, /management, /about, /leadership, /organigramma)
-3. WebSearch  — query LinkedIn: "{azienda}" CFO site:linkedin.com
-4. WebSearch  — query press/B2B: "{azienda}" "responsabile finanziario" -site:linkedin.com
+1. WebSearch  - generic query: "{azienda}" CFO OR "direttore finanziario" OR DAF OR "finance director"
+2. WebFetch   - company website (tries /chi-siamo, /team, /management, /about, /leadership, /organigramma)
+3. WebSearch  - LinkedIn query: "{azienda}" CFO site:linkedin.com
+4. WebSearch  - press/B2B query: "{azienda}" "responsabile finanziario" -site:linkedin.com
 ```
 
-### Modello e costo
+### Model and cost
 
-- **Modello**: `claude-haiku-4-5-20251001` — veloce, efficiente per web research strutturato
-- **Auth**: `claude auth login` — usa i crediti del piano Pro, zero costo API separato
-- **Parallelismo**: fino a `RUN_MAX_CONCURRENCY` aziende per batch (default 4)
-- **Rate-limit handling**: retry con backoff esponenziale + jitter; auto-throttle opzionale
+- **Model**: `claude-haiku-4-5-20251001` - fast, efficient for structured web research
+- **Auth**: `claude auth login` - uses Pro plan credits, zero separate API cost
+- **Parallelism**: up to `RUN_MAX_CONCURRENCY` companies per batch (default 4)
+- **Rate-limit handling**: retry with exponential backoff + jitter; optional auto-throttle
 
-### Concorrenza e resilienza
+### Concurrency and resilience
 
-Configurazione principale in `agent_enricher.py`:
+Main configuration in `agent_enricher.py`:
 
-- `RUN_MAX_CONCURRENCY` / `RUN_MIN_CONCURRENCY`: limite alto/basso dei worker batch
-- `RUN_MAX_RETRIES`: tentativi massimi per azienda (primo tentativo incluso)
-- `RUN_RETRY_BASE_DELAY`: base del backoff esponenziale (`base * 2^(n-1)`) + jitter
-- `RUN_AUTO_THROTTLE`: se `True`, riduce i worker su segnali di rate-limit
-- `RUN_THROTTLE_RECOVERY_BATCHES`: batch puliti richiesti prima di rialzare i worker
-- `DELAY_BETWEEN_BATCHES`: pausa tra batch consecutivi
+- `RUN_MAX_CONCURRENCY` / `RUN_MIN_CONCURRENCY`: upper/lower limit for batch workers
+- `RUN_MAX_RETRIES`: max attempts per company (first attempt included)
+- `RUN_RETRY_BASE_DELAY`: base for exponential backoff (`base * 2^(n-1)`) + jitter
+- `RUN_AUTO_THROTTLE`: if `True`, reduces workers on rate-limit signals
+- `RUN_THROTTLE_RECOVERY_BATCHES`: clean batches required before increasing workers
+- `DELAY_BETWEEN_BATCHES`: pause between consecutive batches
 
-Il checkpoint resta **single-writer**: i job girano in parallelo ma il commit su
-`enrichment_progress.jsonl` avviene serialmente, ordinato per `RANK`.
+Checkpoint remains **single-writer**: jobs run in parallel, but commits to
+`enrichment_progress.jsonl` are serialized and ordered by `RANK`.
 
-### Output per azienda
+### Output per company
 
-Claude termina sempre con un JSON strutturato:
+Claude always finishes with structured JSON:
 
 ```json
 {"nome": "Mario Rossi", "ruolo": "CFO", "linkedin_url": "https://...", "confidenza": "high"}
 ```
 
-oppure `{"nome": null}` se non trovato. Il campo `confidenza` (`high`/`medium`/`low`) è il
-meccanismo principale di QA: post-run si rivedono manualmente i risultati `low` e si
-verificano i `medium`.
+or `{"nome": null}` when not found. The `confidenza` field (`high`/`medium`/`low`) is the
+main QA mechanism: after the run, manually review `low` results and validate `medium` ones.
 
 ---
 
@@ -91,21 +89,21 @@ verificano i `medium`.
 
 ### `output/{year}/enriched.csv`
 
-Tutte le colonne originali di `data.csv` più:
+All original columns from `data.csv` plus:
 
-| Colonna | Valori possibili | Note |
+| Column | Possible values | Notes |
 |---|---|---|
-| `CFO_NOME` | stringa o vuoto | Nome e cognome |
-| `CFO_RUOLO` | stringa o vuoto | Titolo esatto trovato (italiano o inglese, non normalizzato) |
-| `CFO_LINKEDIN` | URL o vuoto | Profilo LinkedIn |
-| `FONTE` | `agent` / `not_found` | Sempre `agent` per `agent_enricher.py` |
-| `CONFIDENZA` | `high` / `medium` / `low` | Stimata da Claude — usata per QA manuale |
-| `DATA_RICERCA` | `YYYY-MM-DD` | Data della ricerca |
+| `CFO_NOME` | string or empty | First and last name |
+| `CFO_RUOLO` | string or empty | Exact title found (Italian or English, not normalized) |
+| `CFO_LINKEDIN` | URL or empty | LinkedIn profile |
+| `FONTE` | `agent` / `not_found` | Always `agent` for `agent_enricher.py` |
+| `CONFIDENZA` | `high` / `medium` / `low` | Estimated by Claude - used for manual QA |
+| `DATA_RICERCA` | `YYYY-MM-DD` | Search date |
 
 ### `output/{year}/enrichment_progress.jsonl`
 
-Checkpoint append-only. Una riga JSON per azienda processata.
-Permette di riprendere una run interrotta senza ricominciare da capo.
+Append-only checkpoint. One JSON line per processed company.
+Allows resuming an interrupted run without starting over.
 
 ```jsonl
 {"rank": 1, "azienda": "C.D.C. Chain Drive", "cfo_nome": "Mario Rossi", "cfo_ruolo": "CFO", "cfo_linkedin": null, "fonte": "agent", "confidenza": "medium", "data_ricerca": "2026-03-06"}
@@ -121,39 +119,39 @@ cd cfo-enricher
 
 # Setup
 uv sync
-claude auth login   # autenticazione piano Pro (una tantum)
+claude auth login   # Pro plan authentication (one-time)
 
-# Run principale (agent-based)
-uv run python agent_enricher.py          # processa RUN_YEAR, riprende dal checkpoint
-# Configura RUN_* in cima al file (anno/input/reset + concorrenza/retry/throttle)
+# Main run (agent-based)
+uv run python agent_enricher.py          # processes RUN_YEAR, resumes from checkpoint
+# Configure RUN_* at the top of the file (year/input/reset + concurrency/retry/throttle)
 
-# Run legacy (pipeline scriptata — solo per confronto/debug)
-uv sync  # richiede anche: uv run playwright install chromium
+# Legacy run (scripted pipeline - for comparison/debug only)
+uv sync  # also requires: uv run playwright install chromium
 uv run python enricher.py 2026
-uv run python enricher.py 2026 --layer 4  # solo Layer 4 agentico
+uv run python enricher.py 2026 --layer 4  # only Layer 4 (agent-based)
 ```
 
 ---
 
-## Dipendenze
+## Dependencies
 
-| Pacchetto | Uso | Note |
+| Package | Usage | Notes |
 |---|---|---|
-| `claude-agent-sdk` | Agent loop con WebSearch + WebFetch (`agent_enricher.py`) | Auth via piano Pro |
-| `requests` | HTTP fetch statico (solo `enricher.py` legacy) | |
-| `beautifulsoup4` | HTML parsing (solo `enricher.py` legacy) | |
-| `ddgs` | DuckDuckGo SERP queries (solo `enricher.py` legacy) | |
-| `playwright` | Browser headless (solo `enricher.py` legacy) | |
-| `anthropic` | Claude API direct (solo `enricher.py` legacy Layer 4) | |
+| `claude-agent-sdk` | Agent loop with WebSearch + WebFetch (`agent_enricher.py`) | Auth via Pro plan |
+| `requests` | Static HTTP fetch (`enricher.py` legacy only) | |
+| `beautifulsoup4` | HTML parsing (`enricher.py` legacy only) | |
+| `ddgs` | DuckDuckGo SERP queries (`enricher.py` legacy only) | |
+| `playwright` | Headless browser (`enricher.py` legacy only) | |
+| `anthropic` | Direct Claude API (`enricher.py` legacy Layer 4 only) | |
 
 ---
 
-## Servizi esclusi e motivazione
+## Excluded services and rationale
 
-| Servizio | Motivo esclusione |
+| Service | Why excluded |
 |---|---|
-| LinkedIn API | Non esiste API pubblica |
-| LinkedIn scraping diretto | Rischio blocco account, violazione ToS, esposizione GDPR |
-| OpenCorporates API | Free tier non affidabile a 500 req/mese; dati (admin legali) non corrispondono a ruoli CFO/DAF |
-| Hunter.io / Apollo | Free tier 25-120/mese, insufficiente per 500 aziende |
-| Google Search API | 100 req/giorno gratuiti, esauriti rapidamente |
+| LinkedIn API | No public API exists |
+| Direct LinkedIn scraping | Account block risk, ToS violations, GDPR exposure |
+| OpenCorporates API | Free tier is unreliable at 500 req/month; legal admin data does not match CFO/DAF roles |
+| Hunter.io / Apollo | Free tier 25-120/month, insufficient for 500 companies |
+| Google Search API | 100 free req/day, exhausted quickly |

@@ -1,31 +1,31 @@
 # Fastest Growing Companies (Leader della Crescita)
 
-Repository per una pipeline in due parti:
+Repository for a two-part pipeline:
 
-1. scraper del ranking **Leader della Crescita** (Il Sole 24 Ore), anni 2019-2026
-2. enrichment dei dati con informazioni CFO/Head of Finance
+1. scraper for the **Leader della Crescita** ranking (Il Sole 24 Ore), years 2019-2026
+2. data enrichment with CFO/Head of Finance information
 
-## Struttura repository
+## Repository structure
 
-- `champions-companies-scraper.zip`: archivio del progetto scraper (contiene `scraper.py`, `main.py`, `output/{year}/data.csv`)
-- `cfo-enricher/`: modulo per arricchire il dataset con dati CFO
+- `champions-companies-scraper.zip`: archive containing the scraper project (`scraper.py`, `main.py`, `output/{year}/data.csv`)
+- `cfo-enricher/`: module that enriches the dataset with CFO data
 
-## Prerequisiti
+## Prerequisites
 
 - Python 3.14+
 - [uv](https://docs.astral.sh/uv/)
-- (solo per enrichment) account Claude con `claude auth login`
+- (enrichment only) Claude account with `claude auth login`
 
 ## Quickstart
 
-### 1) Scraper (da archivio zip)
+### 1) Scraper (from zip archive)
 
 ```bash
 unzip champions-companies-scraper.zip
 cd champions-companies-scraper
 uv sync
-uv run python scraper.py        # tutti gli anni
-uv run python scraper.py 2024   # anno specifico
+uv run python scraper.py        # all years
+uv run python scraper.py 2024   # specific year
 ```
 
 Output: `champions-companies-scraper/output/{year}/data.csv`
@@ -39,23 +39,23 @@ claude auth login
 uv run python agent_enricher.py
 ```
 
-Input default: `cfo-enricher/data/{year}.csv`  
+Default input: `cfo-enricher/data/{year}.csv`  
 Output: `cfo-enricher/output/{year}/enriched.csv`
 
-## Colonne principali
+## Main columns
 
-### Dataset scraper
+### Scraper dataset
 
 `RANK, AZIENDA, TASSO DI CRESCITA, RICAVI {year-5}, RICAVI {year-2}, SETTORE, REGIONE, PRESENZE, SITO WEB`
 
-### Colonne aggiunte dall'enricher
+### Columns added by the enricher
 
 `CFO_NOME, CFO_RUOLO, CFO_LINKEDIN, FONTE, CONFIDENZA, DATA_RICERCA`
 
-## Comandi utili
+## Useful commands
 
 ```bash
-# linter/formatter (nel progetto scraper estratto)
+# linter/formatter (inside the extracted scraper project)
 uv run ruff check .
 uv run ruff format .
 ```

@@ -1,31 +1,31 @@
 # AGENTS.md
 
-Istruzioni operative per agenti automatici che lavorano su questo repository.
+Operational instructions for automated agents working on this repository.
 
-## Obiettivo del progetto
+## Project goal
 
-Arricchire `data/{year}.csv` con informazioni CFO/DAF per azienda tramite `agent_enricher.py`, mantenendo output compatibile e riprendibile.
+Enrich `data/{year}.csv` with CFO/Head of Finance information per company via `agent_enricher.py`, keeping output compatible and resumable.
 
-## File principali
+## Core files
 
-- `agent_enricher.py`: pipeline principale (batch concorrenti + auto-throttle)
-- `docs/architecture.md`: descrizione architetturale
-- `README.md`: setup e uso operativo
+- `agent_enricher.py`: main pipeline (concurrent batches + auto-throttle)
+- `docs/architecture.md`: architecture description
+- `README.md`: setup and operational usage
 - `data/{year}.csv`: input
-- `output/{year}/enriched.csv`: output finale
-- `output/{year}/enrichment_progress.jsonl`: checkpoint append-only
+- `output/{year}/enriched.csv`: final output
+- `output/{year}/enrichment_progress.jsonl`: append-only checkpoint
 
-## Invarianti da non rompere
+## Invariants that must not break
 
-- Preservare schema e naming del checkpoint JSONL:
+- Preserve checkpoint JSONL schema and naming:
   - `rank`, `azienda`, `cfo_nome`, `cfo_ruolo`, `cfo_linkedin`, `fonte`, `confidenza`, `data_ricerca`
-- Preservare colonne finali di `enriched.csv`:
+- Preserve final columns of `enriched.csv`:
   - `CFO_NOME`, `CFO_RUOLO`, `CFO_LINKEDIN`, `FONTE`, `CONFIDENZA`, `DATA_RICERCA`
-- Mantenere resume da checkpoint senza duplicare righe per `RANK`.
-- Con run concorrente, garantire scrittura checkpoint seriale e ordinata per `RANK`.
-- Non introdurre scraping diretto LinkedIn.
+- Keep checkpoint resume behavior without duplicate rows by `RANK`.
+- With concurrent runs, guarantee serial checkpoint writes ordered by `RANK`.
+- Do not introduce direct LinkedIn scraping.
 
-## Setup e comandi
+## Setup and commands
 
 ```bash
 uv sync
@@ -33,32 +33,32 @@ claude auth login
 uv run python agent_enricher.py
 ```
 
-Check minimo prima di consegnare:
+Minimum check before delivery:
 
 ```bash
 uv run python -m py_compile agent_enricher.py
 ```
 
-## Linee guida implementative
+## Implementation guidelines
 
-- Fare modifiche minimali e coerenti con lo stile attuale.
-- Preferire funzioni pure per logica di adattamento/validazione.
-- Evitare scritture concorrenti su file condivisi.
-- Loggare sempre eventi operativi rilevanti:
+- Apply minimal changes consistent with the current style.
+- Prefer pure functions for adaptation/validation logic.
+- Avoid concurrent writes to shared files.
+- Always log relevant operational events:
   - retry
-  - segnali rate-limit
-  - variazione worker (auto-throttle)
-  - summary finale run
+  - rate-limit signals
+  - worker changes (auto-throttle)
+  - final run summary
 
-## Criteri di accettazione consigliati
+## Recommended acceptance criteria
 
-- Nessun errore di sintassi (`py_compile`).
-- Nessun `RANK` duplicato o mancante nel checkpoint.
-- `enriched.csv` sempre generabile da checkpoint + input.
-- Resume funzionante dopo interruzione.
+- No syntax errors (`py_compile`).
+- No duplicate or missing `RANK` values in checkpoint.
+- `enriched.csv` always reproducible from checkpoint + input.
+- Resume works after interruption.
 
-## Non fare
+## Do not
 
-- Non cambiare formato output senza aggiornare anche documentazione e consumer downstream.
-- Non rimuovere fallback `not_found`.
-- Non introdurre dipendenze non necessarie per un fix locale.
+- Do not change output format without also updating documentation and downstream consumers.
+- Do not remove `not_found` fallback.
+- Do not add unnecessary dependencies for a local fix.
