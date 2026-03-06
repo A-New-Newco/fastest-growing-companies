@@ -1,0 +1,22 @@
+[project]
+name = "cfo-enricher"
+version = "0.1.0"
+description = "Enricher per CFO/DAF delle aziende Leader della Crescita"
+requires-python = ">=3.14"
+dependencies = [
+  "requests>=2.32.0",
+  "beautifulsoup4>=4.12.0",
+  "ddgs>=0.1.0",
+  "playwright>=1.49.0",
+  "anthropic>=0.40.0",
+  "claude-agent-sdk>=0.1.0",
+]
+
+[dependency-groups]
+dev = [
+  "ruff>=0.9.0",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py314"

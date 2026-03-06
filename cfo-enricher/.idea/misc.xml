@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Black">
+    <option name="sdkName" value="uv (cfo-enricher)" />
+  </component>
+  <component name="GithubDefaultAccount">
+    <option name="defaultAccountId" value="665ec3ce-a3aa-4a8e-a56c-8ee75c8878ee" />
+  </component>
+  <component name="ProjectRootManager" version="2" project-jdk-name="uv (cfo-enricher)" project-jdk-type="Python SDK" />
+</project>

@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//Users/francescofiore/.claude/projects/**)",
+      "WebSearch",
+      "Bash(zip -r champions-companies-scraper.zip champions-companies-scraper/ --exclude \"champions-companies-scraper/.venv/*\" --exclude \"champions-companies-scraper/__pycache__/*\" --exclude \"champions-companies-scraper/.ruff_cache/*\")",
+      "WebFetch(domain:docs.anthropic.com)",
+      "Bash(python3 -c \":*)"
+    ]
+  }
+}

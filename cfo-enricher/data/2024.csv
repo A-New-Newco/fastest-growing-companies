@@ -1,0 +1,501 @@
+﻿RANK,AZIENDA,TASSO DI CRESCITA,RICAVI 2019,RICAVI 2022,SETTORE,REGIONE,PRESENZE,SITO WEB
+1,Parcop S.r.l. (WiAutomation),460.854,460,81122,E-commerce,Campania,,https://it.wiautomation.com
+2,Bidberry S.r.l.,424.388,101,14499,Pubblicità e marketing,Abruzzo,,https://www.bidberrymedia.com
+3,Golfo Dei Sogni S.r.l. (The Sense Experience Resort),328.644,103,8148,Ospitalità e viaggi,Toscana,,https://www.thesenseresort.it
+4,Oceania S.r.l.,298.105,291,18373,Costruzione e ingegneria,Abruzzo,,https://www.oceaniasrl.it
+5,Business Innovation Lab S.p.A. (Opyn),273.53,743,38711,"Fintech, servizi finanziari e assicurazioni",Lombardia,,https://www.opyn.eu
+6,GreenFeed S.r.l. (GreenFeedCycles),248.527,217,9167,Commercio all'ingrosso,Emilia-Romagna,,https://www.greenfeed.it
+7,Energia Locale S.r.l.,244.207,129,5253,Energia e servizi pubblici,Lombardia,,https://energialocale.com
+8,Bit Mobilily S.r.l.,233.849,188,7010,IT e software,Veneto,,https://bitmobility.it
+9,Main Solution S.r.l.,224.575,1273,43533,Energia e servizi pubblici,Calabria,,https://www.mainsolution.eu
+10,Ly Company Italia S.r.l. Società Benefit (Aqualy),223.043,107,3593,Cibo e bevande,Toscana,,https://www.acquainbrick.it
+11,Nativery S.r.l.,222.444,125,4175,Pubblicità e marketing,Piemonte,,https://www.nativery.com
+12,Pace S.r.l.,217.879,116,3726,Automotive,Lazio,,https://www.paceautomobili.com
+13,Salabam S.r.l. (Salabam - VadoBay - Vivamod),205.865,402,11502,Ospitalità e viaggi,Emilia-Romagna,,https://www.salabam.com
+14,Eva Consulting S.r.l.,205.197,128,3630,Consulenza manageriale,Campania,,https://www.evaconsulting.it
+15,C2R Energy Consulting S.r.l.,203.451,112,3137,Consulenza manageriale,Piemonte,,https://c2rconsulting.com
+16,Conal Service S.r.l. (Formaggi Terre Sarde),196.838,245,6402,Cibo e bevande,Sardegna,,http://www.formaggiterresarde.com
+17,Mia Burton S.r.l.,196.318,149,3889,Abbigliamento e moda,Sicilia,,https://corporate.miaburton.com
+18,Italsoft Group S.r.l.,193.293,1583,39945,Costruzione e ingegneria,Veneto,,https://www.italsoftgroup.it
+19,Rizzi Costruzioni S.r.l.,186.713,476,11218,Costruzione e ingegneria,Lombardia,,https://www.ediltecna.eu
+20,Wakame Italia S.r.l.,185.368,644,14975,Cibo e bevande,Lombardia,,https://www.eathappy.it
+21,Baroni S.r.l. (Baroni Home),182.559,241,5443,E-commerce,Toscana,,https://baronihome.it
+22,X-Win S.r.l.,177.201,1705,36325,Energia e servizi pubblici,Sicilia,,https://www.x-win.it
+23,Luxor Building S.r.l.,177.021,995,21155,Costruzione e ingegneria,Sicilia,,https://www.luxorbuilding.it
+24,Save NRG S.r.l.,172.25,814,16428,Energia e servizi pubblici,Lombardia,,https://www.savenrg.it
+25,Etnos Cooperativa Sociale,166.483,145,2750,Servizi sanitari e sociali,Sicilia,,https://www.cooperativaetnos.net
+26,Newark Engineering S.r.l.,164.89,547,10173,Costruzione e ingegneria,Abruzzo,,https://www.newarkengineering.it
+27,Elogy S.r.l.,159.007,186,3231,Logistica e trasporto,Campania,,https://elogy.io
+28,LV Group S.r.l.,149.348,615,9535,Energia e servizi pubblici,Lazio,,https://lvgroup.net
+29,CAMS Servizi Edili S.r.l.,144.623,1113,16294,Costruzione e ingegneria,Emilia-Romagna,,https://www.cams-srl.it
+30,Exelab S.r.l.,144.029,222,3221,IT e software,Lazio,,https://www.exelab.com
+31,P.B.L. S.r.l.,143.098,1008,14481,Macchinari e attrezzature,Emilia-Romagna,,https://www.pbl.it
+32,Isoterma S.r.l.,142.201,4802,68226,Costruzione e ingegneria,Lombardia,,https://www.isoterma.it
+33,Cosaporto S.r.l.,139.319,120,1649,E-commerce,Lazio,,https://cosaporto.it
+34,RC Relax S.r.l.,139.234,135,1852,Arredamento,Toscana,,https://www.riccardocorredi.it
+35,Imprendiroma S.p.A.,138.268,2665,36046,Costruzione e ingegneria,Lazio,,https://www.imprendiroma.it
+36,Execus S.p.A.,136.435,180,2380,Formazione,Lombardia,,https://www.execus.com
+37,Ecologia Sannita S.r.l.,128.736,178,2129,Smaltimento rifiuti & riciclo,Campania,,https://www.ecologiasannita.it
+38,Greenland S.r.l.,125.127,134,1532,Costruzione e ingegneria,Lombardia,,https://www.greenlandsrl.com
+39,FinDynamic S.r.l.,122.776,222,2456,"Fintech, servizi finanziari e assicurazioni",Lombardia,,https://www.findynamic.com
+40,Edilenergia S.r.l.,122.767,724,8007,Costruzione e ingegneria,Abruzzo,,https://www.edilenergiasrl.it
+41,Hair Gallery Europe S.r.l.,122.411,2127,23396,E-commerce,Marche,,https://www.hair-gallery.it
+42,Tecnica Group S.r.l.,119.515,292,3083,Energia e servizi pubblici,Veneto,,https://www.tecnicagroup.eu
+43,Sagitta SGR S.p.A.,119.464,447,4724,"Fintech, servizi finanziari e assicurazioni",Lombardia,,https://www.sagittasgr.it
+44,G.R. Costruzioni S.r.l.,117.816,310,3200,Costruzione e ingegneria,Lazio,,https://www.grcostruzionisrl.it
+45,Digix S.r.l.,117.112,972,9948,IT e software,Lombardia,,https://digixteam.com
+46,Enesco S.r.l.,115.365,5149,51436,Energia e servizi pubblici,Abruzzo,,https://www.enesco.it
+47,Dodiciundici - Società cooperativa di Servizi,115.141,193,1922,Servizi per l'impiego,Lazio,,https://www.gruppolameridiana.com
+48,InBagno S.r.l.,111.306,463,4369,E-commerce,Campania,,https://www.inbagno.it
+49,Ferraioli S.r.l.,110.982,1512,14200,Energia e servizi pubblici,Marche,,https://www.ferraioliimpianti.it
+50,BizAway S.r.l. SB,110.704,3576,33450,Ospitalità e viaggi,Friuli-Venezia Giulia,,https://bizaway.com
+51,Cridav Italia S.p.A.,109.098,1719,15714,Energia e servizi pubblici,Toscana,,https://cridavitalia.it
+52,Essegi S.r.l.,108.86,3722,33913,Commercio all'ingrosso,Toscana,,https://www.essegi.srl
+53,Agrisole S.r.l.,106.396,8098,71196,"Agricoltura, silvicoltura e pesca",Basilicata,,n/a
+54,EcoTek S.r.l.,106.238,3242,28440,Energia e servizi pubblici,Lombardia,,https://eco-tek.it
+55,Studio Speri Società di Ingegneria S.r.l.,103.388,3946,33198,Costruzione e ingegneria,Lazio,,https://www.studiosperi.it
+56,Whoosnap S.r.l. (Insoore),102.267,391,3235,"Fintech, servizi finanziari e assicurazioni",Lazio,,https://www.insoore.com
+57,CO.IM Costruzioni S.r.l. (Gruppo Pappalardo),101.726,1077,8841,Costruzione e ingegneria,Lazio,,https://www.gruppopappalardo.com
+58,Pinsami S.r.l.,101.476,2053,16790,Cibo e bevande,Emilia-Romagna,,https://www.pinsami.it
+59,Rifo S.r.l. (Rifò),99.363,290,2299,Abbigliamento e moda,Toscana,,https://rifo-lab.com
+60,181Travel S.r.l.,99.057,207,1635,Ospitalità e viaggi,Sardegna,,https://181travel.com
+61,N.E.S. S.r.l. (Nuovi Sistemi Energetici),98.672,356,2792,Energia e servizi pubblici,Sicilia,,https://nuovisistemienergetici.it
+62,Beccaceci S.r.l.,97.334,2813,21616,Costruzione e ingegneria,Abruzzo,,https://www.beccacecicostruzioni.it
+63,Edilgroup7 S.r.l.,95.959,519,3905,Costruzione e ingegneria,Lombardia,,https://www.edilgroup7.com
+64,4Energy S.r.l.,95.579,628,4697,"Servizi professionali, scientifici e tecnici",Marche,,https://www.4-energy.it
+65,Evergreen Mobility Rent S.r.l.,94.904,681,5042,IT e Software,Toscana,,https://www.evergreenrent.it
+66,Sportit S.r.l. (Snowit),94.694,1358,10025,Tempo libero e divertimento,Lombardia,,https://snowit.ski
+67,Start2impact S.r.l. SB,94.589,215,1588,Formazione,Lombardia,,https://www.start2impact.it
+68,Flu S.r.l.,93.994,760,5551,Pubblicità e marketing,Lombardia,,https://www.flu.agency
+69,Endesa S.r.l.,93.927,966,7045,Logistica e trasporto,Lazio,,https://www.dvaexpress.it
+70,Route220 S.r.l. SB,93.259,545,3937,IT e software,Lombardia,,https://evway.net
+71,Dromedian S.r.l.,90.881,4260,29628,IT e software,Abruzzo,,https://www.dromedian.com
+72,Faimed S.r.l.,90.831,508,3532,"Prodotti farmaceutici, biotecnologie e scienze della vita",Campania,,https://faimed.it
+73,Teicos UE S.r.l.,90.445,5757,39765,Costruzione e ingegneria,Lombardia,,https://www.teicosgroup.com
+74,Nonsoloimmobili S.r.l.,88.358,1986,13271,E-commerce,Veneto,,https://www.comenovo.it
+75,Aulab S.r.l.,87.003,309,2018,Formazione,Puglia,,https://aulab.it
+76,Obs Italia S.r.l.,86.023,1327,8541,Costruzione e ingegneria,Emilia-Romagna,,https://obsitalia.it
+77,Manelli Impresa S.p.A.,84.199,35621,222619,Costruzione e ingegneria,Puglia,,https://www.manelli.eu
+78,Sales Performance S.r.l.,83.782,504,3126,Pubblicità e marketing,Sicilia,,https://www.salesperformance.it
+79,Engea Consulting S.r.l.,82.842,361,2204,"Servizi professionali, scientifici e tecnici",Abruzzo,,https://www.engeaconsulting.com
+80,Centro Caravans Barassi S.r.l.,81.816,2631,15815,Vendita al dettaglio,Lombardia,,https://www.centrocaravansbarassi.com
+81,Sinergia FD S.r.l.,81.581,1047,6266,E-commerce,Abruzzo,,https://sinergiafd.com/sinergia
+82,BcodeAutomation S.r.l.,80.751,313,1846,IT e software,Lombardia,,https://bcodeautomation.it
+83,Far Out S.r.l.,79.672,740,4293,Abbigliamento e moda,Marche,,https://www.far-out.it/comingsoon
+84,VisMederi S.r.l.,79.611,3662,21219,"Prodotti farmaceutici, biotecnologie e scienze della vita",Toscana,,https://www.vismederi.com
+85,Enerfin S.p.A.,79.38,9187,53027,Energia e servizi pubblici,Lazio,,https://www.enerfin.it
+86,MadTools S.r.l.,79.228,262,1509,Produzione industriale,Lombardia,,https://www.madtools.it
+87,Knobs S.r.l.,78.582,421,2399,IT e software,Lombardia,,https://knobs.it
+88,Adiemme S.r.l. (ADM),78.287,2543,14411,Arredamento,Friuli-Venezia Giulia,,http://www.adm-italy.it
+89,Busforfun.com S.r.l.,78.247,853,4831,Tempo libero e divertimento,Veneto,,https://www.busforfun.com
+90,I'Mprinting S.r.l.,78.176,3979,22506,IT e software,Lazio,,https://www.imprinting.info
+91,Suncity Group S.r.l.,78.104,7635,43137,Energia e servizi pubblici,Abruzzo,,https://www.suncityitalia.com
+92,Espresso Coffee Shop S.r.l.,77.979,2241,12634,E-commerce,Veneto,,https://www.espressocoffeeshop.com
+93,Consorzio Stabile Medil S.c.p.A.,77.36,16364,91298,Costruzione e ingegneria,Campania,,https://www.medilconsorzio.it
+94,Master Group S.r.l. (KD Cube),75.354,3206,17289,Media e telecomunicazioni,Puglia,,https://master-dealer.it
+95,IT Centric S.p.A.,74.912,2284,12225,IT e software,Campania,,https://itcentric.it
+96,Aiviewgroup S.r.l.,73.535,462,2416,"Servizi professionali, scientifici e tecnici",Lazio,,https://www.aiviewgroup.com
+97,Ocra S.r.l. (Ocra Group),73.422,1112,5800,IT e software,Veneto,,https://www.ocragroup.com
+98,Imperialgroup S.r.l.,73.079,3811,19760,Arredamento,Piemonte,,https://www.imperialgroup.it
+99,Percinque S.r.l.,72.656,547,2814,Consulenza manageriale,Veneto,,https://www.percinque.it
+100,Drop S.r.l. (Drop | e-business & love!),72.388,6169,31605,E-commerce,Marche,,https://www.drop.it
+101,Dilc S.r.l.,72.373,7704,39456,E-commerce,Campania,,https://www.ipermercato-online.it
+102,Incloud Team S.r.l.,71.877,303,1539,IT e software,Lombardia,,https://incloudteam.com
+103,Gyada Cosmetics S.r.l.,71.871,992,5036,Vendita al dettaglio,Sicilia,,https://gyadacosmetics.com
+104,SKY-NRG S.r.l.,71.194,8096,40621,Energia e servizi pubblici,Lombardia,,https://sky-nrg.com
+105,Cava Energia S.r.l.,71.027,503,2516,Energia e servizi pubblici,Campania,,https://www.cavaenergia.it
+106,Eat Happy Togo S.r.l.,70.946,2081,10397,Cibo e bevande,Lombardia,,https://www.eathappy.it
+107,GS Service S.r.l. (Gs Green Solar),70.259,1746,8617,Energia e servizi pubblici,Lombardia,,http://www.gs-service.it
+108,Eviso S.p.A.,69.964,42385,208102,IT e software,Piemonte,,https://eviso.ai
+109,Tra.Co.Gas. S.r.l.,69.895,3677,18031,Logistica e trasporto,Veneto,,https://www.tracogas.com
+110,eFarma Group S.r.l.,69.105,9014,43589,E-commerce,Campania,,https://www.efarma.com
+111,Hustle S.r.l. (Koala Babycare),68.66,2003,9609,E-commerce,Marche,,https://koalababycare.com
+112,Brio Group Soc. Coop. Consortile a r.l.,68.359,6822,32556,Logistica e trasporto,Puglia,,https://www.consorziobrio.it
+113,Cos.Met. S.r.l. Fratelli Rubolino,67.819,6377,30142,Arredamento,Basilicata,,https://www.cosmetinfissi.it
+114,uBroker S.p.A.,67.355,27801,130309,Energia e servizi pubblici,Lombardia,,https://ubroker.it
+115,Progetto Impresa S.r.l.,67.181,346,1616,Consulenza manageriale,Puglia,,https://www.progettoimpresasrl.it
+116,In.tech S.p.A. SB,66.572,4347,20093,Costruzione e ingegneria,Lazio,,https://www.intechspa.it
+117,Isoclean S.r.l. (L'evoluzione del pulito),66.143,2664,12218,Servizi sanitari e sociali,Abruzzo,,https://www.isoclean.it
+118,CO.GE.MA. S.n.c. di Giuseppe Marchese & C.,66.097,954,4370,Costruzione e ingegneria,Lombardia,,https://www.costruzionicogema.it
+119,Archingest S.r.l.,65.232,1808,8156,Costruzione e ingegneria,Piemonte,,https://archingest.it
+120,B.G. S.r.l. (B.G Legno),65.188,3430,15461,Arredamento,Toscana,,https://www.bglegno.it
+121,Morpheus Advisor S.r.l. (Ap Italian Luxury),64.557,2393,10665,Abbigliamento e moda,Toscana,,https://apitalianluxury.com
+122,International Transport Solution S.r.l. (ITS),64.332,5657,25104,Logistica e trasporto,Campania,,https://itssrl.eu
+123,Swascan S.r.l.,64.323,1327,5888,IT e software,Lombardia,,https://www.swascan.com
+124,Pirene S.r.l.,64.221,1136,5032,Pubblicità e marketing,Lombardia,,https://pirene.it
+125,Sciuker Frames S.p.A.,64.007,10748,47413,Arredamento,Campania,,https://www.sciuker.it
+126,Fenyx Italia S.r.l. (LEDdiretto.it),63.744,1474,6470,E-commerce,Puglia,,https://www.leddiretto.it
+127,Afs S.c.a.r.l.,63.555,15438,67543,Logistica e trasporto,Lazio,,https://afsscarl.it
+128,GDA S.r.l.,63.103,8092,35109,Abbigliamento e moda,Puglia,,http://www.decorartex.com
+129,CampuStore S.r.l.,63.065,14529,62995,Formazione,Veneto,,https://www.campustore.it
+130,T-Tex S.r.l.,63.016,3815,16526,"Prodotti farmaceutici, biotecnologie e scienze della vita",Piemonte,,https://t-tex.it
+131,Performa S.r.l.,62.985,759,3288,Costruzione e ingegneria,Piemonte,,http://www.performapali.it
+132,Alfonsino S.p.A.,62.641,1080,4648,Cibo e bevande,Campania,,https://alfonsino.delivery
+133,Parafioriti Costruzioni S.r.l.,62.422,1617,6929,Costruzione e ingegneria,Sicilia,,https://www.parafioriticostruzioni.it
+134,Southenergy S.r.l.,62.335,887,3795,Energia e servizi pubblici,Puglia,,https://www.southenergy.it
+135,Ideal Ceramiche di Giacomo La Russa S.r.l. (Tattahome),62.308,1836,7850,E-commerce,Sicilia,,https://www.tattahome.com
+136,Scuccato S.A. S.r.l.,61.859,1893,8028,Costruzione e ingegneria,Lazio,,https://www.grupposcuccato.it
+137,Energy Boost S.r.l.,61.791,1771,7500,Energia e servizi pubblici,Marche,,https://energyboost.it
+138,SIPLI FLEET S.r.l.,61.434,658,2767,IT e software,Campania,,https://www.siplifleet.it
+139,illimity Bank S.p.A.,61.388,77224,324614,"Fintech, servizi finanziari e assicurazioni",Lombardia,,https://www.illimity.com
+140,E-Globe S.p.A. (Climamarket.it),61.036,6471,27023,E-commerce,Calabria,,https://www.climamarket.it
+141,Tresun S.r.l. (Chasing the sun),61.024,1088,4544,Energia e servizi pubblici,Sicilia,,https://www.tresun.it
+142,TECNO10 S.r.l.,60.481,1186,4903,"Servizi professionali, scientifici e tecnici",Trentino-Alto Adige,,n/a
+143,Pegaso Security S.p.A.,60.081,4347,17834,"Servizi professionali, scientifici e tecnici",Puglia,,https://www.pegasosecurity.it
+144,Edu Group S.r.l.,59.98,9954,40756,Commercio all'ingrosso,Lombardia,,https://www.edugroup.it
+145,Iocoli S.r.l.,59.645,1518,6176,Produzione industriale,Basilicata,,http://www.iocoli.com
+146,Steelhome S.r.l.,59.359,1023,4140,Costruzione e ingegneria,Veneto,,https://www.steelhome.it
+147,Teamservice S.r.l.,59.247,1743,7037,IT e software,Abruzzo,,https://tsv.it
+148,Guarda Medical S.r.l.,59.115,1150,4631,"Prodotti farmaceutici, biotecnologie e scienze della vita",Trentino-Alto Adige,,http://www.guardamedical.srl
+149,Dulàc Farmaceutici 1982 S.r.l.,59.11,2122,8548,"Prodotti farmaceutici, biotecnologie e scienze della vita",Piemonte,,https://www.dulacfarmaceutici.com
+150,BDP S.r.l.,58.92,3644,14624,Costruzione e ingegneria,Lombardia,,https://www.bdp-srl.it
+151,Bimon S.r.l.,58.898,509,2044,"Servizi professionali, scientifici e tecnici",Lazio,,https://bimon.it
+152,Monogrid S.r.l.,58.83,923,3699,IT e software,Toscana,,https://mono-grid.com
+153,Déco S.p.A.,58.804,7197,28821,Arredamento,Lombardia,,https://www.decodecking.it
+154,Co.Fal S.r.l.,58.607,782,3118,Costruzione e ingegneria,Piemonte,,https://cofal.it
+155,Italy Car Rent S.r.l.,58.522,9106,36272,Logistica e trasporto,Trentino-Alto Adige,,https://www.italycarrent.com
+156,Skills Consulting S.r.l.,58.289,1163,4614,Formazione,Campania,,https://www.skills.it
+157,Punto Parquet Toscana S.r.l.s.,58.15,591,2336,Costruzione e ingegneria,Toscana,,https://www.puntoparquetoscana.it
+158,Ekom S.r.l.,58.097,1320,5217,Smaltimento rifiuti & riciclo,Lombardia,,https://www.ekom.me
+159,Xilia S.r.l. (Xilia Wood Experience),58.076,769,3037,Arredamento,Veneto,,https://www.xiliawood.com
+160,Ciocomiti S.r.l.,57.913,527,2077,Cibo e bevande,Trentino-Alto Adige,,https://ciocomiti.com
+161,Esco Gas S.r.l.,57.654,533,2088,Energia e servizi pubblici,Calabria,,http://www.escogas.it
+162,Screen Pharma S.r.l.s.,57.579,583,2283,"Prodotti farmaceutici, biotecnologie e scienze della vita",Umbria,,https://www.screenitalia.it
+163,M.K. Trading S.r.l.,56.543,1915,7346,Cibo e bevande,Campania,,https://www.mktrading.it
+164,TMP Group S.p.A.,56.536,1521,5835,Pubblicità e marketing,Sicilia,,https://tmpgroup.it
+165,Sun-Times S.r.l.,56.421,2126,8137,Pubblicità e marketing,Lombardia,,https://www.suntimes.it
+166,OGA - One Generation Ahead S.r.l.,56.399,1934,7399,Commercio all'ingrosso,Lombardia,,http://www.ogasrl.com
+167,Diciolla S.r.l. (Energiasolare100),56.155,2317,8822,E-commerce,Puglia,,https://www.energiasolare100.com
+168,Sidea Group S.r.l.,55.909,1768,6700,IT e software,Puglia,,https://www.sideagroup.com
+169,U.G.A. Nutraceuticals S.r.l.,55.374,3873,14528,"Prodotti farmaceutici, biotecnologie e scienze della vita",Lombardia,,https://www.uganutraceuticals.com
+170,Everli S.p.A.,55.269,27725,103783,E-commerce,Lombardia,,https://it.everli.com
+171,Selferg S.r.l.,55.218,1816,6793,Energia e servizi pubblici,Puglia,,https://www.selferg.it
+172,In Situ S.r.l. (Check the present for the future),54.864,1503,5581,Costruzione e ingegneria,Friuli-Venezia Giulia,,https://proveinsitu.it
+173,Chianti Restorations S.r.l.,54.421,2916,10736,Costruzione e ingegneria,Lombardia,,https://chiantirestorations.com
+174,MySecretCase S.r.l.,54.256,2779,10201,E-commerce,Lombardia,,https://www.mysecretcase.com
+175,Zara S.r.l.,54.016,1561,5703,Produzione industriale,Marche,,n/a
+176,Diro Legno S.r.l.,53.173,1440,5175,Costruzione e ingegneria,Lazio,,https://www.dirolegno.com
+177,Manuel Costruzioni Generali S.r.l.,52.33,979,3460,Costruzione e ingegneria,Abruzzo,,http://www.manuelsrl.it
+178,Eligo S.p.A.,51.996,588,2063,Abbigliamento e moda,Lombardia,,https://eligo.style
+179,Storeis S.r.l.,51.979,1211,4251,Pubblicità e marketing,Veneto,,https://store.is
+180,Calicantus S.r.l.,51.971,4817,16908,Pubblicità e marketing,Veneto,,https://calicant.us
+181,Natural Food Service S.r.l.,51.303,11513,39879,Commercio all'ingrosso,Lazio,,https://naturalfoodservice.it
+182,Tecs S.r.l.,51.006,628,2162,Energia e servizi pubblici,Sicilia,,https://www.tecsweb.it
+183,Air Innovation S.r.l.,50.903,2322,7978,Costruzione e ingegneria,Emilia-Romagna,,https://www.air-innovation.it
+184,Ediltec S.r.l.,50.776,19069,65361,Costruzione e ingegneria,Emilia-Romagna,,https://www.ediltec.com
+185,Contents S.p.A.,50.673,1017,3479,IT e software,Lombardia,,https://www.contents.com
+186,Digital Angels S.r.l.,50.537,4839,16507,Pubblicità e marketing,Lazio,,https://digitalangels.com
+187,Besharp S.p.A.,50.37,1361,4629,IT e software,Lombardia,,https://www.besharp.it
+188,3E Studio S.r.l.,50.259,2766,9384,"Servizi professionali, scientifici e tecnici",Veneto,,https://www.3estudio.eu
+189,AITHO S.r.l.,50.045,490,1657,IT e software,Sicilia,,https://www.aitho.it
+190,BFP Service S.r.l.,49.985,1608,5427,Costruzione e ingegneria,Puglia,,https://bfpgroup.net
+191,Nethive S.p.A.,49.895,2388,8042,IT e software,Veneto,,https://www.nethive.it
+192,Secret Key S.r.l.,49.749,1040,3494,Pubblicità e marketing,Lazio,,https://www.secretkey.it
+193,Mirror Production S.r.l.,49.361,1079,3595,Pubblicità e marketing,Toscana,,https://www.mirror.it
+194,Seingim Global Service S.r.l.,49.308,8711,28996,Costruzione e ingegneria,Veneto,,https://www.seingim.it
+195,Centro Auto Ricambi S.r.l. (Riparti),49.149,2258,7490,Automotive,Sicilia,,https://officineriparti.it
+196,Zafferano S.r.l.,49.083,11172,37018,Arredamento,Veneto,,https://www.zafferanoitalia.com
+197,DVision Architecture S.r.l. (DVA),48.94,2577,8513,Costruzione e ingegneria,Lombardia,,https://dvisionarchitecture.com
+198,Arcipelago S.c.p.A.,48.723,18239,59997,Energia e servizi pubblici,Trentino-Alto Adige,,https://arcipelagoscpa.com
+199,One Click Tiles S.r.l. (Onetile),48.48,1323,4331,Vendita al dettaglio,Lombardia,,https://www.onetile.it
+200,Arpe Group S.r.l.,48.343,1376,4491,Consulenza manageriale,Lombardia,,https://www.arpegroup.it
+201,Cava International S.r.l. Unipersonale,48.314,12915,42134,Logistica e trasporto,Liguria,,https://cavasrl.eu
+202,Dog & Cat Megastore S.r.l.,48.273,1405,4580,E-commerce,Campania,,https://dogecatmegastore.com
+203,Cam.Edil S.r.l.,48.181,791,2574,Macchinari e attrezzature,Sicilia,,https://www.camedil.net
+204,Fattoretto S.r.l.,47.923,564,1826,Pubblicità e marketing,Veneto,,https://fattoretto.agency
+205,Fae Technology S.p.A. SB,47.821,12201,39411,Produzione industriale,Lombardia,,https://fae.technology
+206,Maco S.r.l.,47.675,3935,12673,Commercio all'ingrosso,Abruzzo,,http://macosrl.com
+207,Gesco S.p.A. Unipersonale,47.635,8624,27749,Energia e servizi pubblici,Toscana,,https://gesco.energy
+208,Gaia Emprise S.r.l.,47.328,1065,3407,"Servizi professionali, scientifici e tecnici",Basilicata,,https://www.gaiaemprise.com
+209,BrandUp Group S.p.A.,47.227,1766,5634,"Servizi professionali, scientifici e tecnici",Marche,,https://brandupgroup.it
+210,Agenzia Chimica Italiana S.r.l.,47.22,7463,23813,Prodotti chimici,Veneto,,https://agenziachimicaitaliana.it
+211,Netalia S.r.l.,46.95,1461,4636,IT e software,Liguria,,https://www.netalia.it
+212,Mint Italia S.r.l. (Mint Cool Cargo),46.746,1816,5740,Logistica e trasporto,Toscana,,https://www.mintitalia.com
+213,Kiwi Digital S.r.l.,46.722,2489,7863,Pubblicità e marketing,Lombardia,,https://kiwidigital.it
+214,CRMpartners S.r.l.,46.571,1025,3226,IT e software,Lazio,,https://www.crmpartners.it
+215,Upline S.r.l.,46.329,2386,7477,"Servizi professionali, scientifici e tecnici",Lombardia,,https://www.up-line.it
+216,Guzzini & Fontana Projects S.r.l.,46.201,1819,5684,Arredamento,Abruzzo,,https://guzziniefontana.it
+217,NuBeTech S.p.A.,46.16,1420,4435,IT e software,Lombardia,,https://www.nubetech.it
+218,Thruex S.r.l.,46.092,2706,8436,Logistica e trasporto,Lombardia,,https://thruex.com
+219,Hyntelo S.r.l.,46.002,2039,6345,IT e software,Lazio,,https://hyntelo.com
+220,Imaco S.p.A.,45.98,7810,24295,Costruzione e ingegneria,Lazio,,https://www.imacospa.com
+221,Cicli Lombardo S.p.A.,45.891,11505,35724,Vendita al dettaglio,Sicilia,,https://www.lombardobikes.com
+222,AS Labruna S.r.l.,45.855,8919,27675,Macchinari e attrezzature,Puglia,,https://www.aslabruna.it
+223,The Information Lab Italia S.r.l.,45.236,3001,9192,IT e software,Lombardia,,https://www.theinformationlab.it
+224,Corset&Co S.r.l.,45.036,6495,19815,Produzione industriale,Emilia-Romagna,,https://corset-co.it
+225,B&T Management S.r.l. (Mutika),45.023,6106,18624,Ospitalità e viaggi,Sicilia,,http://www.mutika.it
+226,Alta Costruzioni S.r.l.,44.819,1154,3506,Costruzione e ingegneria,Puglia,,https://www.altacostruzioni.it
+227,Farmed S.r.l.,44.805,4196,12742,"Prodotti farmaceutici, biotecnologie e scienze della vita",Campania,,https://www.farmedinternational.com
+228,Booster Box S.r.l.,44.749,1628,4938,Pubblicità e marketing,Toscana,,https://www.boosterboxdigital.com
+229,Pasqualone S.r.l.,44.698,2365,7166,Macchinari e attrezzature,Calabria,,https://pasqualone.linde-mh.it
+230,Serre S.r.l.,44.649,6227,18846,Cibo e bevande,Veneto,,https://proseccoserre.com
+231,Suedtirolnet S.r.l.,44.618,881,2665,Media e telecomunicazioni,Trentino-Alto Adige,,https://www.suedtirolnet.it
+232,Reparo S.r.l. (Latterie di Sardegna®),44.581,10904,32953,Cibo e bevande,Sardegna,,https://www.latteriedisardegna.com
+233,Leone S.r.l.,44.523,17107,51639,Smaltimento rifiuti & riciclo,Puglia,,https://www.leonemetalli.com
+234,Aksilia S.r.l.,44.49,575,1734,Consulenza manageriale,Lombardia,,https://aksiliagroup.com
+235,Willo S.r.l.,44.322,516,1551,IT e software,Puglia,,https://www.willo.it
+236,Voto Group S.r.l.,44.307,1448,4350,Costruzione e ingegneria,Campania,,https://www.votogroup.it
+237,Stella Group S.p.A.,44.305,9474,28468,Commercio all'ingrosso,Veneto,,https://stelbi.it
+238,ARS S.r.l. (Ars Automation),44.271,1963,5895,Macchinari e attrezzature,Toscana,,https://www.arsautomation.com
+239,Solarplay S.r.l.,44.086,9037,27033,Energia e servizi pubblici,Veneto,,https://www.solarplay.it
+240,Walliance S.p.A.,44.069,697,2083,"Fintech, servizi finanziari e assicurazioni",Trentino-Alto Adige,,https://www.walliance.it
+241,Sertec Engineering Consulting S.r.l.,43.801,1206,3585,Costruzione e ingegneria,Piemonte,,https://sertec-engineering.com
+242,Heca S.r.l. Unipersonale,43.387,615,1814,"Fintech, servizi finanziari e assicurazioni",Abruzzo,,https://www.hecamga.it
+243,Fifth Beat S.r.l.,43.272,1786,5253,IT e software,Campania,,https://fifthbeat.com
+244,The Italian Sea Group S.p.A.,43.215,100321,294684,Produzione industriale,Toscana,,https://theitalianseagroup.com
+245,Revo Costruzioni S.r.l.,43.146,2993,8778,Costruzione e ingegneria,Lombardia,,https://www.revocostruzioni.com
+246,Horizon Technology Group S.r.l.,42.858,2722,7937,Costruzione e ingegneria,Lazio,,https://www.horizontg.com
+247,Giglio.com S.p.A.,42.581,17633,51112,E-commerce,Lombardia,,https://www.giglio.com
+248,Integra S.r.l.,42.364,551,1589,Produzione industriale,Lombardia,,https://www.integra-automation.it
+249,Gusti d'Italia S.r.l.,42.04,2531,7253,Cibo e bevande,Piemonte,,https://gustiditalia.com
+250,Tecnoplast S.r.l.,41.989,24254,69429,Arredamento,Marche,,https://www.tecnoplastinfissi.com
+251,B1gas S.p.A.,41.818,20334,57997,Energia e servizi pubblici,Lazio,,https://www.b1gas.it
+252,SVS S.r.l.,41.612,8190,23260,Costruzione e ingegneria,Lombardia,,https://www.svs-srl.com
+253,Putetto S.r.l.,41.384,2025,5723,Costruzione e ingegneria,Piemonte,,http://www.putetto.it
+254,TMC Italia S.p.A.,41.286,4763,13433,Costruzione e ingegneria,Lombardia,,https://tmc-employeneurship.com
+255,Laelle Trasporti S.r.l.,41.269,1132,3191,Logistica e trasporto,Lombardia,,https://laelletrasporti.it
+256,Nemo Consulting S.r.l.,41.225,677,1907,Consulenza manageriale,Lombardia,,https://www.nemoconsulting.it
+257,Cobral S.r.l.,41.225,23727,66831,Produzione industriale,Lombardia,,https://www.cobral.eu
+258,Deolab S.r.l. (Horomia),41.136,1243,3494,Vendita al dettaglio,Lombardia,,https://www.horomia.it
+259,Geatop S.r.l.,41.03,1177,3303,"Servizi professionali, scientifici e tecnici",Piemonte,,https://geatop.it
+260,Logistic Service S.r.l.,40.965,752,2105,Logistica e trasporto,Lombardia,,https://www.logisticserviceitaly.it
+261,Munari Group S.r.l.,40.886,3200,8948,Energia e servizi pubblici,Veneto,,https://www.munarigroup.it
+262,Fonderie Pandolfo S.p.A.,40.842,96026,268276,Produzione industriale,Veneto,,https://www.fonderiepandolfo.com
+263,Effezeta System S.r.l.,40.841,4587,12815,Arredamento,Lazio,,https://www.effezetasystem.com
+264,Studio Eko' S.r.l.,40.742,2436,6790,Costruzione e ingegneria,Molise,,https://www.studioeko.biz
+265,Electroelsa S.r.l.,40.702,9341,26020,Macchinari e attrezzature,Toscana,,https://www.electroelsa.com
+266,Yocabè S.r.l.,40.643,1970,5479,E-commerce,Puglia,,https://www.yocabe.com
+267,Ottopuntozero S.r.l.,40.56,1580,4388,Arredamento,Abruzzo,,https://www.ottopuntozero.it
+268,Babylon Cloud S.p.A.,40.556,1020,2833,IT e software,Lazio,,https://www.babyloncloud.com
+269,C.G.M. Gruppi Elettrogeni S.r.l.,40.382,20035,55427,Macchinari e attrezzature,Veneto,,https://www.cgmitalia.it
+270,Time S.r.l.,40.25,1795,4952,Produzione industriale,Toscana,,https://www.timesrl.it
+271,PHSE S.r.l.,40.204,26585,73268,Logistica e trasporto,Lombardia,,https://phse.com
+272,TrenDevice S.p.A.,40.125,7208,19833,E-commerce,Lombardia,,https://www.trendevice.com
+273,Company Imball S.r.l.,39.993,1738,4768,Commercio all'ingrosso,Veneto,,https://www.companyimball.com
+274,Tieffe Group S.r.l.,39.814,4364,11926,Logistica e trasporto,Toscana,,https://www.tieffe-group.it
+275,Gallas Group S.r.l.,39.811,3086,8433,Servizi per l'impiego,Friuli-Venezia Giulia,,https://www.gallasgroup.it
+276,Selectra Italia S.p.A.,39.443,2360,6398,Energia e servizi pubblici,Lazio,,https://selectra.net
+277,Aleas Cosmetics S.r.l. (La Femme),39.317,601,1625,E-commerce,Marche,,https://www.aleascosmetics.com
+278,Appkeep S.r.l.,39.231,1048,2829,"Servizi professionali, scientifici e tecnici",Lombardia,,https://appkeep.it
+279,Comal S.p.A.,39.212,22649,61105,Energia e servizi pubblici,Lazio,,https://www.comalgroup.com
+280,Cast Group S.r.l.,39.163,3800,10242,Macchinari e attrezzature,Veneto,,https://www.cast-group.it
+281,IMEC Service S.r.l.,39.103,3323,8945,Media e telecomunicazioni,Umbria,,http://www.imecservice.it
+282,F.M. Trasporti S.r.l. (FMT),39.086,8444,22719,Logistica e trasporto,Lazio,,https://fmtrasporti.com
+283,Renantis S.p.A. (precedentemente Falck Renewables),39.041,347494,934067,Energia e servizi pubblici,Lombardia,,https://renantis.com
+284,Nicolis Project S.r.l.,38.893,15268,40910,IT e software,Veneto,,https://www.nicolisproject.com
+285,Podium Engineering S.r.l. (Podium Advanced Technologies),38.837,9321,24943,Automotive,Valle d'Aosta,,https://www.podium-tech.com
+286,Ruffato Mario S.r.l.,38.795,9102,24335,Costruzione e ingegneria,Veneto,,https://www.ruffatomario.it
+287,Smart People S.r.l.,38.661,3671,9787,Energia e servizi pubblici,Puglia,,https://www.smartpeoplesrl.it
+288,Active Technologies S.r.l.,38.577,1195,3180,Produzione industriale,Emilia-Romagna,,https://www.activetechnologies.it
+289,DyFlowing S.r.l.,38.31,1646,4355,IT e software,Lombardia,,https://www.dyflowing.com
+290,I-Vet S.r.l.,38.266,1647,4355,"Prodotti farmaceutici, biotecnologie e scienze della vita",Lombardia,,https://i-vet.it
+291,I.T.E. S.r.l.,38.211,6773,17881,Energia e servizi pubblici,Lazio,,https://www.ite-srl.it
+292,Claranet S.r.l. (Claranet IT),38.042,2737,7201,IT e software,Lombardia,,https://www.claranet.it
+293,Burgez S.r.l.,37.933,4553,11948,Cibo e bevande,Lombardia,,https://burgez.com
+294,Tikato S.r.l. (Discoup.com),37.933,1493,3919,Pubblicità e marketing,Veneto,,https://corporate.discoup.com
+295,Leomed S.r.l.,37.673,712,1857,Commercio all'ingrosso,Liguria,,http://www.leomed.it
+296,ODB S.r.l. (ODB Magneti),37.628,962,2507,Produzione industriale,Lombardia,,https://www.odbmagneti.com
+297,Spotview S.r.l.,37.523,1299,3379,Pubblicità e marketing,Emilia-Romagna,,https://www.spotview.it
+298,Lionard S.p.A. (Lionard Luxury Real Estate),37.511,10312,26814,Beni immobili,Toscana,,https://www.lionard.com
+299,Ipses S.r.l.,37.508,1001,2603,Macchinari e attrezzature,Lombardia,,https://www.ipses.com
+300,Centro Sistemi Innovativi S.r.l. (Buffa Store),37.081,3686,9495,Commercio all'ingrosso,Sicilia,,https://www.buffastore.it
+301,Elettro A.M. S.a.s. Ardian Mezini & Co,37.035,1364,3509,Produzione industriale,Trentino-Alto Adige,,http://www.elettroam.it
+302,Reverse S.p.A.,36.842,3694,9465,Servizi per l'impiego,Lombardia,,https://reverse.hr
+303,We Exhibit S.r.l.,36.723,2660,6797,"Servizi professionali, scientifici e tecnici",Veneto,,https://www.weexhibit.biz
+304,SMA Road Safety S.r.l.,36.464,4431,11260,Costruzione e ingegneria,Campania,,https://www.smaroadsafety.com
+305,MoreToTrade S.r.l.,36.351,641,1625,Cibo e bevande,Toscana,,https://olico.it
+306,Phronema S.r.l.,36.315,1400,3546,"Prodotti farmaceutici, biotecnologie e scienze della vita",Puglia,,http://www.phronema.it
+307,Gea Service S.r.l.,36.302,4160,10535,Smaltimento rifiuti & riciclo,Lombardia,,https://www.geaservicesrl.it
+308,Tenute Piccini S.p.A.,36.244,54166,136988,Cibo e bevande,Toscana,,https://www.piccini1882.it
+309,Cherry Bank S.p.A.,36.049,24298,61187,"Fintech, servizi finanziari e assicurazioni",Veneto,,https://www.cherrybank.it
+310,Sistec Impianti S.r.l.,35.99,835,2099,Energia e servizi pubblici,Molise,,n/a
+311,Farmacia S.Caterina S.r.l.,35.969,41684,104782,"Prodotti farmaceutici, biotecnologie e scienze della vita",Campania,,https://www.docpeter.it
+312,Wellynx S.r.l.,35.894,1514,3799,Energia e servizi pubblici,Abruzzo,,https://www.wellynx.com
+313,Alba S.r.l.,35.885,2578,6469,Energia e servizi pubblici,Veneto,,https://www.albaimpianti.it
+314,Italtekno S.r.l.,35.842,938,2351,Energia e servizi pubblici,Sicilia,,https://www.italtekno.com
+315,La Rosa dei Venti - Società cooperativa di servizi,35.802,3812,9548,Logistica e trasporto,Lazio,,https://www.gruppolameridiana.com
+316,VoipVoice S.r.l.,35.744,4125,10318,Media e telecomunicazioni,Toscana,,https://www.voipvoice.it
+317,Saico S.r.l.,35.743,4785,11968,Costruzione e ingegneria,Lazio,,https://www.saicosrl.com
+318,NexumStp S.p.A.,35.534,19822,49351,Consulenza manageriale,Lazio,,https://nexumstp.it
+319,RGM Commerciale S.r.l.,35.513,2764,6879,Macchinari e attrezzature,Emilia-Romagna,,https://www.rgmcommerciale.it
+320,Pilastro S.r.l.,35.34,3163,7840,Logistica e trasporto,Lazio,,https://www.pilastrosrl.it
+321,Generalcostruzioni S.r.l.,35.183,1614,3987,Costruzione e ingegneria,Toscana,,n/a
+322,Freedom in Sales S.r.l.,35.132,5349,13198,Logistica e trasporto,Lombardia,,http://www.freedominsales-fis.it
+323,Laca Trade S.r.l.,35.072,18557,45731,Commercio all'ingrosso,Lombardia,,http://www.lacatrade.com
+324,Gruppo Santamaria S.p.A.,35.049,1373,3383,"Fintech, servizi finanziari e assicurazioni",Lombardia,,https://www.grupposantamaria.it
+325,Openapi S.p.A.,34.944,1645,4043,IT e software,Lazio,,https://openapi.it
+326,Maxfel S.r.l.,34.936,1735,4262,Arredamento,Veneto,,https://maxfelsrl.it
+327,Marlegno S.r.l.,34.867,13703,33615,Costruzione e ingegneria,Lombardia,,https://www.marlegno.it
+328,Xceed S.r.l.,34.735,1205,2948,Tempo libero e divertimento,Lombardia,,https://xceed.me
+329,Tservice S.p.A.,34.714,24068,58841,Logistica e trasporto,Lombardia,,https://tservicespa.com/
+330,Systab S.r.l.,34.635,1250,3050,Costruzione e ingegneria,Emilia-Romagna,,https://www.systab.it
+331,Gruppo Legno S.r.l.,34.588,2286,5572,Produzione industriale,Abruzzo,,https://www.gruppolegno.it
+332,CMC S.r.l. (CMC The Specialift),34.436,24059,58455,Macchinari e attrezzature,Puglia,,https://www.cmclift.com
+333,Chemical Newtech S.p.A.,34.391,6432,15612,Macchinari e attrezzature,Lombardia,,https://www.chemicalnewtech.com
+334,Bylogix S.r.l.,34.366,1648,3998,Automotive,Lazio,,https://www.bylogix.it
+335,Tenda Sistem S.r.l.,34.363,6235,15123,Costruzione e ingegneria,Puglia,,https://www.tendasistem.it
+336,Gwp S.r.l. (Creativa GWP),34.335,730,1770,Pubblicità e marketing,Lombardia,,https://www.gwpcreativa.com
+337,WR57 S.r.l.,34.333,9839,23850,Macchinari e attrezzature,Emilia-Romagna,,https://wr57.it
+338,Fairmat S.r.l.,34.182,3056,7383,IT e software,Veneto,,https://www.fairmat.com
+339,TECMA Solutions S.p.A.,33.958,4280,10288,IT e software,Lombardia,,https://www.tecmasolutions.com
+340,Cianciosi Trasporti e Servizi S.r.l.,33.862,2113,5067,Logistica e trasporto,Abruzzo,,https://www.cianciosigroup.com
+341,Blu Appalti S.r.l.,33.756,2157,5161,Costruzione e ingegneria,Abruzzo,,https://www.bluappalti.it
+342,Nobento S.p.A.,33.572,17916,42697,Arredamento,Sardegna,,https://www.nobento.it
+343,PRSE S.r.l. SB,33.451,1812,4307,Macchinari e attrezzature,Lombardia,,https://www.prse-srl.com
+344,GIA.CRI. S.r.l.,33.418,4867,11559,Vendita al dettaglio,Sardegna,,n/a
+345,Kredias S.p.A.,33.401,888,2109,"Fintech, servizi finanziari e assicurazioni",Puglia,,https://www.kredias.it
+346,Koki S.r.l. (Kopy Print+Gadget),33.244,989,2339,Pubblicità e marketing,Friuli-Venezia Giulia,,https://www.kokigroup.it
+347,Beper S.r.l.,33.244,6649,15729,Vendita al dettaglio,Veneto,,https://www.beper.com
+348,Biogem S.c.a.r.l.,33.213,1261,2981,"Prodotti farmaceutici, biotecnologie e scienze della vita",Campania,,https://www.biogem.it
+349,Asterisco S.r.l.,33.163,784,1852,Pubblicità e marketing,Piemonte,,https://www.asteriscocreativeagency.com
+350,Namirial S.p.A.,33.047,28836,67913,IT e software,Marche,,https://www.namirial.com
+351,Man Buildings S.r.l.,32.915,6520,15310,Costruzione e ingegneria,Emilia-Romagna,,https://manbuildings.com
+352,Sia-Mpl S.r.l.,32.864,4619,10833,Produzione industriale,Emilia-Romagna,,https://www.siampl.it
+353,FiloBlu S.p.A.,32.642,39190,91458,Consulenza manageriale,Veneto,,https://filoblu.com/it
+354,Joker Imballaggi S.r.l.,32.64,1855,4330,Produzione industriale,Puglia,,https://jokerimballaggi.it
+355,Mack & Schühle Italia S.p.A.,32.592,44293,103250,Cibo e bevande,Puglia,,https://mus.it
+356,C.E.V. Consorzio Edili Veneti Soc. Coop.,32.547,7225,16825,Costruzione e ingegneria,Veneto,,https://www.consorziocev.com
+357,Wikicasa S.r.l.,32.499,1213,2822,IT e software,Lombardia,,https://www.wikicasa.it/
+358,Sbamm S.r.l. (Babylino Sensitive),32.484,1620,3766,E-commerce,Abruzzo,,https://www.babylinoshop.com
+359,HF S.r.l. (Accaeffe Building Solutions),32.465,1368,3179,Costruzione e ingegneria,Lombardia,,https://accaeffe.it
+360,Stern Energy S.p.A.,32.421,8955,20793,Energia e servizi pubblici,Emilia-Romagna,,https://www.stern-energy.com
+361,Beond S.r.l.,32.376,882,2045,Automotive,Piemonte,,https://www.beond.net
+362,Maestri S.p.A. (Maestri della Grandine),32.337,20099,46581,Automotive,Piemonte,,https://www.maestridellagrandine.com
+363,Tecnos S.r.l.,32.239,7563,17489,Produzione industriale,Lombardia,,https://www.tecnoslamiere.it
+364,ccelera S.r.l.,32.133,6032,13916,IT e software,Veneto,,https://www.ccelera.com
+365,Deltha Pharma S.r.l.,31.539,887,2020,"Prodotti farmaceutici, biotecnologie e scienze della vita",Lazio,,https://delthapharma.com
+366,HTR Bonifiche S.r.l.,31.333,18124,41055,Smaltimento rifiuti & riciclo,Lazio,,https://gruppohtr.com
+367,Ristoservice S.r.l.,31.229,7483,16910,Cibo e bevande,Lombardia,,https://www.risto-service.it
+368,Union Energy Group S.r.l. (UEG S.r.l.),31.224,76108,171974,Energia e servizi pubblici,Lombardia,,https://www.uniongaseluce.it
+369,Mated S.r.l.,31.205,1162,2624,"Servizi professionali, scientifici e tecnici",Trentino-Alto Adige,,https://www.mated.it
+370,Keytech S.r.l.,31.057,3084,6942,IT e software,Lazio,,https://www.keytech.srl
+371,Amil Care Italia S.r.l.,31.016,880,1978,"Prodotti farmaceutici, biotecnologie e scienze della vita",Lombardia,,https://www.amil-care.com
+372,Windor S.r.l.,31.002,3890,8746,Arredamento,Puglia,,https://www.windor.it
+373,Future Age S.r.l.,30.98,1488,3345,Consulenza manageriale,Lombardia,,https://www.future-age.eu
+374,Dal Prete Engineering S.r.l.,30.961,1362,3060,Produzione industriale,Veneto,,https://www.dalprete.com
+375,Whatwapp Entertainment S.r.l. (Whatwapp),30.647,3606,8041,IT e software,Lombardia,,https://whatwapp.com
+376,JPS S.r.l.,30.607,1266,2820,Consulenza manageriale,Toscana,,https://www.jpsconsulting.it
+377,Pezzilli & Company S.r.l.,30.585,1716,3821,Consulenza manageriale,Lazio,,https://pezzilli.com
+378,Nutis S.r.l. (Caffè Barbaro),30.531,5057,11247,Cibo e bevande,Campania,,https://caffebarbaro.it
+379,Deghi S.p.A.,30.49,40593,90196,E-commerce,Puglia,,https://www.deghi.it
+380,Ames Centro Polidiagnostico Strumentale S.r.l.,30.466,18638,41390,Servizi sanitari e sociali,Lombardia,,http://www.centroames.it
+381,Time Vision S.c.a.r.l.,30.44,3049,6768,Formazione,Campania,,https://www.timevision.it
+382,Verisure Italy S.r.l.,30.418,80074,177625,"Servizi professionali, scientifici e tecnici",Lazio,,https://www.verisure.it
+383,Mercurio S.r.l.,30.308,6816,15082,Costruzione e ingegneria,Lombardia,,https://www.mercurio-group.com
+384,Quantyca S.p.A.,30.193,3658,8071,IT e software,Lombardia,,https://www.quantyca.it
+385,Sergio Bassan S.r.l.,30.176,46500,102576,"Agricoltura, silvicoltura e pesca",Veneto,,https://www.bassan.com
+386,Social & Impact S.r.l. SB,30.1,1100,2422,Pubblicità e marketing,Lazio,,https://www.lucalamesa.com
+387,Increso S.r.l.,30.023,1958,4304,Consulenza manageriale,Lazio,,https://increso.it
+388,Tecnicar S.r.l.,30.008,1332,2927,Automotive,Lombardia,,https://www.tecnicaritalia.it
+389,Gea - Società cooperativa Di Servizi,29.974,799,1754,Servizi per l'impiego,Lazio,,https://www.gruppolameridiana.com
+390,Seriana Edilizia S.r.l.,29.736,5829,12729,Costruzione e ingegneria,Lombardia,,https://www.serianaedilizia.it
+391,Yolo Group S.p.A.,29.507,1752,3805,"Fintech, servizi finanziari e assicurazioni",Lombardia,,https://yolo-insurance.com
+392,Mylav S.r.l.,29.393,5533,11986,Servizi sanitari e sociali,Puglia,,https://www.mylav.net
+393,Panificio Battacone S.r.l.,29.332,2403,5199,Cibo e bevande,Sardegna,,https://www.panificiobattacone.it
+394,MM Operations S.r.l.,29.249,23864,51526,Logistica e trasporto,Emilia-Romagna,,https://mmoperations.it
+395,Rebecca S.r.l. (Mobili Rebecca),29.032,3852,8274,E-commerce,Marche,,https://www.mobilirebecca.it
+396,Instilla S.r.l.,29.002,2156,4627,Pubblicità e marketing,Lombardia,,https://www.instilla.it
+397,Mastech S.r.l.,28.927,1871,4009,"Servizi professionali, scientifici e tecnici",Piemonte,,https://www.mastechsrl.it
+398,Co.Fo.Me.Gra. S.r.l.,28.742,2467,5264,Macchinari e attrezzature,Lombardia,,https://cofomegra.it
+399,Mazzoni Etech S.r.l.,28.737,1812,3866,Produzione industriale,Lombardia,,https://www.m-etech.eu
+400,Le Delizie del Sud S.r.l.,28.661,34623,73740,Cibo e bevande,Campania,,https://ledeliziedelsud.it
+401,Fornace S.Anselmo S.r.l.,28.592,16744,35605,Produzione industriale,Veneto,,https://santanselmo.it
+402,Polistamp Infissi S.r.l.,28.54,20096,42681,Arredamento,Toscana,,https://www.polistampinfissi.it
+403,Perelli Consulting S.r.l.,28.494,1407,2984,Consulenza manageriale,Lombardia,,https://perelliconsulting.com
+404,Redbox S.r.l.,28.385,13141,27808,Produzione industriale,Lazio,,https://redbox.it
+405,Errevi Automation S.r.l.,28.29,8970,18940,Logistica e trasporto,Emilia-Romagna,,https://www.erreviautomation.com
+406,Gummy Industries S.r.l.,28.274,1491,3147,Pubblicità e marketing,Lombardia,,https://gummyindustries.com
+407,Finauto S.p.A.,28.242,9193,19389,Automotive,Toscana,,https://www.finautoprato.it
+408,Visualitics S.r.l.,28.213,1778,3746,IT e software,Piemonte,,https://www.visualitics.it
+409,Westrafo S.r.l.,28.152,21083,44372,Energia e servizi pubblici,Veneto,,https://www.westrafo.com
+410,A.B. Pharm S.r.l.,28.147,3086,6493,"Prodotti farmaceutici, biotecnologie e scienze della vita",Sicilia,,https://abpharm.net
+411,Lovemark S.p.A.,28.002,1151,2414,Pubblicità e marketing,Emilia-Romagna,,https://lovemark.it
+412,Eudata S.r.l. SB,27.948,3824,8010,IT e software,Lombardia,,https://eudata.com
+413,Power Marine Shipyard S.r.l.,27.948,8020,16799,Costruzione e ingegneria,Toscana,,http://www.powermarine.it
+414,Team Web S.r.l. (Bestdigit.it),27.914,5171,10822,E-commerce,Lazio,,https://www.bestdigit.it
+415,Archita Engineering S.r.l.,27.894,2299,4809,Consulenza manageriale,Emilia-Romagna,,https://www.architaengineering.it
+416,IQM selezione S.r.l.,27.832,1861,3888,Servizi per l'impiego,Lombardia,,https://www.iqmselezione.it
+417,MFC S.r.l.,27.786,21256,44354,Cibo e bevande,Campania,,https://www.mfccarni.com
+418,Techind S.r.l.,27.763,12364,25785,Macchinari e attrezzature,Lombardia,,https://techindsrl.it
+419,Nord Est Elevatori S.r.l.,27.638,3704,7702,Macchinari e attrezzature,Veneto,,https://www.nordestelevatori.com
+420,Fae Group S.p.A.,27.61,71020,147581,Macchinari e attrezzature,Trentino-Alto Adige,,https://www.fae-group.com
+421,Bio Clima Service S.r.l.,27.599,1329,2761,"Servizi professionali, scientifici e tecnici",Lombardia,,https://bioclimaservice.it
+422,GSR Technology Italy S.r.l.,27.519,9488,19674,Produzione industriale,Lombardia,,https://www.gsr-technology.it
+423,Realty Advisory S.p.A. (Coldwell Banker Commercial Italy),27.417,2501,5173,Beni immobili,Lombardia,,https://cbcommercial.it
+424,Megaride S.r.l.,27.295,911,1878,Automotive,Campania,,https://www.megaride.eu
+425,Eelectron S.p.A.,27.281,6090,12557,IT e software,Lombardia,,https://www.eelectron.com
+426,Gruppo Tera S.r.l. (Esplodia),27.233,12972,26719,E-commerce,Campania,,https://www.esplodia.com
+427,MGvision S.r.l.,27.191,2077,4275,Pubblicità e marketing,Lazio,,https://www.mgvision.com
+428,Viaggia Quasi Gratis S.r.l.,27.113,2222,4564,Ospitalità e viaggi,Campania,,http://viaggiaquasigratis.com
+429,Mia S.r.l. (Mia-Platform),27.089,4956,10173,IT e software,Lombardia,,https://mia-platform.eu
+430,Secur Impianti S.r.l.,26.879,1116,2279,"Servizi professionali, scientifici e tecnici",Lazio,,https://www.securimpianti.it
+431,System Car S.r.l.,26.824,1604,3273,Automotive,Lombardia,,n/a
+432,C&P S.r.l.,26.748,7891,16069,"Servizi professionali, scientifici e tecnici",Piemonte,,https://www.candpgroup.it
+433,Blue Ocean Finance S.p.A.,26.74,1285,2616,Consulenza manageriale,Lazio,,https://www.blueoceanfinance.it
+434,Altitudo S.r.l.,26.734,5626,11451,IT e software,Veneto,,https://www.altitudo.com
+435,Activa S.r.l.,26.702,2402,4886,Prodotti chimici,Calabria,,https://www.activasrl.com
+436,Meuli Infissi S.r.l.,26.642,1429,2903,Arredamento,Puglia,,https://meulinfissi.com
+437,Qascom S.r.l.,26.531,2496,5055,Aerospaziale e difesa,Veneto,,https://www.qascom.it
+438,Univiti S.r.l.,26.5,2577,5218,Commercio all'ingrosso,Veneto,,https://www.univiti.it
+439,Impresa Duci S.r.l.,26.464,8326,16840,Costruzione e ingegneria,Lombardia,,http://www.impresaduci.it
+440,Almac S.p.A. (AlmaCrawler),26.46,13437,27173,Macchinari e attrezzature,Emilia-Romagna,,https://www.almac-italia.com
+441,IWE S.r.l. (IWE Industrial Water Evaporators),26.422,5579,11273,Macchinari e attrezzature,Lombardia,,https://www.iwe-evaporators.com
+442,Etracom S.r.l. (Materassiedoghe),26.404,9046,18271,E-commerce,Lombardia,,https://www.materassiedoghe.eu
+443,RTT S.r.l.,26.256,3561,7168,IT e software,Lombardia,,https://www.rtt.it
+444,Relizont S.p.A.,26.235,24718,49723,Servizi per l'impiego,Lombardia,,https://www.relizont.it
+445,Caldara Plast S.r.l.,25.969,13888,27761,Smaltimento rifiuti & riciclo,Lombardia,,https://www.caldara.it
+446,Falcor S.r.l.,25.966,2687,5370,Produzione industriale,Lombardia,,https://www.falcorpresse.it
+447,We-Unit Group S.p.A.,25.938,10976,21925,"Fintech, servizi finanziari e assicurazioni",Liguria,,https://www.weunit.it
+448,Green Media Lab S.r.l. SB,25.882,1644,3279,Pubblicità e marketing,Lombardia,,https://greenmedialab.com
+449,Proteko S.p.A.,25.854,5266,10498,"Servizi professionali, scientifici e tecnici",Veneto,,https://www.proteko.it
+450,Dils S.p.A.,25.841,28329,56454,Beni immobili,Lombardia,,https://dils.com
+451,Technonicol Italia S.r.l. (Italiana Membrane),25.816,23700,47201,Prodotti chimici,Friuli-Venezia Giulia,,https://www.technonicol.it
+452,Tera Automation S.r.l.,25.699,3275,6504,Produzione industriale,Toscana,,https://www.tera-automation.com
+453,Euroflex S.p.A.,25.473,40311,79629,Produzione industriale,Campania,,https://www.euroflexspa.it
+454,E.S.A. engineering S.r.l.,25.446,13865,27371,Costruzione e ingegneria,Toscana,,https://esa-engineering.it
+455,Cereria Terenzi Evelino S.r.l.,25.212,17399,34155,Produzione industriale,Emilia-Romagna,,https://cereriaterenzi.com
+456,2A Engineering S.r.l.,25.1,2656,5200,"Servizi professionali, scientifici e tecnici",Lombardia,,https://www.2a-group.it
+457,Work Secure S.r.l.,24.861,1785,3476,E-commerce,Umbria,,https://www.worksecure.it
+458,Oleificio Zucchi S.p.A. (Zucchi),24.853,194525,378589,Cibo e bevande,Lombardia,,https://www.oleificiozucchi.it
+459,Centro Vendite Esagono S.r.l.,24.847,3969,7724,Arredamento,Campania,,https://esagonoceramiche.com
+460,Impre.DO S.p.A. SB,24.8,23139,44977,Costruzione e ingegneria,Lazio,,https://www.impredo.it
+461,Scart Imballaggi S.r.l.,24.798,13289,25830,Produzione industriale,Toscana,,https://grupposcart.com
+462,Join Business Management Consulting S.r.l.,24.731,6156,11947,Consulenza manageriale,Toscana,,https://www.joinbusinessmc.com
+463,Gest Project General Contractor S.r.l.,24.699,2730,5293,Costruzione e ingegneria,Piemonte,,https://gestproject.com
+464,Techbau S.p.A.,24.634,155227,300522,Costruzione e ingegneria,Lombardia,,https://www.techbau.it
+465,Webranking S.r.l.,24.59,21296,41185,Pubblicità e marketing,Emilia-Romagna,,https://webranking.it
+466,Enenso S.r.l.,24.574,3260,6302,Energia e servizi pubblici,Lombardia,,https://www.enenso.it
+467,Magnetic Media Network S.p.A. (MMN),24.532,33770,65217,IT e software,Lombardia,,https://www.mmn.it
+468,Consorzio Stabile Agoraa S.c.a.r.l.,24.526,11950,23076,Costruzione e ingegneria,Sicilia,,https://www.agoraa.it
+469,LMM Logistics S.p.A.,24.526,11497,22200,Logistica e trasporto,Piemonte,,https://lmmlogistics.com
+470,Tecnomacchine S.r.l.,24.479,4850,9355,Macchinari e attrezzature,Toscana,,https://www.venditaescavatori.it
+471,La Risorsa Umana.it S.r.l.,24.458,5362,10337,Servizi per l'impiego,Emilia-Romagna,,https://www.larisorsaumana.it
+472,Hd Casa S.r.l.,24.41,1174,2260,E-commerce,Campania,,https://hdcasa.it
+473,Color Max S.r.l.,24.305,7744,14874,Commercio all'ingrosso,Abruzzo,,https://www.colormax.it
+474,Esosphera S.r.l. (Gaia by Esosphera),24.28,2132,4093,IT e software,Veneto,,https://www.esosphera.com
+475,Galvanica Formelli S.r.l.,24.226,12147,23286,Produzione industriale,Toscana,,https://www.galvanicaformelli.net
+476,Volo.com S.r.l.,24.225,2588,4962,IT e software,Lombardia,,https://www.volocom.it
+477,Smile Ambiente S.r.l.,24.2,2895,5546,Smaltimento rifiuti & riciclo,Toscana,,http://www.smileambiente.it
+478,Alpenite S.r.l.,24.149,14305,27373,IT e software,Veneto,,https://www.alpenite.com
+479,Theras Biocare S.r.l.,24.14,19119,36575,"Prodotti farmaceutici, biotecnologie e scienze della vita",Emilia-Romagna,,https://www.theras-group.com
+480,Cura Farma S.r.l.,24.06,2662,5082,"Prodotti farmaceutici, biotecnologie e scienze della vita",Campania,,https://www.curafarma.it
+481,Co2save S.r.l.,24.019,1792,3419,Energia e servizi pubblici,Lombardia,,https://www.co2save.it
+482,Transporent S.r.l.,23.888,3416,6495,Logistica e trasporto,Puglia,,https://www.transporentsrl.it
+483,Gemco S.r.l.,23.875,2724,5177,Costruzione e ingegneria,Emilia-Romagna,,https://www.gemcoengineering.it
+484,Consorzio Art.E.A. Alto Vicentino,23.83,2197,4172,Costruzione e ingegneria,Veneto,,https://www.consorzioartea.it
+485,Vegan Solutions S.r.l.,23.819,4496,8534,IT e software,Veneto,,https://www.vegans.it
+486,Great Place to Work Institute Italia S.r.l.,23.747,2007,3804,Consulenza manageriale,Lombardia,,https://www.greatplacetowork.it
+487,All S.r.l. (ALL Communication),23.698,8299,15708,Pubblicità e marketing,Lombardia,,http://www.allcommunication.it
+488,C.G.F. S.r.l. (Gruppo Cipriano),23.644,5762,10892,Smaltimento rifiuti & riciclo,Campania,,https://www.cgfsrl.eu
+489,Edil San Felice S.p.A.,23.572,17903,33783,Costruzione e ingegneria,Campania,,https://www.edilsanfelice.it
+490,Moveo Servizi S.p.A.,23.562,3720,7017,Produzione industriale,Lombardia,,http://moveoservizi.com
+491,M&W Veronesi e Associati S.r.l. STP,23.542,1507,2842,"Servizi professionali, scientifici e tecnici",Emilia-Romagna,,https://mwassociati.it
+492,Digitalpa S.r.l.,23.475,1819,3425,IT e software,Sardegna,,https://www.digitalpa.it
+493,MSA S.r.l. (We are MSA),23.452,4297,8085,"Servizi professionali, scientifici e tecnici",Lombardia,,https://wearemsa.it
+494,Aesse Vita S.r.l.,23.435,1823,3429,Costruzione e ingegneria,Toscana,,https://www.lvlineevita.it
+495,Casta S.r.l.,23.431,29349,55190,Produzione industriale,Puglia,,https://castasrl.it
+496,Frau Pharma S.r.l.,23.263,2757,5164,"Prodotti farmaceutici, biotecnologie e scienze della vita",Lombardia,,http://www.fraupharma.com
+497,Ayes S.r.l.,23.2,8394,15696,Costruzione e ingegneria,Lombardia,,https://www.ayesconsulting.com
+498,Dynamicom Education S.r.l.,23.137,8922,16659,Formazione,Lombardia,,https://dynamicom-education.it
+499,BGP Group S.r.l.,23.023,15918,29639,Arredamento,Lombardia,,https://bgptrading.com
+500,Tecnovati Com S.r.l.,22.989,1696,3155,Produzione industriale,Toscana,,https://www.tecnovati.it
