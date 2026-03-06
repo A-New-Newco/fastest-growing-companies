@@ -28,25 +28,13 @@ RUN_RESET: bool = False
 # Maximum parallel workers (companies processed per batch)
 RUN_MAX_CONCURRENCY: int = 4
 
-# Minimum workers when auto-throttle scales down
-RUN_MIN_CONCURRENCY: int = 1
-
 # Max attempts per company (first attempt included)
 RUN_MAX_RETRIES: int = 3
 
 # Exponential backoff base delay for retries
 RUN_RETRY_BASE_DELAY: float = 2.0
 
-# Dynamically adapt concurrency based on rate-limit signals
-RUN_AUTO_THROTTLE: bool = True
-
-# Consecutive clean batches required before scaling up workers
-RUN_THROTTLE_RECOVERY_BATCHES: int = 2
-
-# Seconds to wait between batches (respect Pro plan rate limits)
-DELAY_BETWEEN_BATCHES: float = 1.0
-
-MODEL: str = "claude-haiku-4-5-20251001"
+MODEL: str = "claude-sonnet-4-6"
 
 import asyncio
 import csv
@@ -102,32 +90,77 @@ class CompanyOutcome:
 # ---------------------------------------------------------------------------
 
 
-def _build_prompt(company_name: str, website_url: str) -> str:
+LEGAL_SUFFIXES = re.compile(
+    r"\s*\b(S\.r\.l\.?\s*SB|S\.r\.l\.?|S\.p\.A\.?|S\.a\.s\.?|S\.n\.c\.?|S\.S\.?|S\.r\.l\.s\.?)\s*$",
+    re.IGNORECASE,
+)
+
+
+def _clean_company_name(name: str) -> str:
+    """Strip legal suffixes (S.r.l., S.p.A., etc.) for cleaner web searches."""
+    return LEGAL_SUFFIXES.sub("", name).strip()
+
+
+def _build_prompt(company_name: str, website_url: str, revenue_k: int | None = None) -> str:
     url_line = f"Website: {website_url}" if website_url and website_url.lower() not in ("", "n/a") else "Website: not available"
-    return f"""Find the CFO or head of finance for this Italian company: {company_name}
+    clean_name = _clean_company_name(company_name)
+
+    # Small companies (< 5M€ revenue) rarely have a dedicated CFO
+    is_small = revenue_k is not None and revenue_k < 5000
+
+    if is_small:
+        size_hint = (
+            "This is a SMALL Italian company — it very likely does NOT have a dedicated CFO. "
+            "The person who manages finances is probably the Amministratore Delegato, "
+            "Amministratore Unico, or the owner. That is an acceptable answer."
+        )
+    else:
+        size_hint = (
+            "This company may have a dedicated CFO or finance director. "
+            "Search for that first, but if none exists, the Amministratore Delegato or "
+            "owner who handles finances is also acceptable (with low confidence)."
+        )
+
+    return f"""Find the person responsible for finance management at this Italian company: {company_name}
 {url_line}
 
-Follow this search strategy in order:
-1. WebSearch: "{company_name}" CFO OR "direttore finanziario" OR DAF OR "finance director" OR "chief financial officer"
-2. If no result, WebFetch the company website (try paths: /chi-siamo, /team, /management, /about, /leadership, /organigramma)
-3. If still nothing, WebSearch: "{company_name}" CFO site:linkedin.com
-4. Last resort: WebSearch: "{company_name}" ("responsabile finanziario" OR "financial director") -site:linkedin.com
+{size_hint}
 
-You are looking for the person responsible for the company finances. The title can be in
-Italian (CFO, DAF, Direttore Finanziario, Responsabile Finanziario, Direttore Amministrativo
-e Finanziario) or English (CFO, Finance Director, Head of Finance, VP Finance, Financial
-Controller, Treasurer, Finance Manager). If you find a role that plausibly covers finance
-leadership even with an unusual title, include it with low confidence.
+SEARCH STRATEGY — run these searches. Do NOT stop after the first failed search.
+
+Step 1 — Targeted finance role searches (run at least 2 of these):
+  a) WebSearch: "{clean_name}" "direttore finanziario" OR CFO OR DAF
+  b) WebSearch: "{clean_name}" CFO site:linkedin.com
+  c) WebSearch: "{clean_name}" "responsabile amministrativo" OR "finance manager"
+
+Step 2 — Company team/management page:
+  WebFetch the company website and look for team/management pages:
+  Try: /chi-siamo, /team, /about, /about-us, /management, /leadership, /organigramma, /la-societa
+  Look for anyone with a finance-related title.
+
+Step 3 — LinkedIn company page:
+  WebSearch: "{clean_name}" site:linkedin.com/company
+  Then WebFetch the company LinkedIn page to find employees with finance titles.
+
+Step 4 — Broader search for the company leader (especially for small companies):
+  WebSearch: "{clean_name}" "amministratore delegato" OR "amministratore unico" OR CEO OR founder
+  If no dedicated finance person exists, the top executive who manages finances is acceptable.
+
+IMPORTANT RULES:
+- You MUST try at least 3 different searches before concluding "not found".
+- The legal name is "{company_name}" but search using "{clean_name}" (without legal suffix).
+- Acceptable titles (in order of preference):
+  HIGH confidence: CFO, DAF, Direttore Finanziario, Chief Financial Officer, Finance Director,
+    Direttore Amministrativo e Finanziario, Responsabile Amministrazione Finanza e Controllo
+  MEDIUM confidence: Financial Controller, Head of Finance, VP Finance, Responsabile Finanziario,
+    Finance Manager, Treasurer, Responsabile Amministrativo
+  LOW confidence: Amministratore Delegato, Amministratore Unico, CEO, Fondatore/Owner
+    (only if no dedicated finance person exists)
 
 End your response with ONLY this JSON (no text after it):
 {{"nome": "First Last", "ruolo": "Exact title as found", "linkedin_url": "https://..." or null, "confidenza": "high|medium|low"}}
 
-Use:
-- "high": clear name, role, and reliable source
-- "medium": found but indirect source or non-standard role
-- "low": possible match but uncertain
-
-If nothing found: {{"nome": null}}"""
+If nothing found after exhausting all steps: {{"nome": null}}"""
 
 
 # ---------------------------------------------------------------------------
@@ -200,7 +233,7 @@ def _log_block(block: Any) -> None:
             print(f"    [think] {preview}{'…' if len(text) > 120 else ''}")
 
 
-async def find_cfo(company_name: str, website_url: str) -> dict:
+async def find_cfo(company_name: str, website_url: str, revenue_k: int | None = None) -> dict:
     """Run a Claude agent to find the CFO/head of finance. Returns parsed dict."""
     options = ClaudeAgentOptions(
         model=MODEL,
@@ -208,7 +241,7 @@ async def find_cfo(company_name: str, website_url: str) -> dict:
         permission_mode="acceptEdits",
     )
     last_text = ""
-    async for message in query(prompt=_build_prompt(company_name, website_url), options=options):
+    async for message in query(prompt=_build_prompt(company_name, website_url, revenue_k), options=options):
         if isinstance(message, AssistantMessage):
             for block in message.content:
                 _log_block(block)
@@ -315,10 +348,23 @@ def build_result(rank: int, company_name: str, data: dict[str, Any]) -> Enrichme
     )
 
 
+def _parse_revenue(company: dict[str, str]) -> int | None:
+    """Extract the most recent revenue (in thousands €) from the company row."""
+    # Revenue columns are like "RICAVI 2024", "RICAVI 2021" — pick the latest
+    for key in sorted(company.keys(), reverse=True):
+        if key.startswith("RICAVI"):
+            try:
+                return int(company[key])
+            except (ValueError, TypeError):
+                pass
+    return None
+
+
 async def process_company(company: dict[str, str]) -> CompanyOutcome:
     rank = int(company.get("RANK", 0))
     name = company.get("AZIENDA", "?")
     url = company.get("SITO WEB", "")
+    revenue_k = _parse_revenue(company)
 
     start_ts = time.monotonic()
     max_attempts = max(1, RUN_MAX_RETRIES)
@@ -328,7 +374,7 @@ async def process_company(company: dict[str, str]) -> CompanyOutcome:
     for attempt in range(1, max_attempts + 1):
         print(f"  Rank {rank} | tentativo {attempt}/{max_attempts}: {name}", flush=True)
         try:
-            data = await find_cfo(name, url)
+            data = await find_cfo(name, url, revenue_k)
             result = build_result(rank, name, data)
             return CompanyOutcome(
                 result=result,
@@ -368,39 +414,6 @@ async def process_company(company: dict[str, str]) -> CompanyOutcome:
     )
 
 
-def adapt_concurrency(
-        current: int,
-        batch_outcomes: list[CompanyOutcome],
-        clean_streak: int,
-) -> tuple[int, int]:
-    max_workers = max(1, RUN_MAX_CONCURRENCY)
-    min_workers = max(1, min(RUN_MIN_CONCURRENCY, max_workers))
-
-    if not RUN_AUTO_THROTTLE:
-        return current, clean_streak
-
-    rate_limit_hits = sum(1 for outcome in batch_outcomes if outcome.had_rate_limit)
-    if rate_limit_hits:
-        next_workers = max(min_workers, current - 1)
-        if next_workers < current:
-            print(
-                f"[throttle] Rate-limit rilevato in {rate_limit_hits} job: "
-                f"worker {current} -> {next_workers}"
-            )
-        return next_workers, 0
-
-    next_clean_streak = clean_streak + 1
-    if next_clean_streak >= max(1, RUN_THROTTLE_RECOVERY_BATCHES) and current < max_workers:
-        next_workers = min(max_workers, current + 1)
-        print(
-            f"[throttle] {next_clean_streak} batch puliti: "
-            f"worker {current} -> {next_workers}"
-        )
-        return next_workers, 0
-
-    return current, next_clean_streak
-
-
 # ---------------------------------------------------------------------------
 # Orchestrator
 # ---------------------------------------------------------------------------
@@ -424,11 +437,7 @@ async def main() -> None:
     companies = load_input_csv(input_path)
     print(f"Caricate {len(companies)} aziende da {input_path}")
     print(f"Modello: {MODEL}")
-    print(
-        "Concorrenza configurata: "
-        f"max={RUN_MAX_CONCURRENCY}, min={RUN_MIN_CONCURRENCY}, "
-        f"auto_throttle={RUN_AUTO_THROTTLE}"
-    )
+    print(f"Worker paralleli: {RUN_MAX_CONCURRENCY}")
 
     # Load or reset checkpoint
     done: dict[int, EnrichmentResult] = {}
@@ -445,70 +454,52 @@ async def main() -> None:
     pending = [c for c in companies if int(c.get("RANK", 0)) not in done]
     print(f"Da processare: {len(pending)} aziende\n")
 
+    if not pending:
+        write_enriched_csv(output_dir, companies, done)
+        return
+
     run_start_ts = time.monotonic()
-    max_workers = max(1, RUN_MAX_CONCURRENCY)
-    min_workers = max(1, min(RUN_MIN_CONCURRENCY, max_workers))
-    current_workers = max_workers
-    clean_streak = 0
-    batch_index = 0
-    offset = 0
-    worker_samples = 0
-    worker_sum = 0
+    sem = asyncio.Semaphore(RUN_MAX_CONCURRENCY)
+    checkpoint_lock = asyncio.Lock()
+    progress = {"completed": 0, "found": 0, "rate_limits": 0}
 
-    while offset < len(pending):
-        batch_index += 1
-        batch = pending[offset: offset + current_workers]
-        first_pos = offset + 1
-        last_pos = offset + len(batch)
-        print(
-            f"[batch {batch_index}] aziende {first_pos}-{last_pos}/{len(pending)} "
-            f"| worker={current_workers}"
-        )
+    async def worker(company: dict[str, str]) -> CompanyOutcome:
+        async with sem:
+            outcome = await process_company(company)
 
-        batch_start_ts = time.monotonic()
-        outcomes = await asyncio.gather(*(process_company(company) for company in batch))
-        batch_elapsed_s = time.monotonic() - batch_start_ts
-
-        retries_count = sum(max(0, outcome.attempts - 1) for outcome in outcomes)
-        rate_limit_count = sum(1 for outcome in outcomes if outcome.had_rate_limit)
-
-        for outcome in sorted(outcomes, key=lambda item: item.rank):
+        async with checkpoint_lock:
             done[outcome.rank] = outcome.result
             save_checkpoint_row(output_dir, outcome.result)
+            progress["completed"] += 1
+            if outcome.had_rate_limit:
+                progress["rate_limits"] += 1
+            n = progress["completed"]
+            total = len(pending)
             if outcome.result.cfo_nome:
+                progress["found"] += 1
                 print(
-                    f"  => Rank {outcome.rank} OK ({outcome.result.confidenza}) "
+                    f"  => [{n}/{total}] Rank {outcome.rank} OK ({outcome.result.confidenza}) "
                     f"{outcome.result.cfo_nome} — {outcome.result.cfo_ruolo}"
                 )
             else:
-                print(f"  => Rank {outcome.rank} non trovato")
+                print(f"  => [{n}/{total}] Rank {outcome.rank} non trovato")
 
-        print(
-            f"[batch {batch_index}] tempo={batch_elapsed_s:.1f}s "
-            f"| retry={retries_count} | rate_limit={rate_limit_count}"
-        )
+        return outcome
 
-        worker_samples += 1
-        worker_sum += current_workers
-        current_workers, clean_streak = adapt_concurrency(current_workers, outcomes, clean_streak)
-        current_workers = max(min_workers, min(max_workers, current_workers))
-
-        offset += len(batch)
-        if offset < len(pending):
-            await asyncio.sleep(DELAY_BETWEEN_BATCHES)
+    tasks = [asyncio.create_task(worker(c)) for c in pending]
+    await asyncio.gather(*tasks)
 
     write_enriched_csv(output_dir, companies, done)
 
     # Summary
     total_elapsed_s = time.monotonic() - run_start_ts
-    avg_workers = (worker_sum / worker_samples) if worker_samples else 0.0
-    found = sum(1 for r in done.values() if r.cfo_nome)
-    total = len(done)
+    found = progress["found"]
+    total = len(pending)
     pct = 100 * found // total if total else 0
     print(f"\nTempo run: {total_elapsed_s:.1f}s")
-    if worker_samples:
-        print(f"Worker medi attivi: {avg_workers:.2f}")
     print(f"Risultati: {found}/{total} aziende con CFO identificato ({pct}%)")
+    if progress["rate_limits"]:
+        print(f"Rate-limit retries: {progress['rate_limits']}")
     for conf in ("high", "medium", "low"):
         count = sum(1 for r in done.values() if r.confidenza == conf)
         if count:
