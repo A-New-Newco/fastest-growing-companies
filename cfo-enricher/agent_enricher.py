@@ -34,7 +34,7 @@ RUN_MAX_RETRIES: int = 3
 # Exponential backoff base delay for retries
 RUN_RETRY_BASE_DELAY: float = 2.0
 
-MODEL: str = "claude-sonnet-4-6"
+MODEL: str = "claude-haiku-4-5-20251001"
 
 import asyncio
 import csv
