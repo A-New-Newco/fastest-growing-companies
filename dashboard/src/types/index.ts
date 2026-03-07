@@ -62,3 +62,12 @@ export type SortField =
   | "settore"
   | "regione";
 export type SortDir = "asc" | "desc";
+
+export type CfoPresenceFilter = "all" | "has" | "no";
+
+export interface ChartFilterState {
+  settori: string[];
+  regioni: string[];
+  cfoPresence: CfoPresenceFilter;
+  growthRange: [number, number];
+}

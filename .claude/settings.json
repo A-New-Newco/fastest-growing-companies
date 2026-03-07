@@ -24,7 +24,9 @@
       "Bash(curl -s \"https://raw.githubusercontent.com/openpolis/geojson-italy/master/geojson/limits_IT_regions.geojson\" -o /Users/francescofiore/Coding/Reef/fastest-growing-companies/dashboard/public/geo/italy-regions.json)",
       "Bash(npm run build)",
       "Bash(npm install --save-dev @types/react-simple-maps)",
-      "Bash(npm list recharts)"
+      "Bash(npm list recharts)",
+      "Bash(wc -l /Users/francescofiore/Coding/Reef/fastest-growing-companies/cfo-enricher/data/*.csv /Users/francescofiore/Coding/Reef/fastest-growing-companies/cfo-enricher/output/2026/enriched.csv)",
+      "Bash(grep -c \"\"\"fonte\"\": \"\"agent\"\"\" /Users/francescofiore/Coding/Reef/fastest-growing-companies/cfo-enricher/output/2026/enrichment_progress.jsonl)"
     ]
   }
 }

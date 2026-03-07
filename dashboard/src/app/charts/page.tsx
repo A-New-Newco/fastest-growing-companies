@@ -1,13 +1,19 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { loadCompanies } from "@/lib/data";
-import type { Company } from "@/types";
+import type { Company, ChartFilterState } from "@/types";
+import { DEFAULT_CHART_FILTERS, applyChartFilters } from "@/lib/filters";
+import ChartFilterBar from "@/components/charts/ChartFilterBar";
 import TopSectorsBar from "@/components/charts/TopSectorsBar";
 import RoleDistributionPie from "@/components/charts/RoleDistributionPie";
 import ConfidenceBar from "@/components/charts/ConfidenceBar";
 import GrowthRevenueScatter from "@/components/charts/GrowthRevenueScatter";
 import RegionMap from "@/components/charts/RegionMap";
+import CfoPresenceBySettore from "@/components/charts/CfoPresenceBySettore";
+import CfoPresenceByRegione from "@/components/charts/CfoPresenceByRegione";
+import GrowthByCfoPresence from "@/components/charts/GrowthByCfoPresence";
+import RevenueByCfoPresence from "@/components/charts/RevenueByCfoPresence";
 
 function ChartSkeleton({ height = 300 }: { height?: number }) {
   return (
@@ -21,12 +27,18 @@ function ChartSkeleton({ height = 300 }: { height?: number }) {
 export default function ChartsPage() {
   const [companies, setCompanies] = useState<Company[]>([]);
   const [loading, setLoading] = useState(true);
+  const [filters, setFilters] = useState<ChartFilterState>(DEFAULT_CHART_FILTERS);
 
   useEffect(() => {
     loadCompanies()
       .then(setCompanies)
       .finally(() => setLoading(false));
   }, []);
+
+  const filtered = useMemo(
+    () => applyChartFilters(companies, filters),
+    [companies, filters]
+  );
 
   return (
     <div className="space-y-6">
@@ -41,6 +53,16 @@ export default function ChartsPage() {
 
       {loading ? (
         <div className="space-y-6">
+          <ChartSkeleton height={56} />
+          <ChartSkeleton height={420} />
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <ChartSkeleton height={340} />
+            <ChartSkeleton height={340} />
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <ChartSkeleton height={380} />
+            <ChartSkeleton height={320} />
+          </div>
           <ChartSkeleton height={460} />
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <ChartSkeleton height={320} />
@@ -51,20 +73,48 @@ export default function ChartsPage() {
         </div>
       ) : (
         <>
-          {/* Scatter: Growth vs Revenue */}
-          <GrowthRevenueScatter companies={companies} />
+          {/* Global filter bar */}
+          <ChartFilterBar
+            companies={companies}
+            filters={filters}
+            onChange={setFilters}
+            filteredCount={filtered.length}
+          />
 
-          {/* Two-column row */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <RoleDistributionPie companies={companies} />
-            <ConfidenceBar companies={companies} />
+          {/* ── CFO Presence section ─────────────────────────────────────────── */}
+          <div>
+            <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-widest mb-4">
+              Analisi Presenza CFO
+            </h2>
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <CfoPresenceBySettore companies={filtered} />
+                <CfoPresenceByRegione companies={filtered} />
+              </div>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <GrowthByCfoPresence companies={filtered} />
+                <RevenueByCfoPresence companies={filtered} />
+              </div>
+            </div>
           </div>
 
-          {/* Top sectors bar */}
-          <TopSectorsBar companies={companies} />
+          {/* ── General charts ───────────────────────────────────────────────── */}
+          <div>
+            <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-widest mb-4">
+              Analisi Generale
+            </h2>
+            <div className="space-y-6">
+              <GrowthRevenueScatter companies={filtered} />
 
-          {/* Italy map */}
-          <RegionMap companies={companies} />
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <RoleDistributionPie companies={filtered} />
+                <ConfidenceBar companies={filtered} />
+              </div>
+
+              <TopSectorsBar companies={filtered} />
+              <RegionMap companies={filtered} />
+            </div>
+          </div>
         </>
       )}
     </div>
