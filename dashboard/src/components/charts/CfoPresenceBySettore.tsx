@@ -47,7 +47,7 @@ function CustomTooltip({
         <div className="flex justify-between gap-6">
           <span className="flex items-center gap-1.5">
             <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block" />
-            Con CFO reale
+            With Real CFO
           </span>
           <span className="font-medium text-slate-900">
             {d?.hasCfo} ({d?.pct.toFixed(0)}%)
@@ -56,12 +56,12 @@ function CustomTooltip({
         <div className="flex justify-between gap-6">
           <span className="flex items-center gap-1.5">
             <span className="w-2 h-2 rounded-full bg-slate-200 inline-block" />
-            Senza CFO reale
+            Without Real CFO
           </span>
           <span className="font-medium text-slate-900">{d?.noCfo}</span>
         </div>
         <div className="flex justify-between gap-6 pt-1 border-t border-slate-100 mt-1">
-          <span className="text-slate-500">Totale</span>
+          <span className="text-slate-500">Total</span>
           <span className="font-medium text-slate-900">{d?.total}</span>
         </div>
       </div>
@@ -100,11 +100,11 @@ export default function CfoPresenceBySettore({ companies }: Props) {
         <div className="flex items-start justify-between gap-2">
           <div>
             <CardTitle className="text-base font-semibold text-slate-900">
-              CFO Presence per Settore
+              CFO Presence by Sector
             </CardTitle>
             <p className="text-xs text-slate-500 mt-0.5">
-              Aziende con CFO/Finance Manager reale vs. senza, per settore.
-              Ordinato per tasso di presenza CFO.
+              Companies with a real CFO/Finance Manager vs. without, by sector.
+              Sorted by CFO presence rate.
             </p>
           </div>
           <div className="flex items-center rounded-md border border-slate-200 overflow-hidden bg-slate-50 h-7 flex-shrink-0">
@@ -128,11 +128,11 @@ export default function CfoPresenceBySettore({ companies }: Props) {
         <div className="flex items-center gap-4 mb-3">
           <span className="flex items-center gap-1.5 text-xs text-slate-600">
             <span className="w-2.5 h-2.5 rounded-sm bg-emerald-500 inline-block" />
-            Con CFO reale
+            With Real CFO
           </span>
           <span className="flex items-center gap-1.5 text-xs text-slate-600">
             <span className="w-2.5 h-2.5 rounded-sm bg-slate-200 inline-block" />
-            Senza CFO reale
+            Without Real CFO
           </span>
         </div>
         <ResponsiveContainer width="100%" height={420}>
@@ -174,8 +174,8 @@ export default function CfoPresenceBySettore({ companies }: Props) {
               </Bar>
             ) : (
               <>
-                <Bar dataKey="hasCfo" stackId="a" fill="#10b981" fillOpacity={0.85} name="Con CFO reale" />
-                <Bar dataKey="noCfo" stackId="a" fill="#e2e8f0" name="Senza CFO reale" radius={[4, 4, 0, 0]}>
+                <Bar dataKey="hasCfo" stackId="a" fill="#10b981" fillOpacity={0.85} name="With Real CFO" />
+                <Bar dataKey="noCfo" stackId="a" fill="#e2e8f0" name="Without Real CFO" radius={[4, 4, 0, 0]}>
                   <LabelList
                     dataKey="total"
                     position="top"

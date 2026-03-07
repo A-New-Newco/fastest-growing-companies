@@ -99,9 +99,9 @@ function MultiSelectDropdown({
 
 // ── CFO presence toggle ────────────────────────────────────────────────────────
 const CFO_OPTIONS: { value: CfoPresenceFilter; label: string }[] = [
-  { value: "all", label: "Tutte" },
-  { value: "has", label: "Con CFO reale" },
-  { value: "no", label: "Senza CFO reale" },
+  { value: "all", label: "All" },
+  { value: "has", label: "With Real CFO" },
+  { value: "no", label: "Without Real CFO" },
 ];
 
 export default function ChartFilterBar({
@@ -149,12 +149,12 @@ export default function ChartFilterBar({
         {/* Label */}
         <div className="flex items-center gap-1.5 text-xs font-medium text-slate-500 mr-1">
           <SlidersHorizontal className="w-3.5 h-3.5" />
-          <span>Filtri</span>
+          <span>Filters</span>
         </div>
 
         {/* Settore multi-select */}
         <MultiSelectDropdown
-          label="Settore"
+          label="Sector"
           options={allSettori}
           selected={filters.settori}
           onToggle={toggleSettore}
@@ -163,7 +163,7 @@ export default function ChartFilterBar({
 
         {/* Regione multi-select */}
         <MultiSelectDropdown
-          label="Regione"
+          label="Region"
           options={allRegioni}
           selected={filters.regioni}
           onToggle={toggleRegione}
@@ -191,7 +191,7 @@ export default function ChartFilterBar({
         {/* Spacer + result count + clear */}
         <div className="flex items-center gap-3 ml-auto">
           <span className="text-xs text-slate-400">
-            {filteredCount} / {companies.length} aziende
+            {filteredCount} / {companies.length} companies
           </span>
           {active && (
             <button
@@ -199,7 +199,7 @@ export default function ChartFilterBar({
               className="flex items-center gap-1 text-xs text-indigo-600 hover:text-indigo-800 font-medium"
             >
               <X className="w-3 h-3" />
-              Rimuovi filtri
+              Clear filters
             </button>
           )}
         </div>

@@ -49,7 +49,7 @@ function CustomTooltip({
           <div className="flex justify-between gap-6">
             <span className="flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block" />
-              Con CFO ({d.countWith})
+              With CFO ({d.countWith})
             </span>
             <span className="font-medium text-slate-900">
               {formatGrowth(d.avgWithCfo!)}
@@ -60,7 +60,7 @@ function CustomTooltip({
           <div className="flex justify-between gap-6">
             <span className="flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full bg-slate-400 inline-block" />
-              Senza CFO ({d.countNo})
+              Without CFO ({d.countNo})
             </span>
             <span className="font-medium text-slate-900">
               {formatGrowth(d.avgNoCfo!)}
@@ -125,17 +125,17 @@ export default function GrowthByCfoPresence({ companies }: Props) {
     <Card className="border-slate-200 bg-white">
       <CardHeader className="pb-2">
         <CardTitle className="text-base font-semibold text-slate-900">
-          Crescita Media: Con vs. Senza CFO Reale
+          Avg. Growth: With vs. Without Real CFO
         </CardTitle>
         <p className="text-xs text-slate-500 mt-0.5">
-          CAGR medio per le aziende con CFO/Finance Manager vs. senza, per settore (top 12 per numerosità).
-          Media globale:{" "}
+          Avg. CAGR for companies with CFO/Finance Manager vs. without, by sector (top 12 by size).
+          Global avg:{" "}
           <span className="text-emerald-600 font-medium">
-            con CFO {formatGrowth(globalWith)}
+            with CFO {formatGrowth(globalWith)}
           </span>
           {" · "}
           <span className="text-slate-500 font-medium">
-            senza {formatGrowth(globalNo)}
+            without {formatGrowth(globalNo)}
           </span>
         </p>
       </CardHeader>
@@ -169,7 +169,7 @@ export default function GrowthByCfoPresence({ companies }: Props) {
               iconType="square"
               iconSize={10}
               formatter={(value) =>
-                value === "avgWithCfo" ? "Con CFO reale" : "Senza CFO reale"
+                value === "avgWithCfo" ? "With Real CFO" : "Without Real CFO"
               }
               wrapperStyle={{ fontSize: 11, color: "#64748b" }}
             />

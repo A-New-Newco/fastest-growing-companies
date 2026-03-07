@@ -59,7 +59,7 @@ function CustomTooltip({
         <div className="flex justify-between gap-6">
           <span className="flex items-center gap-1.5">
             <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block" />
-            Con CFO reale
+            With Real CFO
           </span>
           <span className="font-medium text-slate-900">
             {d?.hasCfo} ({pct}%)
@@ -68,12 +68,12 @@ function CustomTooltip({
         <div className="flex justify-between gap-6">
           <span className="flex items-center gap-1.5">
             <span className="w-2 h-2 rounded-full bg-slate-400 inline-block" />
-            Senza CFO reale
+            Without Real CFO
           </span>
           <span className="font-medium text-slate-900">{d?.noCfo}</span>
         </div>
         <div className="flex justify-between gap-6 pt-1 border-t border-slate-100">
-          <span className="text-slate-500">Totale</span>
+          <span className="text-slate-500">Total</span>
           <span className="font-medium text-slate-900">{d?.total}</span>
         </div>
       </div>
@@ -103,11 +103,11 @@ export default function RevenueByCfoPresence({ companies }: Props) {
     <Card className="border-slate-200 bg-white">
       <CardHeader className="pb-2">
         <CardTitle className="text-base font-semibold text-slate-900">
-          Dimensione Ricavi vs. Presenza CFO (2024)
+          Revenue Size vs. CFO Presence (2024)
         </CardTitle>
         <p className="text-xs text-slate-500 mt-0.5">
-          Distribuzione delle aziende per fascia di ricavi 2024, colorata per presenza di un CFO reale.
-          Mostra a quale soglia di fatturato le aziende tendono a dotarsi di una funzione finanziaria dedicata.
+          Distribution of companies by 2024 revenue bracket, colored by real CFO presence.
+          Shows at which revenue threshold companies tend to have a dedicated finance function.
         </p>
       </CardHeader>
       <CardContent>
@@ -135,7 +135,7 @@ export default function RevenueByCfoPresence({ companies }: Props) {
               iconType="square"
               iconSize={10}
               formatter={(value) =>
-                value === "hasCfo" ? "Con CFO reale" : "Senza CFO reale"
+                value === "hasCfo" ? "With Real CFO" : "Without Real CFO"
               }
               wrapperStyle={{ fontSize: 11, color: "#64748b" }}
             />
