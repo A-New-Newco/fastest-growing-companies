@@ -5,7 +5,26 @@
       "WebSearch",
       "Bash(zip -r champions-companies-scraper.zip champions-companies-scraper/ --exclude \"champions-companies-scraper/.venv/*\" --exclude \"champions-companies-scraper/__pycache__/*\" --exclude \"champions-companies-scraper/.ruff_cache/*\")",
       "WebFetch(domain:docs.anthropic.com)",
-      "Bash(python3 -c \":*)"
+      "Bash(python3 -c \":*)",
+      "Bash(sort -t',' -k1 -n)",
+      "Bash(python3:*)",
+      "Bash(npx create-next-app@14 dashboard --typescript --tailwind --app --src-dir --no-eslint --import-alias \"@/*\" --yes)",
+      "Bash(cp -r dashboard_temp/docs dashboard/docs)",
+      "Bash(cp -r dashboard_temp/scripts dashboard/scripts)",
+      "Bash(cp -r dashboard_temp/public/data dashboard/public/data)",
+      "Bash(npm install recharts papaparse @tanstack/react-table react-simple-maps topojson-client)",
+      "Bash(npm install --save-dev @types/papaparse @types/react-simple-maps @types/topojson-client)",
+      "Bash(npx shadcn@latest init --yes --base-color zinc)",
+      "Bash(npm install --save-dev @types/papaparse @types/topojson-client)",
+      "Bash(npx shadcn@latest init -y)",
+      "Bash(printf '\\\\n')",
+      "Bash(printf '\\\\n\\\\n')",
+      "Bash(npm install class-variance-authority clsx tailwind-merge lucide-react @radix-ui/react-dialog @radix-ui/react-select @radix-ui/react-slider @radix-ui/react-tooltip @radix-ui/react-popover @radix-ui/react-slot tailwindcss-animate)",
+      "Bash(npx shadcn@latest add button card badge input dialog tooltip select slider table)",
+      "Bash(curl -s \"https://raw.githubusercontent.com/openpolis/geojson-italy/master/geojson/limits_IT_regions.geojson\" -o /Users/francescofiore/Coding/Reef/fastest-growing-companies/dashboard/public/geo/italy-regions.json)",
+      "Bash(npm run build)",
+      "Bash(npm install --save-dev @types/react-simple-maps)",
+      "Bash(npm list recharts)"
     ]
   }
 }
