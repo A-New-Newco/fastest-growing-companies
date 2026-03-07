@@ -2,8 +2,47 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { TrendingUp } from "lucide-react";
 import { cn } from "@/lib/utils";
+
+function LogoMark() {
+  return (
+    <svg
+      width="28"
+      height="28"
+      viewBox="0 0 28 28"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+    >
+      {/* Background rounded square */}
+      <rect width="28" height="28" rx="6" fill="#4f46e5" />
+
+      {/* Bar chart columns — ascending left to right */}
+      <rect x="5" y="17" width="4" height="7" rx="1" fill="white" fillOpacity="0.45" />
+      <rect x="11" y="12" width="4" height="12" rx="1" fill="white" fillOpacity="0.65" />
+      <rect x="17" y="7" width="4" height="17" rx="1" fill="white" fillOpacity="0.85" />
+
+      {/* Trend arrow: line + arrowhead going up-right over the bars */}
+      <polyline
+        points="4,20 11,13 17,8 24,4"
+        stroke="white"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        fill="none"
+      />
+      {/* Arrowhead tip */}
+      <polyline
+        points="20,3 24,4 23,8"
+        stroke="white"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        fill="none"
+      />
+    </svg>
+  );
+}
 
 const NAV_LINKS = [
   { href: "/", label: "Overview" },
@@ -19,8 +58,8 @@ export default function Navbar() {
       <div className="mx-auto max-w-screen-xl px-6 flex items-center justify-between h-14">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2.5 group">
-          <div className="flex items-center justify-center w-7 h-7 rounded-md bg-indigo-600 group-hover:bg-indigo-500 transition-colors">
-            <TrendingUp className="w-4 h-4 text-white" />
+          <div className="transition-transform group-hover:scale-105 duration-150">
+            <LogoMark />
           </div>
           <span className="text-white font-semibold text-sm tracking-tight">
             Leader della Crescita
