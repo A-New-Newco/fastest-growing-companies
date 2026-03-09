@@ -2,14 +2,14 @@
 
 import { useRef, useState, useEffect, useMemo } from "react";
 import { ChevronDown, X, SlidersHorizontal } from "lucide-react";
-import type { Company, ChartFilterState, CfoPresenceFilter } from "@/types";
-import { DEFAULT_CHART_FILTERS, hasActiveFilters } from "@/lib/filters";
+import type { Company, FilterState, CfoPresenceFilter } from "@/types";
+import { DEFAULT_FILTER_STATE } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
 interface ChartFilterBarProps {
   companies: Company[];
-  filters: ChartFilterState;
-  onChange: (f: ChartFilterState) => void;
+  filters: FilterState;
+  onChange: (f: FilterState) => void;
   filteredCount: number;
 }
 
@@ -119,7 +119,12 @@ export default function ChartFilterBar({
     [companies]
   );
 
-  const active = hasActiveFilters(filters);
+  const active =
+    filters.settori.length > 0 ||
+    filters.regioni.length > 0 ||
+    filters.hasRealCfoFilter !== "all" ||
+    filters.minGrowth > 0 ||
+    filters.maxGrowth < 600;
 
   function toggleSettore(v: string) {
     const next = filters.settori.includes(v)
@@ -136,11 +141,11 @@ export default function ChartFilterBar({
   }
 
   function setCfoPresence(v: CfoPresenceFilter) {
-    onChange({ ...filters, cfoPresence: v });
+    onChange({ ...filters, hasRealCfoFilter: v });
   }
 
   function clearAll() {
-    onChange(DEFAULT_CHART_FILTERS);
+    onChange({ ...DEFAULT_FILTER_STATE });
   }
 
   return (
@@ -178,7 +183,7 @@ export default function ChartFilterBar({
               onClick={() => setCfoPresence(opt.value)}
               className={cn(
                 "px-3 h-full text-xs font-medium transition-colors",
-                filters.cfoPresence === opt.value
+                filters.hasRealCfoFilter === opt.value
                   ? "bg-indigo-600 text-white"
                   : "text-slate-500 hover:bg-slate-100"
               )}

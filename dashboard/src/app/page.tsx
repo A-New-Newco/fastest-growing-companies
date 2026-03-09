@@ -18,7 +18,7 @@ export default function OverviewPage() {
   }, []);
 
   return (
-    <div className="space-y-6">
+    <div className="mx-auto max-w-screen-xl px-6 py-8 space-y-6">
       {/* Page header */}
       <div className="pb-2 border-b border-slate-200">
         <h1 className="text-2xl font-bold text-slate-900 tracking-tight">

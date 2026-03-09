@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { loadCompanies } from "@/lib/data";
-import type { Company, ChartFilterState } from "@/types";
-import { DEFAULT_CHART_FILTERS, applyChartFilters } from "@/lib/filters";
+import { loadCompanies, filterCompanies } from "@/lib/data";
+import type { Company } from "@/types";
+import { useFilters } from "@/lib/filter-context";
 import ChartFilterBar from "@/components/charts/ChartFilterBar";
 import TopSectorsBar from "@/components/charts/TopSectorsBar";
 import RoleDistributionPie from "@/components/charts/RoleDistributionPie";
@@ -27,7 +27,7 @@ function ChartSkeleton({ height = 300 }: { height?: number }) {
 export default function ChartsPage() {
   const [companies, setCompanies] = useState<Company[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filters, setFilters] = useState<ChartFilterState>(DEFAULT_CHART_FILTERS);
+  const { filters, setFilters } = useFilters();
 
   useEffect(() => {
     loadCompanies()
@@ -36,12 +36,12 @@ export default function ChartsPage() {
   }, []);
 
   const filtered = useMemo(
-    () => applyChartFilters(companies, filters),
+    () => filterCompanies(companies, filters),
     [companies, filters]
   );
 
   return (
-    <div className="space-y-6">
+    <div className="mx-auto max-w-screen-xl px-6 py-8 space-y-6">
       <div className="pb-2 border-b border-slate-200">
         <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
           Analytics &amp; Charts

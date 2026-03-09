@@ -47,7 +47,6 @@ function LogoMark() {
 const NAV_LINKS = [
   { href: "/", label: "Overview" },
   { href: "/explorer", label: "Explorer" },
-  { href: "/charts", label: "Charts" },
 ];
 
 export default function Navbar() {
