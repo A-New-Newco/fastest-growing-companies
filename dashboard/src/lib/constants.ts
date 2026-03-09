@@ -114,6 +114,10 @@ export const DEFAULT_FILTER_STATE = {
   minGrowth: 0,
   maxGrowth: 600,
   cfoFoundOnly: false,
+  linkedinFilter: "all" as const,
+  hasRealCfoFilter: "all" as const,
+  minRevenue: 0,
+  maxRevenue: 0,
 };
 
 // ── Categories considered "real CFO" for HAS_REAL_CFO logic ──────────────────

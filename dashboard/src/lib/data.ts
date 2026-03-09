@@ -112,6 +112,18 @@ export function filterCompanies(
 
     if (filters.cfoFoundOnly && !c.cfoFound) return false;
 
+    if (filters.hasRealCfoFilter === "has" && !c.hasRealCfo) return false;
+    if (filters.hasRealCfoFilter === "no" && c.hasRealCfo) return false;
+
+    if (filters.linkedinFilter === "has" && !c.cfoLinkedin) return false;
+    if (filters.linkedinFilter === "no" && c.cfoLinkedin) return false;
+
+    // minRevenue / maxRevenue in €M → convert to thousands for comparison
+    if (filters.minRevenue > 0 && c.ricavi2024 < filters.minRevenue * 1_000)
+      return false;
+    if (filters.maxRevenue > 0 && c.ricavi2024 > filters.maxRevenue * 1_000)
+      return false;
+
     return true;
   });
 }

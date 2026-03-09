@@ -52,6 +52,10 @@ export interface FilterState {
   minGrowth: number;
   maxGrowth: number;
   cfoFoundOnly: boolean;
+  linkedinFilter: CfoPresenceFilter;
+  hasRealCfoFilter: CfoPresenceFilter;
+  minRevenue: number; // €M (0 = no filter)
+  maxRevenue: number; // €M (0 = no filter)
 }
 
 export type SortField =

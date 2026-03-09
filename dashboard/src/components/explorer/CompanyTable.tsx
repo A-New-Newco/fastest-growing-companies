@@ -10,7 +10,7 @@ import {
   createColumnHelper,
   type SortingState,
 } from "@tanstack/react-table";
-import { ArrowUpDown, ArrowUp, ArrowDown, ExternalLink, Linkedin } from "lucide-react";
+import { ArrowUpDown, ArrowUp, ArrowDown, ExternalLink, Linkedin, Download } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -35,6 +35,39 @@ const columnHelper = createColumnHelper<Company>();
 
 interface CompanyTableProps {
   companies: Company[];
+}
+
+function exportToCsv(companies: Company[]) {
+  const headers = [
+    "Rank", "Company", "Sector", "Region", "Growth Rate (%)",
+    "Revenue 2021 (K€)", "Revenue 2024 (K€)", "Website",
+    "CFO Name", "CFO Role", "CFO Category", "CFO LinkedIn", "Confidence",
+  ];
+  const rows = companies.map((c) => [
+    c.rank,
+    c.azienda,
+    c.settore,
+    c.regione,
+    c.tassoCrescita,
+    c.ricavi2021,
+    c.ricavi2024,
+    c.sitoWeb,
+    c.cfoNome ?? "",
+    c.cfoRuolo ?? "",
+    c.cfoRuoloCategory,
+    c.cfoLinkedin ?? "",
+    c.confidenza ?? "",
+  ]);
+  const csvContent = [headers, ...rows]
+    .map((row) => row.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(","))
+    .join("\n");
+  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `leader-della-crescita-${companies.length}-companies.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
 }
 
 export default function CompanyTable({ companies }: CompanyTableProps) {
@@ -113,26 +146,30 @@ export default function CompanyTable({ companies }: CompanyTableProps) {
         header: "CFO Name",
         enableSorting: false,
         cell: (info) => {
-          const row = info.row.original;
           const name = info.getValue();
           if (!name) return <span className="text-slate-300 text-xs">—</span>;
+          return <span className="text-xs text-slate-700">{name}</span>;
+        },
+      }),
+      columnHelper.accessor("cfoLinkedin", {
+        header: "LinkedIn",
+        enableSorting: false,
+        cell: (info) => {
+          const url = info.getValue();
+          if (!url) return <span className="text-slate-300 text-xs">—</span>;
           return (
-            <div className="flex items-center gap-1.5 group">
-              <span className="text-xs text-slate-700">{name}</span>
-              {row.cfoLinkedin && (
-                <a
-                  href={row.cfoLinkedin}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={(e) => e.stopPropagation()}
-                  className="opacity-0 group-hover:opacity-100 transition-opacity text-slate-400 hover:text-blue-600"
-                >
-                  <Linkedin className="w-3 h-3" />
-                </a>
-              )}
-            </div>
+            <a
+              href={url}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              className="text-blue-500 hover:text-blue-700 transition-colors"
+            >
+              <Linkedin className="w-3.5 h-3.5" />
+            </a>
           );
         },
+        size: 72,
       }),
       columnHelper.accessor("cfoRuoloCategory", {
         header: "CFO Category",
@@ -267,6 +304,18 @@ export default function CompanyTable({ companies }: CompanyTableProps) {
 
       {/* Pagination */}
       <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-7 px-2.5 text-xs gap-1.5"
+            onClick={() => exportToCsv(companies)}
+            disabled={companies.length === 0}
+          >
+            <Download className="w-3 h-3" />
+            Export CSV ({companies.length})
+          </Button>
+        </div>
         <div className="flex items-center gap-2 text-xs text-slate-500">
           <span>Rows per page:</span>
           <Select
