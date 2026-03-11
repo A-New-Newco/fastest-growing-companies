@@ -19,7 +19,7 @@ export async function GET(_req: NextRequest, { params }: Params) {
     .from("campaigns")
     .select(
       `
-      id, team_id, name, description, status, created_by, created_at, updated_at,
+      id, team_id, name, description, status, connection_note_template, quota_policy, pause_reason, integration_mode, created_by, created_at, updated_at,
       campaign_contacts(status)
     `
     )
@@ -37,6 +37,10 @@ export async function GET(_req: NextRequest, { params }: Params) {
     name: row.name,
     description: row.description,
     status: row.status,
+    connectionNoteTemplate: row.connection_note_template,
+    quotaPolicy: row.quota_policy,
+    pauseReason: row.pause_reason,
+    integrationMode: row.integration_mode,
     createdBy: row.created_by,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
@@ -76,6 +80,12 @@ export async function PATCH(req: NextRequest, { params }: Params) {
   if (body.name !== undefined) updates.name = body.name.trim();
   if (body.description !== undefined) updates.description = body.description?.trim() || null;
   if (body.status !== undefined) updates.status = body.status;
+  if (body.connectionNoteTemplate !== undefined) {
+    updates.connection_note_template = body.connectionNoteTemplate?.trim() || null;
+  }
+  if (body.quotaPolicy !== undefined) updates.quota_policy = body.quotaPolicy;
+  if (body.pauseReason !== undefined) updates.pause_reason = body.pauseReason?.trim() || null;
+  if (body.integrationMode !== undefined) updates.integration_mode = body.integrationMode;
 
   if (Object.keys(updates).length === 0) {
     return NextResponse.json({ error: "Nothing to update" }, { status: 400 });
@@ -99,6 +109,10 @@ export async function PATCH(req: NextRequest, { params }: Params) {
     name: data.name,
     description: data.description,
     status: data.status,
+    connectionNoteTemplate: data.connection_note_template,
+    quotaPolicy: data.quota_policy,
+    pauseReason: data.pause_reason,
+    integrationMode: data.integration_mode,
     createdBy: data.created_by,
     createdAt: data.created_at,
     updatedAt: data.updated_at,

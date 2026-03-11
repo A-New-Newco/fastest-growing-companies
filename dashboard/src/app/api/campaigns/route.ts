@@ -27,7 +27,7 @@ export async function GET() {
     .from("campaigns")
     .select(
       `
-      id, team_id, name, description, status, created_by, created_at, updated_at,
+      id, team_id, name, description, status, connection_note_template, quota_policy, pause_reason, integration_mode, created_by, created_at, updated_at,
       campaign_contacts(status)
     `
     )
@@ -47,6 +47,10 @@ export async function GET() {
       name: row.name,
       description: row.description,
       status: row.status,
+      connectionNoteTemplate: row.connection_note_template,
+      quotaPolicy: row.quota_policy,
+      pauseReason: row.pause_reason,
+      integrationMode: row.integration_mode,
       createdBy: row.created_by,
       createdAt: row.created_at,
       updatedAt: row.updated_at,
@@ -84,7 +88,7 @@ export async function POST(req: NextRequest) {
   }
 
   const body = await req.json();
-  const { name, description } = body;
+  const { name, description, connectionNoteTemplate, quotaPolicy, integrationMode } = body;
 
   if (!name?.trim()) {
     return NextResponse.json({ error: "name is required" }, { status: 400 });
@@ -97,6 +101,9 @@ export async function POST(req: NextRequest) {
       team_id: membership.team_id,
       name: name.trim(),
       description: description?.trim() || null,
+      connection_note_template: connectionNoteTemplate?.trim() || null,
+      quota_policy: quotaPolicy || "conservative",
+      integration_mode: integrationMode || "dashboard",
       created_by: user.id,
     })
     .select()
@@ -112,6 +119,10 @@ export async function POST(req: NextRequest) {
     name: data.name,
     description: data.description,
     status: data.status,
+    connectionNoteTemplate: data.connection_note_template,
+    quotaPolicy: data.quota_policy,
+    pauseReason: data.pause_reason,
+    integrationMode: data.integration_mode,
     createdBy: data.created_by,
     createdAt: data.created_at,
     updatedAt: data.updated_at,

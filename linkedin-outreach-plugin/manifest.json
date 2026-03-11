@@ -9,6 +9,9 @@
     "storage"
   ],
   "host_permissions": [
+    "https://*/*",
+    "http://localhost/*",
+    "http://127.0.0.1/*",
     "https://script.google.com/*",
     "https://script.googleusercontent.com/*",
     "https://api.groq.com/*",

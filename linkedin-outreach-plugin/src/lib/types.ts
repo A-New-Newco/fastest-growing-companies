@@ -9,6 +9,10 @@ export interface ProfileData {
 }
 
 export interface ExtensionSettings {
+  integrationMode?: 'dashboard' | 'legacy';
+  dashboardBaseUrl?: string;
+  pluginToken?: string;
+  campaignId?: string;
   groqApiKey: string;
   googleAppUrl: string;
   crmWebhookToken: string;

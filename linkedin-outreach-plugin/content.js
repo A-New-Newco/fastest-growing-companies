@@ -61,6 +61,26 @@ class LinkedInBotHeadless {
         return true;
       }
 
+      if (request.type === 'GET_PAGE_HTML') {
+        sendResponse({
+          html: document.documentElement?.outerHTML || '',
+          url: window.location.href,
+        });
+        return true;
+      }
+
+      if (request.type === 'PREPARE_CONNECTION_NOTE') {
+        this.prepareConnectionNote(request.payload)
+          .then((result) => sendResponse(result))
+          .catch((err) => sendResponse({ error: err.message }));
+        return true;
+      }
+
+      if (request.type === 'DETECT_PLATFORM_WARNING') {
+        sendResponse(this.detectPlatformWarnings());
+        return true;
+      }
+
       if (request.type === 'START_AUTOMATION') {
         this.runAutomation(request.payload)
           .then(() => sendResponse({ success: true }))
@@ -69,6 +89,30 @@ class LinkedInBotHeadless {
       }
       return false;
     });
+  }
+
+  detectPlatformWarnings() {
+    const text = normalizeText(document.body?.innerText || '');
+    const warningTokens = [
+      'captcha',
+      'checkpoint',
+      'verify',
+      'limite',
+      'limit reached',
+      'too many requests',
+      'restricted',
+      'temporarily blocked',
+      'security verification',
+      'sospeso',
+      'bloccato'
+    ];
+    const detected = warningTokens.find((token) => text.includes(token));
+
+    return {
+      hasWarning: Boolean(detected),
+      code: detected ? (detected.includes('captcha') ? 'captcha' : 'ui_unknown') : null,
+      token: detected || null,
+    };
   }
 
   extractProfileData() {
@@ -209,6 +253,45 @@ class LinkedInBotHeadless {
       }
       throw this.buildDebugError(messageWithDebug);
     }
+  }
+
+  async prepareConnectionNote({ message }) {
+    if (!this.profileData) this.extractProfileData();
+    this.debugTrail = [];
+    this.debugStep('prepare:start', {
+      path: window.location.pathname,
+      msgLength: message?.length || 0
+    });
+
+    if (!message || !message.trim()) {
+      throw this.buildDebugError('Message is required to prepare note.');
+    }
+
+    const hasConnectAction = await this.clickConnect();
+    this.debugStep('prepare:connect-detected', { hasConnectAction });
+    if (!hasConnectAction) {
+      throw this.buildDebugError('Connect action not found on this profile.');
+    }
+
+    await this.sleep(800);
+    const addNoteBtnOpened = await this.clickAddNote();
+    this.debugStep('prepare:add-note-clicked', { addNoteBtnOpened });
+    if (!addNoteBtnOpened) {
+      throw this.buildDebugError('Unable to open add-note composer.');
+    }
+
+    await this.sleep(800);
+    const textareaFilled = await this.fillTextarea(message);
+    this.debugStep('prepare:textarea-filled', { textareaFilled });
+    if (!textareaFilled) {
+      throw this.buildDebugError('Unable to fill note textarea.');
+    }
+
+    return {
+      success: true,
+      waitingUserSend: true,
+      warning: this.detectPlatformWarnings(),
+    };
   }
 
   async completeInviteWithNote(message) {

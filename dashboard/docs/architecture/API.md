@@ -170,3 +170,24 @@ Ricerca aziende nella `companies_full` view per nome. Usato da `AddContactsModal
 | Admin | `/admin/*` | Richiede `role = admin` |
 
 Gestisce anche il refresh automatico del token Supabase via `supabase.auth.getUser()`.
+
+---
+
+## Enrichment Sessions (aggiunto 2026-03-11)
+
+| Method | Route | Purpose |
+|---|---|---|
+| GET | `/api/enrichment-sessions` | List team's sessions with progress counters |
+| POST | `/api/enrichment-sessions` | Create session + company rows |
+| GET | `/api/enrichment-sessions/[id]` | Session detail |
+| PATCH | `/api/enrichment-sessions/[id]` | Update name / status (pause) / model_config |
+| DELETE | `/api/enrichment-sessions/[id]` | Delete (blocked if running) |
+| GET | `/api/enrichment-sessions/[id]/companies` | Paginated company rows with logs |
+| **GET** | **`/api/enrichment-sessions/[id]/stream`** | **SSE — runs enrichment, streams events** |
+| POST | `/api/enrichment-sessions/[id]/apply` | Apply all done results to source tables |
+| POST | `/api/enrichment-sessions/[id]/companies/[companyRowId]/apply` | Apply single result |
+
+### SSE stream events
+`session_start`, `company_start`, `log`, `company_done`, `session_progress`, `heartbeat`, `session_complete`, `session_paused`, `error`
+
+See `dashboard/docs/features/ENRICHMENT_SESSIONS.md` for full event payloads.

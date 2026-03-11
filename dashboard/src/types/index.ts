@@ -92,6 +92,8 @@ export interface ChartFilterState {
 // ── Campaign types ─────────────────────────────────────────────────────────────
 
 export type CampaignStatus = "draft" | "active" | "paused" | "completed" | "archived";
+export type QuotaPolicy = "conservative" | "balanced" | "aggressive";
+export type IntegrationMode = "dashboard" | "legacy";
 
 export type ContactStatus =
   | "pending"
@@ -108,6 +110,10 @@ export interface Campaign {
   name: string;
   description: string | null;
   status: CampaignStatus;
+  connectionNoteTemplate?: string | null;
+  quotaPolicy?: QuotaPolicy;
+  pauseReason?: string | null;
+  integrationMode?: IntegrationMode;
   createdBy: string;
   createdAt: string;
   updatedAt: string;
@@ -135,10 +141,72 @@ export interface CampaignContact {
   notes: string | null;
   contactedAt: string | null;
   repliedAt: string | null;
+  claimedBy?: string | null;
+  claimExpiresAt?: string | null;
+  lastAttemptAt?: string | null;
+  lastErrorCode?: string | null;
   addedBy: string;
   addedAt: string;
   updatedAt: string;
 }
+
+export type OutreachRunStatus = "running" | "paused" | "stopped" | "completed";
+
+export interface OutreachRun {
+  id: string;
+  campaignId: string;
+  teamId: string;
+  startedBy: string;
+  status: OutreachRunStatus;
+  pauseReason: string | null;
+  startedAt: string;
+  endedAt: string | null;
+  updatedAt: string;
+}
+
+export interface OperatorProfile {
+  userId: string;
+  teamId: string;
+  linkedinUrl: string;
+  fullName: string;
+  headline: string | null;
+  confidence: number;
+  source: string;
+  htmlHash: string;
+  verifiedAt: string;
+}
+
+export interface OutreachEvent {
+  id: string;
+  campaignId: string;
+  campaignContactId: string;
+  runId: string | null;
+  actorUserId: string | null;
+  eventType: string;
+  payload: Record<string, unknown>;
+  createdAt: string;
+}
+
+export interface ClaimLease {
+  contactId: string;
+  companyId: string;
+  companyName: string;
+  contactName: string | null;
+  contactRole: string | null;
+  contactLinkedin: string | null;
+  message: string;
+  leaseExpiresAt: string;
+  runId: string | null;
+}
+
+export type PluginFailureCode =
+  | "captcha"
+  | "checkpoint"
+  | "rate_warning"
+  | "ui_unknown"
+  | "account_restricted"
+  | "network_error"
+  | "manual_abort";
 
 export interface CreateCampaignInput {
   name: string;
@@ -268,6 +336,126 @@ export interface FieldMappingResult {
   extra_fields: string[];
   source_name_suggestion: string;
   notes: string | null;
+}
+
+// ── Enrichment Session types ──────────────────────────────────────────────────
+
+export type EnrichmentSessionStatus = "pending" | "running" | "paused" | "completed" | "failed";
+export type EnrichmentCompanyStatus = "pending" | "running" | "done" | "failed" | "skipped";
+
+export interface EnrichmentModelConfig {
+  models: string[];
+  current_model_index: number;
+}
+
+export interface EnrichmentSession {
+  id: string;
+  teamId: string;
+  name: string;
+  status: EnrichmentSessionStatus;
+  modelConfig: EnrichmentModelConfig;
+  tokensInput: number;
+  tokensOutput: number;
+  tokensTotal: number;
+  totalCompanies: number;
+  completedCount: number;
+  foundCount: number;
+  failedCount: number;
+  startedAt: string | null;
+  completedAt: string | null;
+  lastHeartbeat: string | null;
+  createdBy: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface SSELogEntry {
+  ts: string; // ISO timestamp
+  event: "search" | "fetch" | "think" | "result";
+  data: {
+    text?: string;
+    query?: string;
+    url?: string;
+  };
+}
+
+export interface EnrichmentSessionCompany {
+  id: string;
+  sessionId: string;
+  companyId: string;
+  companyOrigin: "curated" | "imported";
+  companyName: string;
+  companyWebsite: string | null;
+  companyCountry: string | null;
+  status: EnrichmentCompanyStatus;
+  resultNome: string | null;
+  resultRuolo: string | null;
+  resultLinkedin: string | null;
+  resultConfidenza: "high" | "medium" | "low" | null;
+  logs: SSELogEntry[];
+  tokensInput: number;
+  tokensOutput: number;
+  modelUsed: string | null;
+  errorMessage: string | null;
+  appliedAt: string | null;
+  appliedBy: string | null;
+  position: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateEnrichmentSessionInput {
+  name: string;
+  companies: Array<{
+    companyId: string;
+    companyOrigin: "curated" | "imported";
+    companyName: string;
+    companyWebsite: string | null;
+    companyCountry: string | null;
+  }>;
+  modelConfig?: EnrichmentModelConfig;
+}
+
+// SSE event payloads (streamed from /api/enrichment-sessions/[id]/stream)
+export interface SSESessionStart {
+  sessionId: string;
+  totalCompanies: number;
+  resumedAt: number; // position index where we resumed from
+}
+
+export interface SSECompanyStart {
+  companyRowId: string;
+  position: number;
+  companyName: string;
+  model: string;
+}
+
+export interface SSELog {
+  companyRowId: string;
+  entry: SSELogEntry;
+}
+
+export interface SSECompanyDone {
+  companyRowId: string;
+  status: "done" | "failed";
+  result?: {
+    nome: string | null;
+    ruolo: string | null;
+    linkedin: string | null;
+    confidenza: "high" | "medium" | "low" | null;
+  };
+  tokensInput: number;
+  tokensOutput: number;
+  modelUsed: string | null;
+  errorMessage?: string;
+}
+
+export interface SSESessionProgress {
+  completed: number;
+  total: number;
+  found: number;
+  failed: number;
+  tokensTotal: number;
 }
 
 // ── Auth / Team types ─────────────────────────────────────────────────────────

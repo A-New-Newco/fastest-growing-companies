@@ -18,7 +18,7 @@ export async function PATCH(req: NextRequest, { params }: Params) {
   // RLS ensures only team members can see/update this contact
   const { data: existing } = await supabase
     .from("campaign_contacts")
-    .select("id, status")
+    .select("id, status, claimed_by, claim_expires_at, last_attempt_at, last_error_code")
     .eq("id", params.contactId)
     .eq("campaign_id", params.id)
     .maybeSingle();
@@ -76,6 +76,10 @@ export async function PATCH(req: NextRequest, { params }: Params) {
     notes: data.notes,
     contactedAt: data.contacted_at,
     repliedAt: data.replied_at,
+    claimedBy: data.claimed_by,
+    claimExpiresAt: data.claim_expires_at,
+    lastAttemptAt: data.last_attempt_at,
+    lastErrorCode: data.last_error_code,
     addedBy: data.added_by,
     addedAt: data.added_at,
     updatedAt: data.updated_at,

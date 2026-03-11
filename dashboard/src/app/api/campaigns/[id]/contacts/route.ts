@@ -19,7 +19,7 @@ export async function GET(_req: NextRequest, { params }: Params) {
   const { data: contactRows, error } = await supabase
     .from("campaign_contacts")
     .select(
-      "id, campaign_id, company_id, contact_name, contact_role, contact_linkedin, status, notes, contacted_at, replied_at, added_by, added_at, updated_at"
+      "id, campaign_id, company_id, contact_name, contact_role, contact_linkedin, status, notes, contacted_at, replied_at, claimed_by, claim_expires_at, last_attempt_at, last_error_code, added_by, added_at, updated_at"
     )
     .eq("campaign_id", params.id)
     .order("added_at", { ascending: true });
@@ -59,6 +59,10 @@ export async function GET(_req: NextRequest, { params }: Params) {
       notes: row.notes,
       contactedAt: row.contacted_at,
       repliedAt: row.replied_at,
+      claimedBy: row.claimed_by,
+      claimExpiresAt: row.claim_expires_at,
+      lastAttemptAt: row.last_attempt_at,
+      lastErrorCode: row.last_error_code,
       addedBy: row.added_by,
       addedAt: row.added_at,
       updatedAt: row.updated_at,

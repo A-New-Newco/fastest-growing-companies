@@ -37,11 +37,15 @@
       "Bash(npx tsc:*)",
       "Bash(ls /Users/francescofiore/Coding/Reef/fastest-growing-companies/dashboard/src/app/api/campaigns/[id]/)",
       "Bash(ls /Users/francescofiore/Coding/Reef/fastest-growing-companies/dashboard/src/app/campaigns/[id])",
-      "Bash(node -e \"require\\(''groq-sdk''\\)\")"
+      "Bash(node -e \"require\\(''groq-sdk''\\)\")",
+      "Bash(find /Users/francescofiore/Coding/Reef/fastest-growing-companies/dashboard/app/api -type f \\\\\\(-name *.ts -o -name *.tsx -o -name *.js \\\\\\))",
+      "Bash(grep -r \"stream\\\\|SSE\\\\|EventEmitter\\\\|ReadableStream\" /Users/francescofiore/Coding/Reef/fastest-growing-companies/dashboard/src --include=*.ts --include=*.tsx)",
+      "Bash(/Users/francescofiore/Coding/Reef/fastest-growing-companies/dashboard/docs/architecture/DATABASE.md:*)"
     ],
     "additionalDirectories": [
       "/Users/francescofiore/Coding/Reef/fastest-growing-companies/dashboard/src/app/campaigns",
-      "/Users/francescofiore/Coding/Reef/fastest-growing-companies/dashboard/src/app/api/imports/[batchId]"
+      "/Users/francescofiore/Coding/Reef/fastest-growing-companies/dashboard/src/app/api/imports/[batchId]",
+      "/Users/francescofiore/Coding/Reef/fastest-growing-companies/dashboard/src/app/api/enrichment-sessions/[id]"
     ]
   }
 }

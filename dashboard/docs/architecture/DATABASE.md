@@ -194,3 +194,15 @@ Vista materializzata che combina company data + contacts enrichment + annotation
 | Server (anon) | `src/lib/supabase/server.ts` | Letture in API routes, RLS attiva |
 | Admin (service role) | `src/lib/supabase/admin.ts` | Scritture in API routes, bypassa RLS |
 | Client (anon) | `src/lib/supabase/client.ts` | Letture dirette nei componenti, RLS attiva |
+
+| `005_enrichment_sessions.sql` | enrichment_sessions, enrichment_session_companies, enum enrichment_session_status/enrichment_company_status |
+
+### `enrichment_sessions`
+Team-scoped table. Tracks an enrichment run with aggregate progress counters and Groq model pool state.
+
+### `enrichment_session_companies`
+Per-company rows within a session. Stores snapshots (name/website/country), status, enrichment results, per-company logs (JSONB array), token usage, and whether the result has been applied back to the source record.
+
+RLS: both tables scoped via `enrichment_sessions.team_id → team_memberships`.
+
+See `dashboard/docs/features/ENRICHMENT_SESSIONS.md` for full schema.
