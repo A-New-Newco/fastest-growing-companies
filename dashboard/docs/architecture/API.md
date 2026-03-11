@@ -31,6 +31,7 @@ Recupera le annotations del team per un dato anno.
 | Param | Tipo | Default |
 |---|---|---|
 | `year` | query string | `2026` |
+| `country` | query string | `IT` (`all` per tutte) |
 
 **Auth**: team member. Usa client server (RLS).
 
@@ -151,8 +152,9 @@ Ricerca aziende nella `companies_full` view per nome. Usato da `AddContactsModal
 | `search` | query string | `""` (tutti) |
 | `limit` | number | `30` (max 100) |
 | `year` | number | `2026` |
+| `country` | query string | opzionale (`IT`, `DE`, ... oppure `all`) |
 
-**Returns**: array di `{ id, azienda, settore, regione, cfo_nome, cfo_ruolo, cfo_linkedin }`
+**Returns**: array di `{ id, azienda, settore, regione, country, cfo_nome, cfo_ruolo, cfo_linkedin }`
 
 ---
 

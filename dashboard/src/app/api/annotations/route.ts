@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { createAdminSupabaseClient } from "@/lib/supabase/admin";
+import { ALL_COUNTRIES_VALUE, DEFAULT_COUNTRY, normalizeCountryCode } from "@/lib/constants";
 
 // GET /api/annotations?year=2026
 export async function GET(req: NextRequest) {
@@ -12,11 +13,24 @@ export async function GET(req: NextRequest) {
   }
 
   const year = req.nextUrl.searchParams.get("year") ?? "2026";
+  const rawCountry = req.nextUrl.searchParams.get("country");
+  const country =
+    rawCountry === null
+      ? DEFAULT_COUNTRY
+      : rawCountry === ALL_COUNTRIES_VALUE
+      ? ALL_COUNTRIES_VALUE
+      : normalizeCountryCode(rawCountry);
 
-  const { data, error } = await supabase
+  let query = supabase
     .from("annotations")
     .select("id, company_id, contact_left, low_quality, note, updated_at, companies!inner(source_id, sources!inner(year))")
     .eq("companies.sources.year", parseInt(year));
+
+  if (country !== ALL_COUNTRIES_VALUE) {
+    query = query.eq("companies.sources.country", country);
+  }
+
+  const { data, error } = await query;
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });

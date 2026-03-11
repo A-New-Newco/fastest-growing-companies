@@ -1,6 +1,11 @@
 "use client";
 
 import { createClientSupabaseClient } from "@/lib/supabase/client";
+import {
+  ALL_COUNTRIES_VALUE,
+  DEFAULT_COUNTRY,
+  normalizeCountryCode,
+} from "@/lib/constants";
 import type {
   Annotation,
   Company,
@@ -23,8 +28,8 @@ interface CompanyFullRow {
   appearances: number | null;
   financials: { revenue_start: number | null; revenue_end: number | null } | null;
   year: number;
-  country: string;
-  source_name: string;
+  country: string | null;
+  source_name: string | null;
   contact_id: string | null;
   cfo_nome: string | null;
   cfo_ruolo: string | null;
@@ -142,6 +147,8 @@ function mapRow(row: CompanyFullRow): Company {
     regione: translateRegion(row.region),
     presenze: row.appearances ?? 0,
     sitoWeb: row.website ?? "",
+    country: normalizeCountryCode(row.country),
+    sourceName: row.source_name,
     cfoNome: row.cfo_nome,
     cfoRuolo: row.cfo_ruolo,
     cfoRuoloCategory: ruoloCategory,
@@ -153,16 +160,37 @@ function mapRow(row: CompanyFullRow): Company {
   };
 }
 
-export async function loadCompanies(year = 2026): Promise<Company[]> {
+export async function loadCompanies(
+  year = 2026,
+  country: string = DEFAULT_COUNTRY
+): Promise<Company[]> {
   const supabase = createClientSupabaseClient();
-  const { data, error } = await supabase
+  let query = supabase
     .from("companies_full")
     .select("*")
     .eq("year", year)
     .order("rank", { ascending: true });
 
+  if (country !== ALL_COUNTRIES_VALUE) {
+    query = query.eq("country", normalizeCountryCode(country));
+  }
+
+  const { data, error } = await query;
+
   if (error) throw new Error(`Failed to load companies: ${error.message}`);
   return (data as CompanyFullRow[]).map(mapRow);
+}
+
+export async function loadAvailableCountries(year = 2026): Promise<string[]> {
+  const supabase = createClientSupabaseClient();
+  const { data, error } = await supabase
+    .from("companies_full")
+    .select("country")
+    .eq("year", year);
+
+  if (error) throw new Error(`Failed to load countries: ${error.message}`);
+
+  return [...new Set((data ?? []).map((r) => normalizeCountryCode(r.country)))].sort();
 }
 
 // ── Annotation mutations ───────────────────────────────────────────────────────
@@ -193,6 +221,13 @@ export function filterCompanies(
   filters: FilterState
 ): Company[] {
   return companies.filter((c) => {
+    if (
+      filters.country !== ALL_COUNTRIES_VALUE &&
+      c.country !== normalizeCountryCode(filters.country)
+    ) {
+      return false;
+    }
+
     if (filters.search) {
       const q = filters.search.toLowerCase();
       if (

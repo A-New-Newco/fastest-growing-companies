@@ -154,6 +154,7 @@ async function main() {
 
     const companiesPayload = batch.map((r) => ({
       source_id: sourceId,
+      country: COUNTRY,
       rank: parseNumber(r, ["RANK"]) ?? null,
       name: pickFirstDefined(r, ["COMPANY", "AZIENDA"]) ?? "",
       website: pickFirstDefined(r, ["WEBSITE", "SITO WEB"]),

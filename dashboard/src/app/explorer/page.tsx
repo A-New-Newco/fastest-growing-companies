@@ -93,11 +93,22 @@ export default function ExplorerPage() {
   const { filters, setFilters } = useFilters();
 
   useEffect(() => {
-    loadCompanies()
-      .then(setCompanies)
+    let cancelled = false;
+    setLoading(true);
+
+    loadCompanies(2026, filters.country)
+      .then((rows) => {
+        if (!cancelled) setCompanies(rows);
+      })
       .catch(console.error)
-      .finally(() => setLoading(false));
-  }, []);
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [filters.country]);
 
   function handleAnnotationSave(
     companyId: string,

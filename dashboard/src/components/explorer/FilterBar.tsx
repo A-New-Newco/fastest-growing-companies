@@ -81,7 +81,7 @@ export default function FilterBar({
   }
 
   function reset() {
-    onChange({ ...DEFAULT_FILTER_STATE });
+    onChange({ ...DEFAULT_FILTER_STATE, country: filters.country });
   }
 
   return (

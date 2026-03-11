@@ -12,6 +12,7 @@
 | `001_auth_and_teams.sql` | profiles, teams, team_memberships, join_requests, annotations (+ RLS) |
 | `002_team_scoped_annotations.sql` | aggiunge `team_id` ad annotations, riscrive RLS |
 | `003_campaigns.sql` | campaigns, campaign_contacts, enum campaign_status/contact_status |
+| `004_country_support.sql` | aggiunge `country` a `sources` e `companies` per supporto multi-country |
 
 ---
 
@@ -160,6 +161,8 @@ Vista materializzata che combina company data + contacts enrichment + annotation
 | `appearances` | presenze nel ranking (0–7) |
 | `financials` | `{ revenue_start, revenue_end }` (in migliaia €) |
 | `year` | anno del ranking |
+| `country` | ISO-3166 alpha-2 (es. `IT`, `DE`) |
+| `source_name` | nome della fonte ranking |
 | `cfo_nome` | nome contatto |
 | `cfo_ruolo` | ruolo raw |
 | `cfo_ruolo_category` | categoria normalizzata |

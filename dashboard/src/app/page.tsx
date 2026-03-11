@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { loadCompanies } from "@/lib/data";
+import { ALL_COUNTRIES_VALUE, getCountryLabel } from "@/lib/constants";
+import { useFilters } from "@/lib/filter-context";
 import type { Company } from "@/types";
 import KpiGrid from "@/components/overview/KpiGrid";
 import CfoQualityBreakdown from "@/components/overview/CfoQualityBreakdown";
@@ -10,22 +12,39 @@ import Top10Table from "@/components/overview/Top10Table";
 export default function OverviewPage() {
   const [companies, setCompanies] = useState<Company[]>([]);
   const [loading, setLoading] = useState(true);
+  const { filters } = useFilters();
 
   useEffect(() => {
-    loadCompanies()
-      .then(setCompanies)
-      .finally(() => setLoading(false));
-  }, []);
+    let cancelled = false;
+    setLoading(true);
+
+    loadCompanies(2026, filters.country)
+      .then((rows) => {
+        if (!cancelled) setCompanies(rows);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [filters.country]);
+
+  const countryLabel =
+    filters.country === ALL_COUNTRIES_VALUE
+      ? "All Countries"
+      : getCountryLabel(filters.country);
 
   return (
     <div className="mx-auto max-w-screen-xl px-6 py-8 space-y-6">
       {/* Page header */}
       <div className="pb-2 border-b border-slate-200">
         <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
-          Italy&apos;s Fastest Growing Companies
+          Fastest Growing Companies
         </h1>
         <p className="mt-1 text-sm text-slate-500">
-          2026 Edition &middot; Il Sole 24 Ore &mdash; Leaders of Growth
+          2026 Edition &middot; {countryLabel} &middot; Il Sole 24 Ore &mdash; Leaders of Growth
         </p>
       </div>
 

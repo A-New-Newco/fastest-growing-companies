@@ -109,8 +109,39 @@ export const SECTOR_COLORS: Record<string, string> = {
 // Default color for unknown sectors
 export const DEFAULT_SECTOR_COLOR = "#94a3b8";
 
+// ── Country metadata ──────────────────────────────────────────────────────────
+export const DEFAULT_COUNTRY = "IT";
+export const ALL_COUNTRIES_VALUE = "all";
+
+const COUNTRY_LABELS: Record<string, string> = {
+  IT: "Italy",
+  DE: "Germany",
+  FR: "France",
+  ES: "Spain",
+  PT: "Portugal",
+  UK: "United Kingdom",
+  GB: "United Kingdom",
+  US: "United States",
+  NL: "Netherlands",
+  BE: "Belgium",
+  CH: "Switzerland",
+  AT: "Austria",
+};
+
+export function normalizeCountryCode(value: string | null | undefined): string {
+  const normalized = value?.trim().toUpperCase();
+  return normalized && normalized.length > 0 ? normalized : DEFAULT_COUNTRY;
+}
+
+export function getCountryLabel(code: string): string {
+  if (code === ALL_COUNTRIES_VALUE) return "All countries";
+  const normalized = normalizeCountryCode(code);
+  return COUNTRY_LABELS[normalized] ?? normalized;
+}
+
 // ── Filter defaults ────────────────────────────────────────────────────────────
 export const DEFAULT_FILTER_STATE = {
+  country: DEFAULT_COUNTRY,
   search: "",
   settori: [] as string[],
   regioni: [] as string[],

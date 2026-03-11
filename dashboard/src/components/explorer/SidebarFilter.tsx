@@ -225,7 +225,9 @@ export default function SidebarFilter({
           </span>
           {hasActive && (
             <button
-              onClick={() => onChange({ ...DEFAULT_FILTER_STATE })}
+              onClick={() =>
+                onChange({ ...DEFAULT_FILTER_STATE, country: filters.country })
+              }
               className="flex items-center gap-0.5 text-[11px] text-indigo-600 hover:text-indigo-800 font-medium"
             >
               <X className="w-3 h-3" />

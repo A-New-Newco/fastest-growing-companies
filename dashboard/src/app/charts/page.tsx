@@ -30,10 +30,21 @@ export default function ChartsPage() {
   const { filters, setFilters } = useFilters();
 
   useEffect(() => {
-    loadCompanies()
-      .then(setCompanies)
-      .finally(() => setLoading(false));
-  }, []);
+    let cancelled = false;
+    setLoading(true);
+
+    loadCompanies(2026, filters.country)
+      .then((rows) => {
+        if (!cancelled) setCompanies(rows);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [filters.country]);
 
   const filtered = useMemo(
     () => filterCompanies(companies, filters),

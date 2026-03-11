@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { ALL_COUNTRIES_VALUE, normalizeCountryCode } from "@/lib/constants";
 
 // GET /api/companies/search?search=acme&limit=30&year=2026
 export async function GET(req: NextRequest) {
@@ -15,13 +16,22 @@ export async function GET(req: NextRequest) {
   const q = req.nextUrl.searchParams.get("search") ?? "";
   const limit = Math.min(Number(req.nextUrl.searchParams.get("limit") ?? "30"), 100);
   const year = Number(req.nextUrl.searchParams.get("year") ?? "2026");
+  const rawCountry = req.nextUrl.searchParams.get("country");
+  const country =
+    rawCountry && rawCountry !== ALL_COUNTRIES_VALUE
+      ? normalizeCountryCode(rawCountry)
+      : null;
 
   let query = supabase
     .from("companies_full")
-    .select("id, name, sector, region, cfo_nome, cfo_ruolo, cfo_linkedin")
+    .select("id, name, sector, region, country, cfo_nome, cfo_ruolo, cfo_linkedin")
     .eq("year", year)
     .order("rank", { ascending: true })
     .limit(limit);
+
+  if (country) {
+    query = query.eq("country", country);
+  }
 
   if (q.trim()) {
     query = query.ilike("name", `%${q.trim()}%`);
@@ -39,6 +49,7 @@ export async function GET(req: NextRequest) {
       azienda: row.name,
       settore: row.sector,
       regione: row.region,
+      country: row.country,
       cfo_nome: row.cfo_nome,
       cfo_ruolo: row.cfo_ruolo,
       cfo_linkedin: row.cfo_linkedin,

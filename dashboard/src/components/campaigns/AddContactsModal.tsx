@@ -10,7 +10,9 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Linkedin, Plus, X, Search } from "lucide-react";
+import { Linkedin, Plus, Search } from "lucide-react";
+import { ALL_COUNTRIES_VALUE, normalizeCountryCode } from "@/lib/constants";
+import { useFilters } from "@/lib/filter-context";
 import type { CampaignContact } from "@/types";
 
 interface ContactRow {
@@ -36,6 +38,7 @@ export default function AddContactsModal({
   onClose,
   onAdded,
 }: Props) {
+  const { filters } = useFilters();
   const [search, setSearch] = useState("");
   const [rows, setRows] = useState<ContactRow[]>([]);
   const [loading, setLoading] = useState(false);
@@ -46,6 +49,9 @@ export default function AddContactsModal({
     setLoading(true);
     try {
       const params = new URLSearchParams({ search: q, limit: "30" });
+      if (filters.country !== ALL_COUNTRIES_VALUE) {
+        params.set("country", normalizeCountryCode(filters.country));
+      }
       const res = await fetch(`/api/companies/search?${params}`);
       if (!res.ok) throw new Error("Failed to load companies");
       const data: Array<{
@@ -71,12 +77,14 @@ export default function AddContactsModal({
     } finally {
       setLoading(false);
     }
-  }, [existingContactCompanyIds]);
+  }, [existingContactCompanyIds, filters.country]);
 
   useEffect(() => {
     fetchCompanies(search);
+    // Intentionally exclude fetchCompanies to avoid re-fetching on every render:
+    // existingContactCompanyIds is a Set recreated by the parent.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [search]);
+  }, [search, filters.country]);
 
   const selectedRows = rows.filter((r) => r.selected && !r.alreadyAdded);
 

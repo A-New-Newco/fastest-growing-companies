@@ -58,7 +58,7 @@ interface CompanyTableProps {
 
 function exportToCsv(companies: Company[]) {
   const headers = [
-    "Rank", "Company", "Sector", "Region", "Growth Rate (%)",
+    "Rank", "Company", "Country", "Source", "Sector", "Region", "Growth Rate (%)",
     "Revenue 2021 (K€)", "Revenue 2024 (K€)", "Website",
     "CFO Name", "CFO Role", "CFO Category", "CFO LinkedIn", "Confidence",
     "Contact Left", "Low Quality", "Note",
@@ -66,6 +66,8 @@ function exportToCsv(companies: Company[]) {
   const rows = companies.map((c) => [
     c.rank,
     c.azienda,
+    c.country,
+    c.sourceName ?? "",
     c.settore,
     c.regione,
     c.tassoCrescita,

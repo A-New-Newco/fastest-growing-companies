@@ -30,6 +30,8 @@ export interface Company {
   regione: string;
   presenze: number; // 0–7 (times appeared in ranking)
   sitoWeb: string;
+  country: string; // ISO-3166 alpha-2 (e.g. IT, DE)
+  sourceName: string | null;
   cfoNome: string | null;
   cfoRuolo: string | null; // original raw value
   cfoRuoloCategory: RuoloCategory;
@@ -54,6 +56,7 @@ export interface RegionStats {
 }
 
 export interface FilterState {
+  country: string; // ISO-3166 alpha-2 or "all"
   search: string;
   settori: string[];
   regioni: string[];

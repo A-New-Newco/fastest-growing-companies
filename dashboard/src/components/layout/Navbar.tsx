@@ -1,9 +1,27 @@
 "use client";
 
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Globe } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { loadAvailableCountries } from "@/lib/data";
 import { useAuth } from "@/lib/auth-context";
+import { useFilters } from "@/lib/filter-context";
+import {
+  ALL_COUNTRIES_VALUE,
+  DEFAULT_COUNTRY,
+  DEFAULT_FILTER_STATE,
+  getCountryLabel,
+  normalizeCountryCode,
+} from "@/lib/constants";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 function LogoMark() {
   return (
@@ -58,6 +76,49 @@ const ADMIN_LINKS = [
 export default function Navbar() {
   const pathname = usePathname();
   const { user, isAdmin, signOut } = useAuth();
+  const { filters, setFilters } = useFilters();
+  const [countries, setCountries] = useState<string[]>([DEFAULT_COUNTRY]);
+
+  useEffect(() => {
+    if (!user) return;
+
+    let cancelled = false;
+
+    loadAvailableCountries()
+      .then((rows) => {
+        if (cancelled) return;
+        setCountries(rows.length > 0 ? rows : [DEFAULT_COUNTRY]);
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setCountries((prev) => (prev.length > 0 ? prev : [DEFAULT_COUNTRY]));
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [user]);
+
+  const selectedCountry =
+    filters.country === ALL_COUNTRIES_VALUE
+      ? ALL_COUNTRIES_VALUE
+      : normalizeCountryCode(filters.country);
+
+  const countryOptions = useMemo(() => {
+    const codes = new Set(countries.map((c) => normalizeCountryCode(c)));
+    if (selectedCountry !== ALL_COUNTRIES_VALUE) {
+      codes.add(selectedCountry);
+    }
+    return [ALL_COUNTRIES_VALUE, ...Array.from(codes).sort()];
+  }, [countries, selectedCountry]);
+
+  function handleCountryChange(value: string) {
+    const country =
+      value === ALL_COUNTRIES_VALUE ? ALL_COUNTRIES_VALUE : normalizeCountryCode(value);
+    // Country switch resets local filters to avoid stale sector/region criteria.
+    setFilters({ ...DEFAULT_FILTER_STATE, country });
+  }
 
   return (
     <header className="sticky top-0 z-50 w-full bg-slate-900 border-b border-slate-700/60">
@@ -122,6 +183,29 @@ export default function Navbar() {
                 );
               })}
           </nav>
+
+          {/* Country selector */}
+          {user && (
+            <div className="hidden md:flex items-center gap-2 ml-3 pl-3 border-l border-slate-700">
+              <Globe className="w-3.5 h-3.5 text-slate-400" />
+              <Select value={selectedCountry} onValueChange={handleCountryChange}>
+                <SelectTrigger className="h-8 w-[156px] border-slate-700 bg-slate-800/80 text-slate-100 text-xs focus:ring-indigo-500 focus:ring-offset-slate-900">
+                  <SelectValue placeholder="Country" />
+                </SelectTrigger>
+                <SelectContent className="border-slate-700 bg-slate-900 text-slate-100">
+                  {countryOptions.map((code) => (
+                    <SelectItem
+                      key={code}
+                      value={code}
+                      className="text-xs text-slate-100 focus:bg-slate-800 focus:text-white"
+                    >
+                      {getCountryLabel(code)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
 
           {/* User menu */}
           {user && (
