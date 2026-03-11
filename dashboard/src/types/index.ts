@@ -85,6 +85,79 @@ export interface ChartFilterState {
   growthRange: [number, number];
 }
 
+// ── Campaign types ─────────────────────────────────────────────────────────────
+
+export type CampaignStatus = "draft" | "active" | "paused" | "completed" | "archived";
+
+export type ContactStatus =
+  | "pending"
+  | "contacted"
+  | "replied"
+  | "meeting_scheduled"
+  | "converted"
+  | "not_interested"
+  | "no_reply";
+
+export interface Campaign {
+  id: string;
+  teamId: string;
+  name: string;
+  description: string | null;
+  status: CampaignStatus;
+  createdBy: string;
+  createdAt: string;
+  updatedAt: string;
+  // Computed stats (aggregated by API)
+  totalContacts?: number;
+  contactedCount?: number;
+  repliedCount?: number;
+  convertedCount?: number;
+}
+
+export interface CampaignContact {
+  id: string;
+  campaignId: string;
+  companyId: string;
+  // Company snapshot (joined)
+  companyName?: string;
+  companySector?: string;
+  companyRegion?: string;
+  companyLinkedin?: string;
+  // Contact info (pre-filled from CFO data, editable)
+  contactName: string | null;
+  contactRole: string | null;
+  contactLinkedin: string | null;
+  status: ContactStatus;
+  notes: string | null;
+  contactedAt: string | null;
+  repliedAt: string | null;
+  addedBy: string;
+  addedAt: string;
+  updatedAt: string;
+}
+
+export interface CreateCampaignInput {
+  name: string;
+  description?: string;
+}
+
+export interface AddContactsToCampaignInput {
+  companies: Array<{
+    companyId: string;
+    contactName: string | null;
+    contactRole: string | null;
+    contactLinkedin: string | null;
+  }>;
+}
+
+export interface UpdateContactInput {
+  status?: ContactStatus;
+  notes?: string;
+  contactName?: string;
+  contactRole?: string;
+  contactLinkedin?: string;
+}
+
 // ── Auth / Team types ─────────────────────────────────────────────────────────
 
 export type MembershipRole = "admin" | "member";

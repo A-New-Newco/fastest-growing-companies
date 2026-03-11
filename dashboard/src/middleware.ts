@@ -64,11 +64,13 @@ export async function middleware(request: NextRequest) {
 
   // --- Authenticated: check membership ---
   if (!isPublicRoute) {
-    const { data: membership, error: membershipError } = await supabase
+    const { data: memberships, error: membershipError } = await supabase
       .from("team_memberships")
-      .select("role")
+      .select("team_id, role")
       .eq("user_id", user.id)
-      .maybeSingle()
+    const hasMembership = (memberships?.length ?? 0) > 0
+    const hasAdminMembership =
+      memberships?.some((membership) => membership.role === "admin") ?? false
 
     if (membershipError) {
       // DB query failed (likely auth issue) — force re-login
@@ -76,7 +78,7 @@ export async function middleware(request: NextRequest) {
       return redirect("/login")
     }
 
-    if (!membership) {
+    if (!hasMembership) {
       // No membership — check join request status
       const { data: joinRequest } = await supabase
         .from("join_requests")
@@ -86,16 +88,14 @@ export async function middleware(request: NextRequest) {
         .limit(1)
         .maybeSingle()
 
-      if (!joinRequest || joinRequest.status === "rejected") {
-        if (!isLimboRoute || pathname === "/pending-approval") {
-          const dest = new URL("/join-team", request.url)
-          if (joinRequest?.status === "rejected") dest.searchParams.set("rejected", "true")
-          return redirect(dest)
-        }
-      } else if (joinRequest.status === "pending") {
+      if (joinRequest?.status === "pending") {
         if (pathname !== "/pending-approval") {
           return redirect("/pending-approval")
         }
+      } else if (!isLimboRoute || pathname === "/pending-approval") {
+        const dest = new URL("/join-team", request.url)
+        if (joinRequest?.status === "rejected") dest.searchParams.set("rejected", "true")
+        return redirect(dest)
       }
 
       return supabaseResponse
@@ -107,7 +107,7 @@ export async function middleware(request: NextRequest) {
     }
 
     // Admin-only routes
-    if (isAdminRoute && membership.role !== "admin") {
+    if (isAdminRoute && !hasAdminMembership) {
       return redirect("/")
     }
   }

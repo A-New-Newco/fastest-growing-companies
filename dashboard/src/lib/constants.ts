@@ -1,4 +1,4 @@
-import type { RuoloCategory, Confidenza } from "@/types";
+import type { RuoloCategory, Confidenza, CampaignStatus, ContactStatus } from "@/types";
 
 // ── CFO Role Category metadata ─────────────────────────────────────────────────
 export const ROLE_CATEGORY_META: Record<
@@ -127,3 +127,29 @@ export const DEFAULT_FILTER_STATE = {
 // ── Categories considered "real CFO" for HAS_REAL_CFO logic ──────────────────
 export const REAL_CFO_CATEGORIES: RuoloCategory[] = ["CFO / DAF", "Finance Manager"];
 export const REAL_CFO_CONFIDENCES: Confidenza[] = ["high", "medium"];
+
+// ── Campaign status metadata ───────────────────────────────────────────────────
+export const CAMPAIGN_STATUS_META: Record<
+  CampaignStatus,
+  { label: string; color: string; bg: string }
+> = {
+  draft:     { label: "Draft",     color: "#475569", bg: "#f1f5f9" },
+  active:    { label: "Active",    color: "#166534", bg: "#dcfce7" },
+  paused:    { label: "Paused",    color: "#92400e", bg: "#fef3c7" },
+  completed: { label: "Completed", color: "#3730a3", bg: "#e0e7ff" },
+  archived:  { label: "Archived",  color: "#64748b", bg: "#f8fafc" },
+};
+
+// ── Contact status metadata ────────────────────────────────────────────────────
+export const CONTACT_STATUS_META: Record<
+  ContactStatus,
+  { label: string; color: string; bg: string }
+> = {
+  pending:           { label: "Pending",           color: "#475569", bg: "#f1f5f9" },
+  contacted:         { label: "Contacted",          color: "#1d4ed8", bg: "#dbeafe" },
+  replied:           { label: "Replied",            color: "#92400e", bg: "#fef3c7" },
+  meeting_scheduled: { label: "Meeting Scheduled",  color: "#6d28d9", bg: "#ede9fe" },
+  converted:         { label: "Converted",          color: "#166534", bg: "#dcfce7" },
+  not_interested:    { label: "Not Interested",     color: "#991b1b", bg: "#fee2e2" },
+  no_reply:          { label: "No Reply",           color: "#334155", bg: "#e2e8f0" },
+};

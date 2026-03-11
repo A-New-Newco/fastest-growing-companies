@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import {
   useReactTable,
   getCoreRowModel,
@@ -9,6 +9,7 @@ import {
   flexRender,
   createColumnHelper,
   type SortingState,
+  type RowSelectionState,
 } from "@tanstack/react-table";
 import {
   ArrowUpDown,
@@ -21,6 +22,8 @@ import {
   UserX,
   ThumbsDown,
   StickyNote,
+  Plus,
+  X,
 } from "lucide-react";
 import {
   Table,
@@ -42,12 +45,15 @@ import type { Annotation, Company } from "@/types";
 import { formatRevenue, formatGrowth } from "@/lib/data";
 import { ROLE_CATEGORY_META, CONFIDENCE_META } from "@/lib/constants";
 import AnnotationModal from "./AnnotationModal";
+import AddToCampaignModal from "@/components/campaigns/AddToCampaignModal";
 
 const columnHelper = createColumnHelper<Company>();
 
 interface CompanyTableProps {
   companies: Company[];
   onAnnotationSave?: (companyId: string, annotation: Omit<Annotation, "companyId">) => void;
+  // Selection mode (optional — campaigns feature)
+  selectionMode?: boolean;
 }
 
 function exportToCsv(companies: Company[]) {
@@ -87,12 +93,55 @@ function exportToCsv(companies: Company[]) {
   URL.revokeObjectURL(url);
 }
 
-export default function CompanyTable({ companies, onAnnotationSave }: CompanyTableProps) {
+export default function CompanyTable({ companies, onAnnotationSave, selectionMode = false }: CompanyTableProps) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 25 });
   const [editingCompany, setEditingCompany] = useState<Company | null>(null);
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
+  const [addToCampaignOpen, setAddToCampaignOpen] = useState(false);
 
-  const columns = useMemo(
+  // Reset selection when companies change (e.g. filter applied)
+  useEffect(() => {
+    setRowSelection({});
+  }, [companies]);
+
+  const selectedIds = Object.keys(rowSelection).filter((k) => rowSelection[k]);
+
+  const selectedCompanies = useMemo(
+    () => companies.filter((c) => rowSelection[c.id]),
+    [companies, rowSelection]
+  );
+
+  const checkboxColumn = useMemo(
+    () =>
+      columnHelper.display({
+        id: "select",
+        header: ({ table }) => (
+          <input
+            type="checkbox"
+            checked={table.getIsAllPageRowsSelected()}
+            ref={(el) => {
+              if (el) el.indeterminate = table.getIsSomePageRowsSelected();
+            }}
+            onChange={table.getToggleAllPageRowsSelectedHandler()}
+            className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-400 cursor-pointer"
+          />
+        ),
+        cell: ({ row }) => (
+          <input
+            type="checkbox"
+            checked={row.getIsSelected()}
+            onChange={row.getToggleSelectedHandler()}
+            onClick={(e) => e.stopPropagation()}
+            className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-400 cursor-pointer"
+          />
+        ),
+        size: 40,
+      }),
+    []
+  );
+
+  const dataColumns = useMemo(
     () => [
       columnHelper.accessor("rank", {
         header: "#",
@@ -284,15 +333,23 @@ export default function CompanyTable({ companies, onAnnotationSave }: CompanyTab
     []
   );
 
+  const columns = useMemo(
+    () => (selectionMode ? [checkboxColumn, ...dataColumns] : dataColumns),
+    [selectionMode, checkboxColumn, dataColumns]
+  );
+
   const table = useReactTable({
     data: companies,
     columns,
-    state: { sorting, pagination },
+    state: { sorting, pagination, rowSelection },
     onSortingChange: setSorting,
     onPaginationChange: setPagination,
+    onRowSelectionChange: setRowSelection,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
+    getRowId: (row) => row.id,
+    enableRowSelection: selectionMode,
     manualPagination: false,
   });
 
@@ -357,6 +414,7 @@ export default function CompanyTable({ companies, onAnnotationSave }: CompanyTab
                     <TableRow
                       key={row.id}
                       className="hover:bg-slate-50/60 transition-colors group/row"
+                      data-selected={row.getIsSelected() || undefined}
                     >
                       {row.getVisibleCells().map((cell) => (
                         <TableCell key={cell.id} className="py-2.5">
@@ -435,6 +493,33 @@ export default function CompanyTable({ companies, onAnnotationSave }: CompanyTab
         </div>
       </div>
 
+      {/* Floating selection action bar */}
+      {selectionMode && selectedIds.length > 0 && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40
+                        flex items-center gap-3 px-4 py-2.5 rounded-full shadow-xl
+                        bg-slate-900 border border-slate-700 text-white text-sm">
+          <span className="tabular-nums font-medium">
+            {selectedIds.length} selected
+          </span>
+          <button
+            onClick={() => setRowSelection({})}
+            className="text-slate-400 hover:text-white"
+            title="Clear selection"
+          >
+            <X className="w-3.5 h-3.5" />
+          </button>
+          <div className="w-px h-4 bg-slate-600" />
+          <button
+            onClick={() => setAddToCampaignOpen(true)}
+            className="flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-500
+                       text-white text-xs font-medium px-3 py-1.5 rounded-full transition-colors"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            Add to campaign
+          </button>
+        </div>
+      )}
+
       <AnnotationModal
         company={editingCompany}
         onClose={() => setEditingCompany(null)}
@@ -443,6 +528,21 @@ export default function CompanyTable({ companies, onAnnotationSave }: CompanyTab
           onAnnotationSave?.(id, ann);
         }}
       />
+
+      {addToCampaignOpen && (
+        <AddToCampaignModal
+          open={addToCampaignOpen}
+          selectedCompanies={selectedCompanies.map((c) => ({
+            id: c.id,
+            azienda: c.azienda,
+            cfoNome: c.cfoNome,
+            cfoRuolo: c.cfoRuolo,
+            cfoLinkedin: c.cfoLinkedin,
+          }))}
+          onClose={() => setAddToCampaignOpen(false)}
+          onAdded={() => setRowSelection({})}
+        />
+      )}
     </>
   );
 }

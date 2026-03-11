@@ -7,8 +7,10 @@
 ## How to Resume
 
 1. Read `docs/PRD.md` for the full spec
-2. Check which steps are done below
-3. Continue from the first `[ ]` or `[~]` step
+2. Read `docs/architecture/` for current DB schema and API routes
+3. Read `docs/features/` for feature-specific docs
+4. Check which steps are done below
+5. Continue from the first `[ ]` or `[~]` step
 
 ---
 
@@ -26,6 +28,10 @@
 - [x] Step 8: Charts base — TopSectorsBar, RoleDistributionPie (with "Other" modal), ConfidenceBar
 - [x] Step 9: GrowthRevenueScatter + RegionMap (react-simple-maps + italy-regions.json)
 - [x] Step 10: Build verification — `npm run build` passes 0 errors (Recharts v3 type fixes applied)
+- [x] Step 11: Supabase auth + multi-team — profiles, teams, team_memberships, join_requests, middleware, /login, /join-team, /pending-approval, /admin/requests
+- [x] Step 12: Team-scoped annotations — migration 002, `annotations` table con `team_id`, API `/api/annotations`, AnnotationModal
+- [x] Step 13: Campagne LinkedIn outreach — migration 003, tabelle `campaigns` + `campaign_contacts`, 8 API routes, 10 componenti, pagine `/campaigns` e `/campaigns/[id]`, row selection nell'Explorer → vedere `docs/features/CAMPAIGNS.md`
+- [x] Step 14: Docs restructure — `docs/` organizzato in `features/` e `architecture/`, regole di aggiornamento in `CLAUDE.md`
 
 ---
 
@@ -48,3 +54,6 @@
 | 2026-03-07 | Recharts over Tremor | More controllable, native scatter plot, lighter bundle |
 | 2026-03-07 | TanStack Table v8 | Declarative sort/filter, shadcn Table as render layer |
 | 2026-03-07 | "Real CFO" = CFO/DAF or Finance Manager + medium/high confidence | 92.4% "contact found" is misleading; only ~28% are true finance officers |
+| 2026-03-11 | Campaign contacts stored separately from companies | Permette tracking per-campagna, deduplicazione, e future integrazioni con il plugin |
+| 2026-03-11 | Optimistic updates per status contatto | Evita latenza percepita; rollback su errore |
+| 2026-03-11 | `companies_full` view per join dei dati azienda nei contacts | Evita dipendenza dalla struttura interna della tabella companies |

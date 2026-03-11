@@ -12,53 +12,76 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
-  // Verify the caller is an admin in any team
-  const { data: membership } = await supabase
-    .from("team_memberships")
-    .select("role")
-    .eq("user_id", user.id)
-    .maybeSingle()
+  const body = await req.json().catch(() => null)
+  const requestId = typeof body?.request_id === "string" ? body.request_id : ""
+  const action = body?.action
 
-  if (membership?.role !== "admin") {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 })
-  }
-
-  const { request_id, action } = await req.json()
-
-  if (!request_id || !["approve", "reject"].includes(action)) {
+  if (!requestId || (action !== "approve" && action !== "reject")) {
     return NextResponse.json({ error: "Invalid payload" }, { status: 400 })
   }
 
   const admin = createAdminSupabaseClient()
+  const { data: joinRequest, error: joinRequestError } = await admin
+    .from("join_requests")
+    .select("id, team_id, user_id, status")
+    .eq("id", requestId)
+    .maybeSingle()
+
+  if (joinRequestError) {
+    return NextResponse.json({ error: joinRequestError.message }, { status: 500 })
+  }
+  if (!joinRequest) {
+    return NextResponse.json({ error: "Request not found" }, { status: 404 })
+  }
+
+  // Verify the caller is admin for the request team
+  const { data: membership, error: membershipError } = await supabase
+    .from("team_memberships")
+    .select("id")
+    .eq("user_id", user.id)
+    .eq("team_id", joinRequest.team_id)
+    .eq("role", "admin")
+    .maybeSingle()
+
+  if (membershipError) {
+    return NextResponse.json({ error: membershipError.message }, { status: 500 })
+  }
+  if (!membership) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 })
+  }
+  if (joinRequest.status !== "pending") {
+    return NextResponse.json({ error: "Request already reviewed" }, { status: 409 })
+  }
 
   // Update join_request status
-  const { data: joinRequest, error: updateError } = await admin
+  const { data: reviewedRequest, error: updateError } = await admin
     .from("join_requests")
     .update({
       status: action === "approve" ? "approved" : "rejected",
       reviewed_by: user.id,
       reviewed_at: new Date().toISOString(),
     })
-    .eq("id", request_id)
-    .select()
-    .single()
+    .eq("id", requestId)
+    .eq("status", "pending")
+    .select("id, team_id, user_id")
+    .maybeSingle()
 
-  if (updateError || !joinRequest) {
-    return NextResponse.json(
-      { error: updateError?.message ?? "Request not found" },
-      { status: 500 }
-    )
+  if (updateError) {
+    return NextResponse.json({ error: updateError.message }, { status: 500 })
+  }
+  if (!reviewedRequest) {
+    return NextResponse.json({ error: "Request already reviewed" }, { status: 409 })
   }
 
   // If approving, create team membership
   if (action === "approve") {
     const { error: memberError } = await admin.from("team_memberships").insert({
-      team_id: joinRequest.team_id,
-      user_id: joinRequest.user_id,
+      team_id: reviewedRequest.team_id,
+      user_id: reviewedRequest.user_id,
       role: "member",
     })
 
-    if (memberError) {
+    if (memberError && memberError.code !== "23505") {
       return NextResponse.json({ error: memberError.message }, { status: 500 })
     }
   }

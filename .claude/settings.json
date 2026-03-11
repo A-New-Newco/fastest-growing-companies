@@ -33,7 +33,11 @@
       "Bash(/Users/francescofiore/Coding/Reef/fastest-growing-companies/dashboard/src/app/login/page.tsx:*)",
       "Bash(/Users/francescofiore/Coding/Reef/fastest-growing-companies/dashboard/src/app/join-team/page.tsx:*)",
       "Bash(grep -v \"^$\")",
-      "Bash(npx vercel:*)"
+      "Bash(npx vercel:*)",
+      "Bash(npx tsc:*)"
+    ],
+    "additionalDirectories": [
+      "/Users/francescofiore/Coding/Reef/fastest-growing-companies/dashboard/src/app/campaigns"
     ]
   }
 }

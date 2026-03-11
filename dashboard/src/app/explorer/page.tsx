@@ -10,7 +10,7 @@ import {
 import type { Annotation, Company } from "@/types";
 import { useFilters } from "@/lib/filter-context";
 import { cn } from "@/lib/utils";
-import { TableIcon, BarChart2 } from "lucide-react";
+import { TableIcon, BarChart2, CheckSquare } from "lucide-react";
 import SidebarFilter from "@/components/explorer/SidebarFilter";
 import CompanyTable from "@/components/explorer/CompanyTable";
 import CfoPresenceBySettore from "@/components/charts/CfoPresenceBySettore";
@@ -89,6 +89,7 @@ export default function ExplorerPage() {
   const [companies, setCompanies] = useState<Company[]>([]);
   const [loading, setLoading] = useState(true);
   const [view, setView] = useState<View>("table");
+  const [selectionMode, setSelectionMode] = useState(false);
   const { filters, setFilters } = useFilters();
 
   useEffect(() => {
@@ -168,6 +169,22 @@ export default function ExplorerPage() {
             </button>
           </div>
 
+          {/* Selection mode toggle (table view only) */}
+          {view === "table" && (
+            <button
+              onClick={() => setSelectionMode((v) => !v)}
+              className={cn(
+                "flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md border transition-all",
+                selectionMode
+                  ? "border-indigo-400 bg-indigo-50 text-indigo-700"
+                  : "border-slate-200 text-slate-500 hover:text-slate-700 hover:border-slate-300"
+              )}
+            >
+              <CheckSquare className="w-3.5 h-3.5" />
+              {selectionMode ? "Selecting" : "Select"}
+            </button>
+          )}
+
           <span className="text-xs text-slate-400 tabular-nums ml-auto">
             <span className="font-semibold text-slate-700">{filtered.length}</span>
             {" / "}
@@ -184,7 +201,11 @@ export default function ExplorerPage() {
               <ChartsSkeleton />
             )
           ) : view === "table" ? (
-            <CompanyTable companies={filtered} onAnnotationSave={handleAnnotationSave} />
+            <CompanyTable
+              companies={filtered}
+              onAnnotationSave={handleAnnotationSave}
+              selectionMode={selectionMode}
+            />
           ) : (
             <ChartsView companies={filtered} />
           )}

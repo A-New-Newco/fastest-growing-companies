@@ -48,6 +48,11 @@ function LogoMark() {
 const NAV_LINKS = [
   { href: "/", label: "Overview" },
   { href: "/explorer", label: "Explorer" },
+  { href: "/campaigns", label: "Campaigns" },
+];
+
+const ADMIN_LINKS = [
+  { href: "/admin/team", label: "Team" },
 ];
 
 export default function Navbar() {
@@ -95,22 +100,27 @@ export default function Navbar() {
               );
             })}
 
-            {isAdmin && (
-              <Link
-                href="/admin/requests"
-                className={cn(
-                  "relative px-3.5 py-1.5 text-sm rounded-md transition-all duration-150",
-                  pathname.startsWith("/admin")
-                    ? "text-white bg-white/10 font-medium"
-                    : "text-slate-400 hover:text-white hover:bg-white/5"
-                )}
-              >
-                Requests
-                {pathname.startsWith("/admin") && (
-                  <span className="absolute inset-x-3.5 -bottom-[1px] h-[2px] bg-indigo-500 rounded-full" />
-                )}
-              </Link>
-            )}
+            {isAdmin &&
+              ADMIN_LINKS.map(({ href, label }) => {
+                const isActive = pathname.startsWith(href);
+                return (
+                  <Link
+                    key={href}
+                    href={href}
+                    className={cn(
+                      "relative px-3.5 py-1.5 text-sm rounded-md transition-all duration-150",
+                      isActive
+                        ? "text-white bg-white/10 font-medium"
+                        : "text-slate-400 hover:text-white hover:bg-white/5"
+                    )}
+                  >
+                    {label}
+                    {isActive && (
+                      <span className="absolute inset-x-3.5 -bottom-[1px] h-[2px] bg-indigo-500 rounded-full" />
+                    )}
+                  </Link>
+                );
+              })}
           </nav>
 
           {/* User menu */}

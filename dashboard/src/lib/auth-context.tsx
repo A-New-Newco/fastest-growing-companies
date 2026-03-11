@@ -28,12 +28,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isAdmin, setIsAdmin] = useState(false)
 
   async function checkAdmin(userId: string) {
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from("team_memberships")
-      .select("role")
+      .select("id")
       .eq("user_id", userId)
-      .maybeSingle()
-    setIsAdmin(data?.role === "admin")
+      .eq("role", "admin")
+      .limit(1)
+
+    if (error) {
+      setIsAdmin(false)
+      return
+    }
+
+    setIsAdmin((data?.length ?? 0) > 0)
   }
 
   useEffect(() => {
