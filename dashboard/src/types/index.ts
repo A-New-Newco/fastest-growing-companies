@@ -12,7 +12,15 @@ export type RuoloCategory =
   | "Other"
   | "Not Found";
 
+export interface Annotation {
+  companyId: string; // Supabase UUID
+  contactLeft: boolean;
+  lowQuality: boolean;
+  note: string;
+}
+
 export interface Company {
+  id: string; // Supabase UUID
   rank: number;
   azienda: string;
   tassoCrescita: number; // CAGR percentage (e.g. 503.37)
@@ -29,6 +37,7 @@ export interface Company {
   confidenza: Confidenza;
   cfoFound: boolean; // true if any contact found
   hasRealCfo: boolean; // true if CFO/DAF or Finance Manager + medium/high confidence
+  annotation?: Annotation;
 }
 
 export interface SectorStats {
@@ -74,4 +83,36 @@ export interface ChartFilterState {
   regioni: string[];
   cfoPresence: CfoPresenceFilter;
   growthRange: [number, number];
+}
+
+// ── Auth / Team types ─────────────────────────────────────────────────────────
+
+export type MembershipRole = "admin" | "member";
+export type RequestStatus = "pending" | "approved" | "rejected";
+
+export interface UserProfile {
+  id: string;
+  email: string;
+  full_name: string | null;
+  avatar_url: string | null;
+  created_at: string;
+}
+
+export interface TeamMembership {
+  id: string;
+  team_id: string;
+  user_id: string;
+  role: MembershipRole;
+  created_at: string;
+}
+
+export interface JoinRequest {
+  id: string;
+  team_id: string;
+  user_id: string;
+  status: RequestStatus;
+  message: string | null;
+  reviewed_by: string | null;
+  reviewed_at: string | null;
+  created_at: string;
 }

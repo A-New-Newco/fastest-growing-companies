@@ -1,0 +1,118 @@
+#linkedin-outreach-widget {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 350px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 999999;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  overflow: hidden;
+  border: 1px solid #e0e0e0;
+  display: flex;
+  flex-direction: column;
+}
+
+#lo-header {
+  background-color: #0a66c2;
+  color: #fff;
+  padding: 12px 16px;
+  font-weight: 600;
+  font-size: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#lo-header .lo-close {
+  cursor: pointer;
+  font-weight: bold;
+}
+
+#lo-body {
+  padding: 16px;
+  font-size: 13px;
+  color: #333;
+}
+
+.lo-group {
+  margin-bottom: 12px;
+}
+
+.lo-group label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.lo-group select,
+.lo-group textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: 13px;
+}
+
+.lo-group textarea {
+  resize: vertical;
+}
+
+.lo-btn {
+  width: 100%;
+  padding: 10px;
+  background-color: #0a66c2;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 14px;
+  margin-top: 5px;
+}
+
+.lo-btn:hover {
+  background-color: #004182;
+}
+
+.lo-btn-secondary {
+  background-color: #fff;
+  color: #0a66c2;
+  border: 1px solid #0a66c2;
+}
+
+.lo-btn-secondary:hover {
+  background-color: #f3f2ef;
+}
+
+.lo-footer {
+  padding: 12px 16px;
+  border-top: 1px solid #e0e0e0;
+  background-color: #f9fafb;
+}
+
+#lo-char-count {
+  font-size: 11px;
+  text-align: right;
+  margin-top: 4px;
+  color: #666;
+}
+
+.lo-alert {
+  color: #d11124;
+}
+
+.lo-hidden {
+  display: none !important;
+}
+
+#lo-status-msg {
+  font-size: 12px;
+  margin-top: 6px;
+  text-align: center;
+  font-weight: bold;
+  color: #057642;
+}

@@ -1,7 +1,8 @@
 "use client";
 
-import Papa from "papaparse";
+import { createClientSupabaseClient } from "@/lib/supabase/client";
 import type {
+  Annotation,
   Company,
   FilterState,
   SectorStats,
@@ -10,24 +11,93 @@ import type {
   Confidenza,
 } from "@/types";
 
-// ── Singleton cache ────────────────────────────────────────────────────────────
-let _companies: Company[] | null = null;
-
-function parseBoolean(val: string): boolean {
-  return val?.toLowerCase() === "true";
+// ── Type for the companies_full view row ──────────────────────────────────────
+interface CompanyFullRow {
+  id: string;
+  rank: number;
+  name: string;
+  website: string | null;
+  growth_rate: number | null;
+  sector: string | null;
+  region: string | null;
+  appearances: number | null;
+  financials: { revenue_start: number | null; revenue_end: number | null } | null;
+  year: number;
+  country: string;
+  source_name: string;
+  contact_id: string | null;
+  cfo_nome: string | null;
+  cfo_ruolo: string | null;
+  cfo_ruolo_category: string | null;
+  cfo_linkedin: string | null;
+  confidenza: string | null;
+  enrichment_source: string | null;
+  contact_left: boolean | null;
+  low_quality: boolean | null;
+  annotation_note: string | null;
 }
 
-function parseNumber(val: string): number {
-  const n = parseFloat(val);
-  return isNaN(n) ? 0 : n;
+const SECTOR_TRANSLATIONS: Record<string, string> = {
+  "Abbigliamento e moda": "Apparel and Fashion",
+  "Aerospaziale e difesa": "Aerospace and Defense",
+  "Agricoltura, silvicoltura e pesca": "Agriculture, Forestry and Fishing",
+  Arredamento: "Furniture",
+  "Auto e servizi associati": "Automotive and Related Services",
+  "Beni immobili": "Real Estate",
+  "Cibo e bevande": "Food and Beverages",
+  "Commercio all'ingrosso": "Wholesale Trade",
+  "Consulenza manageriale": "Management Consulting",
+  "Costruzione e ingegneria": "Construction and Engineering",
+  "Energia e servizi pubblici": "Energy and Utilities",
+  "Fintech, servizi finanziari e assicurazioni":
+    "Fintech, Financial Services and Insurance",
+  Formazione: "Education and Training",
+  "IT e software": "IT and Software",
+  "Logistica e trasporto": "Logistics and Transportation",
+  "Macchinari e attrezzature": "Machinery and Equipment",
+  "Media e telecomunicazioni": "Media and Telecommunications",
+  "Ospitalità e viaggi": "Hospitality and Travel",
+  "Prodotti chimici": "Chemical Products",
+  "Prodotti farmaceutici, biotecnologie e scienze della vita":
+    "Pharmaceuticals, Biotechnology and Life Sciences",
+  "Produzione industriale": "Industrial Manufacturing",
+  "Pubblicità e marketing": "Advertising and Marketing",
+  "Servizi per l'impiego": "Employment Services",
+  "Servizi professionali, scientifici e tecnici":
+    "Professional, Scientific and Technical Services",
+  "Servizi sanitari e sociali": "Health and Social Services",
+  "Smaltimento rifiuti & riciclo": "Waste Management & Recycling",
+  "Tempo libero e divertimento": "Leisure and Entertainment",
+  "Vendita al dettaglio": "Retail",
+};
+
+const REGION_TRANSLATIONS: Record<string, string> = {
+  Lombardia: "Lombardy",
+  Piemonte: "Piedmont",
+  Puglia: "Apulia",
+  Sardegna: "Sardinia",
+  Sicilia: "Sicily",
+  Toscana: "Tuscany",
+  "Trentino-Alto Adige": "Trentino-South Tyrol",
+  "Valle d'Aosta": "Aosta Valley",
+};
+
+function translateSector(value: string | null): string {
+  if (!value) return "";
+  return SECTOR_TRANSLATIONS[value] ?? value;
 }
 
-function parseConfidenza(val: string): Confidenza {
+function translateRegion(value: string | null): string {
+  if (!value) return "";
+  return REGION_TRANSLATIONS[value] ?? value;
+}
+
+function parseConfidenza(val: string | null): Confidenza {
   if (val === "high" || val === "medium" || val === "low") return val;
   return null;
 }
 
-function parseRuoloCategory(val: string): RuoloCategory {
+function parseRuoloCategory(val: string | null): RuoloCategory {
   const valid: RuoloCategory[] = [
     "CFO / DAF",
     "CEO / AD",
@@ -40,46 +110,81 @@ function parseRuoloCategory(val: string): RuoloCategory {
     "Other",
     "Not Found",
   ];
-  return valid.includes(val as RuoloCategory)
-    ? (val as RuoloCategory)
-    : "Not Found";
+  return valid.includes(val as RuoloCategory) ? (val as RuoloCategory) : "Not Found";
 }
 
-function mapRow(raw: Record<string, string>): Company {
+function mapRow(row: CompanyFullRow): Company {
+  const ruoloCategory = parseRuoloCategory(row.cfo_ruolo_category);
+  const confidenza = parseConfidenza(row.confidenza);
+  const cfoFound = !!row.cfo_nome;
+  const hasRealCfo =
+    (ruoloCategory === "CFO / DAF" || ruoloCategory === "Finance Manager") &&
+    (confidenza === "high" || confidenza === "medium");
+
+  const annotation: Annotation | undefined =
+    row.contact_left !== null || row.low_quality !== null || row.annotation_note
+      ? {
+          companyId: row.id,
+          contactLeft: row.contact_left ?? false,
+          lowQuality: row.low_quality ?? false,
+          note: row.annotation_note ?? "",
+        }
+      : undefined;
+
   return {
-    rank: parseNumber(raw["RANK"]),
-    azienda: raw["AZIENDA"] ?? "",
-    tassoCrescita: parseNumber(raw["TASSO DI CRESCITA"]),
-    ricavi2021: parseNumber(raw["RICAVI 2021"]),
-    ricavi2024: parseNumber(raw["RICAVI 2024"]),
-    settore: raw["SETTORE"] ?? "",
-    regione: raw["REGIONE"] ?? "",
-    presenze: parseNumber(raw["PRESENZE"]),
-    sitoWeb: raw["SITO WEB"] ?? "",
-    cfoNome: raw["CFO_NOME"] || null,
-    cfoRuolo: raw["CFO_RUOLO"] || null,
-    cfoRuoloCategory: parseRuoloCategory(raw["CFO_RUOLO_CATEGORY"]),
-    cfoLinkedin: raw["CFO_LINKEDIN"] || null,
-    confidenza: parseConfidenza(raw["CONFIDENZA"]),
-    cfoFound: parseBoolean(raw["CFO_FOUND"]),
-    hasRealCfo: parseBoolean(raw["HAS_REAL_CFO"]),
+    id: row.id,
+    rank: row.rank,
+    azienda: row.name,
+    tassoCrescita: row.growth_rate ?? 0,
+    ricavi2021: row.financials?.revenue_start ?? 0,
+    ricavi2024: row.financials?.revenue_end ?? 0,
+    settore: translateSector(row.sector),
+    regione: translateRegion(row.region),
+    presenze: row.appearances ?? 0,
+    sitoWeb: row.website ?? "",
+    cfoNome: row.cfo_nome,
+    cfoRuolo: row.cfo_ruolo,
+    cfoRuoloCategory: ruoloCategory,
+    cfoLinkedin: row.cfo_linkedin,
+    confidenza,
+    cfoFound,
+    hasRealCfo,
+    annotation,
   };
 }
 
-export async function loadCompanies(): Promise<Company[]> {
-  if (_companies) return _companies;
+export async function loadCompanies(year = 2026): Promise<Company[]> {
+  const supabase = createClientSupabaseClient();
+  const { data, error } = await supabase
+    .from("companies_full")
+    .select("*")
+    .eq("year", year)
+    .order("rank", { ascending: true });
 
-  const res = await fetch("/data/2026_cleaned.csv");
-  const text = await res.text();
+  if (error) throw new Error(`Failed to load companies: ${error.message}`);
+  return (data as CompanyFullRow[]).map(mapRow);
+}
 
-  const result = Papa.parse<Record<string, string>>(text, {
-    header: true,
-    skipEmptyLines: true,
-    transformHeader: (h) => h.trim(),
+// ── Annotation mutations ───────────────────────────────────────────────────────
+
+export async function upsertAnnotation(
+  companyId: string,
+  annotation: Omit<Annotation, "companyId">
+): Promise<void> {
+  const res = await fetch("/api/annotations", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      company_id: companyId,
+      contact_left: annotation.contactLeft,
+      low_quality: annotation.lowQuality,
+      note: annotation.note,
+    }),
   });
-
-  _companies = result.data.map(mapRow);
-  return _companies;
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.error ?? "Failed to save annotation");
+  }
 }
 
 // ── Filtering ──────────────────────────────────────────────────────────────────
@@ -118,7 +223,6 @@ export function filterCompanies(
     if (filters.linkedinFilter === "has" && !c.cfoLinkedin) return false;
     if (filters.linkedinFilter === "no" && c.cfoLinkedin) return false;
 
-    // minRevenue / maxRevenue in €M → convert to thousands for comparison
     if (filters.minRevenue > 0 && c.ricavi2024 < filters.minRevenue * 1_000)
       return false;
     if (filters.maxRevenue > 0 && c.ricavi2024 > filters.maxRevenue * 1_000)
@@ -138,17 +242,12 @@ export function computeSectorStats(companies: Company[]): SectorStats[] {
   }
 
   return Array.from(map.entries())
-    .map(([settore, rates]) => {
-      const sorted = [...rates].sort((a, b) => a - b);
-      const mid = Math.floor(sorted.length / 2);
-      const medianRevenue2024 = 0; // computed separately if needed
-      return {
-        settore,
-        count: rates.length,
-        avgGrowth: rates.reduce((a, b) => a + b, 0) / rates.length,
-        medianRevenue2024,
-      };
-    })
+    .map(([settore, rates]) => ({
+      settore,
+      count: rates.length,
+      avgGrowth: rates.reduce((a, b) => a + b, 0) / rates.length,
+      medianRevenue2024: 0,
+    }))
     .sort((a, b) => b.avgGrowth - a.avgGrowth);
 }
 

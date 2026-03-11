@@ -54,7 +54,7 @@ export default function CfoQualityBreakdown({
       textColor: "text-blue-700",
       bg: "bg-blue-50",
       border: "border-blue-200",
-      description: "CEO, Founder, Amministratore, or low-confidence match",
+      description: "CEO, Founder, Administrator, or low-confidence match",
     },
     {
       label: "Not Found",

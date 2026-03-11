@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/lib/auth-context";
 
 function LogoMark() {
   return (
@@ -51,6 +52,7 @@ const NAV_LINKS = [
 
 export default function Navbar() {
   const pathname = usePathname();
+  const { user, isAdmin, signOut } = useAuth();
 
   return (
     <header className="sticky top-0 z-50 w-full bg-slate-900 border-b border-slate-700/60">
@@ -61,37 +63,71 @@ export default function Navbar() {
             <LogoMark />
           </div>
           <span className="text-white font-semibold text-sm tracking-tight">
-            Leader della Crescita
+            Leaders of Growth
           </span>
           <span className="ml-0.5 inline-flex items-center rounded-full bg-indigo-600/20 border border-indigo-500/40 px-2 py-0.5 text-[10px] font-semibold text-indigo-300 tracking-wider">
             2026
           </span>
         </Link>
 
-        {/* Nav links */}
-        <nav className="flex items-center gap-1">
-          {NAV_LINKS.map(({ href, label }) => {
-            const isActive =
-              href === "/" ? pathname === "/" : pathname.startsWith(href);
-            return (
+        <div className="flex items-center gap-1">
+          {/* Nav links */}
+          <nav className="flex items-center gap-1">
+            {NAV_LINKS.map(({ href, label }) => {
+              const isActive =
+                href === "/" ? pathname === "/" : pathname.startsWith(href);
+              return (
+                <Link
+                  key={href}
+                  href={href}
+                  className={cn(
+                    "relative px-3.5 py-1.5 text-sm rounded-md transition-all duration-150",
+                    isActive
+                      ? "text-white bg-white/10 font-medium"
+                      : "text-slate-400 hover:text-white hover:bg-white/5"
+                  )}
+                >
+                  {label}
+                  {isActive && (
+                    <span className="absolute inset-x-3.5 -bottom-[1px] h-[2px] bg-indigo-500 rounded-full" />
+                  )}
+                </Link>
+              );
+            })}
+
+            {isAdmin && (
               <Link
-                key={href}
-                href={href}
+                href="/admin/requests"
                 className={cn(
                   "relative px-3.5 py-1.5 text-sm rounded-md transition-all duration-150",
-                  isActive
+                  pathname.startsWith("/admin")
                     ? "text-white bg-white/10 font-medium"
                     : "text-slate-400 hover:text-white hover:bg-white/5"
                 )}
               >
-                {label}
-                {isActive && (
+                Requests
+                {pathname.startsWith("/admin") && (
                   <span className="absolute inset-x-3.5 -bottom-[1px] h-[2px] bg-indigo-500 rounded-full" />
                 )}
               </Link>
-            );
-          })}
-        </nav>
+            )}
+          </nav>
+
+          {/* User menu */}
+          {user && (
+            <div className="flex items-center gap-2 ml-3 pl-3 border-l border-slate-700">
+              <span className="text-xs text-slate-400 max-w-[160px] truncate hidden sm:block">
+                {user.email}
+              </span>
+              <button
+                onClick={() => signOut()}
+                className="text-xs text-slate-400 hover:text-white px-2.5 py-1.5 rounded-md hover:bg-white/5 transition-colors"
+              >
+                Sign out
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     </header>
   );

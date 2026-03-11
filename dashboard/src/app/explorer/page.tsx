@@ -7,7 +7,7 @@ import {
   getUniqueSettori,
   getUniqueRegioni,
 } from "@/lib/data";
-import type { Company } from "@/types";
+import type { Annotation, Company } from "@/types";
 import { useFilters } from "@/lib/filter-context";
 import { cn } from "@/lib/utils";
 import { TableIcon, BarChart2 } from "lucide-react";
@@ -94,8 +94,22 @@ export default function ExplorerPage() {
   useEffect(() => {
     loadCompanies()
       .then(setCompanies)
+      .catch(console.error)
       .finally(() => setLoading(false));
   }, []);
+
+  function handleAnnotationSave(
+    companyId: string,
+    annotation: Omit<Annotation, "companyId">
+  ) {
+    setCompanies((prev) =>
+      prev.map((c) =>
+        c.id === companyId
+          ? { ...c, annotation: { companyId, ...annotation } }
+          : c
+      )
+    );
+  }
 
   const settori = useMemo(() => getUniqueSettori(companies), [companies]);
   const regioni = useMemo(() => getUniqueRegioni(companies), [companies]);
@@ -170,7 +184,7 @@ export default function ExplorerPage() {
               <ChartsSkeleton />
             )
           ) : view === "table" ? (
-            <CompanyTable companies={filtered} />
+            <CompanyTable companies={filtered} onAnnotationSave={handleAnnotationSave} />
           ) : (
             <ChartsView companies={filtered} />
           )}

@@ -13,14 +13,26 @@ import { formatGrowth } from "@/lib/data";
 
 const GEO_URL = "/geo/italy-regions.json";
 
-// Mapping from GeoJSON reg_name → CSV regione name
-const GEO_TO_CSV: Record<string, string> = {
+// Mapping from GeoJSON reg_name aliases to canonical region names
+const GEO_ALIASES: Record<string, string> = {
   "Valle d'Aosta/Vallée d'Aoste": "Valle d'Aosta",
   "Trentino-Alto Adige/Südtirol": "Trentino-Alto Adige",
 };
 
+const REGION_TRANSLATIONS: Record<string, string> = {
+  Lombardia: "Lombardy",
+  Piemonte: "Piedmont",
+  Puglia: "Apulia",
+  Sardegna: "Sardinia",
+  Sicilia: "Sicily",
+  Toscana: "Tuscany",
+  "Trentino-Alto Adige": "Trentino-South Tyrol",
+  "Valle d'Aosta": "Aosta Valley",
+};
+
 function normalizeGeoName(geoName: string): string {
-  return GEO_TO_CSV[geoName] ?? geoName;
+  const canonical = GEO_ALIASES[geoName] ?? geoName;
+  return REGION_TRANSLATIONS[canonical] ?? canonical;
 }
 
 interface RegionMapProps {

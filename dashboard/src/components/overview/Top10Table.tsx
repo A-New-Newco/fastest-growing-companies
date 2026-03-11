@@ -26,7 +26,7 @@ export default function Top10Table({ companies }: Top10TableProps) {
           Top 10 by Growth Rate
         </CardTitle>
         <p className="text-xs text-slate-500">
-          CAGR 2021 → 2024 — Source: Il Sole 24 Ore, Leader della Crescita 2026
+          CAGR 2021 → 2024 — Source: Il Sole 24 Ore, Leaders of Growth 2026
         </p>
       </CardHeader>
       <CardContent className="p-0">

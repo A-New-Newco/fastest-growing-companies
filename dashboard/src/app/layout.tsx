@@ -10,7 +10,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Leader della Crescita 2026 — Dashboard",
+  title: "Leaders of Growth 2026 — Dashboard",
   description:
     "Business intelligence dashboard for Italy's fastest growing companies — Il Sole 24 Ore ranking 2026.",
 };

@@ -25,7 +25,7 @@ export default function OverviewPage() {
           Italy&apos;s Fastest Growing Companies
         </h1>
         <p className="mt-1 text-sm text-slate-500">
-          2026 Edition &middot; Il Sole 24 Ore &mdash; Leader della Crescita
+          2026 Edition &middot; Il Sole 24 Ore &mdash; Leaders of Growth
         </p>
       </div>
 

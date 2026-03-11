@@ -10,7 +10,18 @@ import {
   createColumnHelper,
   type SortingState,
 } from "@tanstack/react-table";
-import { ArrowUpDown, ArrowUp, ArrowDown, ExternalLink, Linkedin, Download } from "lucide-react";
+import {
+  ArrowUpDown,
+  ArrowUp,
+  ArrowDown,
+  ExternalLink,
+  Linkedin,
+  Download,
+  Pencil,
+  UserX,
+  ThumbsDown,
+  StickyNote,
+} from "lucide-react";
 import {
   Table,
   TableBody,
@@ -27,14 +38,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import type { Company } from "@/types";
+import type { Annotation, Company } from "@/types";
 import { formatRevenue, formatGrowth } from "@/lib/data";
 import { ROLE_CATEGORY_META, CONFIDENCE_META } from "@/lib/constants";
+import AnnotationModal from "./AnnotationModal";
 
 const columnHelper = createColumnHelper<Company>();
 
 interface CompanyTableProps {
   companies: Company[];
+  onAnnotationSave?: (companyId: string, annotation: Omit<Annotation, "companyId">) => void;
 }
 
 function exportToCsv(companies: Company[]) {
@@ -42,6 +55,7 @@ function exportToCsv(companies: Company[]) {
     "Rank", "Company", "Sector", "Region", "Growth Rate (%)",
     "Revenue 2021 (K€)", "Revenue 2024 (K€)", "Website",
     "CFO Name", "CFO Role", "CFO Category", "CFO LinkedIn", "Confidence",
+    "Contact Left", "Low Quality", "Note",
   ];
   const rows = companies.map((c) => [
     c.rank,
@@ -54,9 +68,12 @@ function exportToCsv(companies: Company[]) {
     c.sitoWeb,
     c.cfoNome ?? "",
     c.cfoRuolo ?? "",
-    c.cfoRuoloCategory,
+    ROLE_CATEGORY_META[c.cfoRuoloCategory].label,
     c.cfoLinkedin ?? "",
     c.confidenza ?? "",
+    c.annotation?.contactLeft ? "yes" : "",
+    c.annotation?.lowQuality ? "yes" : "",
+    c.annotation?.note ?? "",
   ]);
   const csvContent = [headers, ...rows]
     .map((row) => row.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(","))
@@ -65,14 +82,15 @@ function exportToCsv(companies: Company[]) {
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = `leader-della-crescita-${companies.length}-companies.csv`;
+  a.download = `fastest-growing-companies-${companies.length}.csv`;
   a.click();
   URL.revokeObjectURL(url);
 }
 
-export default function CompanyTable({ companies }: CompanyTableProps) {
+export default function CompanyTable({ companies, onAnnotationSave }: CompanyTableProps) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 25 });
+  const [editingCompany, setEditingCompany] = useState<Company | null>(null);
 
   const columns = useMemo(
     () => [
@@ -84,6 +102,41 @@ export default function CompanyTable({ companies }: CompanyTableProps) {
           </span>
         ),
         size: 48,
+      }),
+      // Annotation status badges
+      columnHelper.display({
+        id: "status",
+        header: "",
+        cell: (info) => {
+          const ann = info.row.original.annotation;
+          if (!ann?.contactLeft && !ann?.lowQuality && !ann?.note) return null;
+          return (
+            <div className="flex items-center gap-1">
+              {ann.contactLeft && (
+                <span
+                  title="No longer at company"
+                  className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-orange-50 text-orange-600"
+                >
+                  <UserX className="w-3 h-3" />
+                </span>
+              )}
+              {ann.lowQuality && (
+                <span
+                  title="Low quality"
+                  className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-red-50 text-red-600"
+                >
+                  <ThumbsDown className="w-3 h-3" />
+                </span>
+              )}
+              {ann.note && (
+                <span title={ann.note} className="text-slate-400">
+                  <StickyNote className="w-3 h-3" />
+                </span>
+              )}
+            </div>
+          );
+        },
+        size: 60,
       }),
       columnHelper.accessor("azienda", {
         header: "Company",
@@ -209,6 +262,24 @@ export default function CompanyTable({ companies }: CompanyTableProps) {
         },
         size: 80,
       }),
+      // Edit / annotate button
+      columnHelper.display({
+        id: "edit",
+        header: "",
+        cell: (info) => (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              setEditingCompany(info.row.original);
+            }}
+            className="opacity-0 group-hover/row:opacity-100 transition-opacity p-1 rounded hover:bg-slate-100 text-slate-400 hover:text-indigo-500"
+            title="Annotate"
+          >
+            <Pencil className="w-3 h-3" />
+          </button>
+        ),
+        size: 36,
+      }),
     ],
     []
   );
@@ -229,138 +300,149 @@ export default function CompanyTable({ companies }: CompanyTableProps) {
   const currentPage = pagination.pageIndex + 1;
 
   return (
-    <div className="space-y-3">
-      <div className="rounded-lg border border-slate-200 bg-white overflow-hidden">
-        <div className="overflow-x-auto">
-          <Table>
-            <TableHeader>
-              {table.getHeaderGroups().map((hg) => (
-                <TableRow key={hg.id} className="bg-slate-50 hover:bg-slate-50">
-                  {hg.headers.map((header) => (
-                    <TableHead
-                      key={header.id}
-                      className="text-xs font-semibold text-slate-500 uppercase tracking-wider py-2.5 whitespace-nowrap"
-                      style={{ width: header.getSize() }}
-                    >
-                      {header.column.getCanSort() ? (
-                        <button
-                          className="flex items-center gap-1 hover:text-slate-900 transition-colors"
-                          onClick={header.column.getToggleSortingHandler()}
-                        >
-                          {flexRender(
+    <>
+      <div className="space-y-3">
+        <div className="rounded-lg border border-slate-200 bg-white overflow-hidden">
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                {table.getHeaderGroups().map((hg) => (
+                  <TableRow key={hg.id} className="bg-slate-50 hover:bg-slate-50">
+                    {hg.headers.map((header) => (
+                      <TableHead
+                        key={header.id}
+                        className="text-xs font-semibold text-slate-500 uppercase tracking-wider py-2.5 whitespace-nowrap"
+                        style={{ width: header.getSize() }}
+                      >
+                        {header.column.getCanSort() ? (
+                          <button
+                            className="flex items-center gap-1 hover:text-slate-900 transition-colors"
+                            onClick={header.column.getToggleSortingHandler()}
+                          >
+                            {flexRender(
+                              header.column.columnDef.header,
+                              header.getContext()
+                            )}
+                            {header.column.getIsSorted() === "asc" ? (
+                              <ArrowUp className="w-3 h-3" />
+                            ) : header.column.getIsSorted() === "desc" ? (
+                              <ArrowDown className="w-3 h-3" />
+                            ) : (
+                              <ArrowUpDown className="w-3 h-3 opacity-40" />
+                            )}
+                          </button>
+                        ) : (
+                          flexRender(
                             header.column.columnDef.header,
                             header.getContext()
-                          )}
-                          {header.column.getIsSorted() === "asc" ? (
-                            <ArrowUp className="w-3 h-3" />
-                          ) : header.column.getIsSorted() === "desc" ? (
-                            <ArrowDown className="w-3 h-3" />
-                          ) : (
-                            <ArrowUpDown className="w-3 h-3 opacity-40" />
-                          )}
-                        </button>
-                      ) : (
-                        flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )
-                      )}
-                    </TableHead>
-                  ))}
-                </TableRow>
-              ))}
-            </TableHeader>
-            <TableBody>
-              {table.getRowModel().rows.length === 0 ? (
-                <TableRow>
-                  <TableCell
-                    colSpan={columns.length}
-                    className="text-center py-12 text-slate-400 text-sm"
-                  >
-                    No companies match the current filters.
-                  </TableCell>
-                </TableRow>
-              ) : (
-                table.getRowModel().rows.map((row) => (
-                  <TableRow
-                    key={row.id}
-                    className="hover:bg-slate-50/60 transition-colors"
-                  >
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id} className="py-2.5">
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext()
+                          )
                         )}
-                      </TableCell>
+                      </TableHead>
                     ))}
                   </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
+                ))}
+              </TableHeader>
+              <TableBody>
+                {table.getRowModel().rows.length === 0 ? (
+                  <TableRow>
+                    <TableCell
+                      colSpan={columns.length}
+                      className="text-center py-12 text-slate-400 text-sm"
+                    >
+                      No companies match the current filters.
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  table.getRowModel().rows.map((row) => (
+                    <TableRow
+                      key={row.id}
+                      className="hover:bg-slate-50/60 transition-colors group/row"
+                    >
+                      {row.getVisibleCells().map((cell) => (
+                        <TableCell key={cell.id} className="py-2.5">
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext()
+                          )}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
+        </div>
+
+        {/* Pagination */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-7 px-2.5 text-xs gap-1.5"
+              onClick={() => exportToCsv(companies)}
+              disabled={companies.length === 0}
+            >
+              <Download className="w-3 h-3" />
+              Export CSV ({companies.length})
+            </Button>
+          </div>
+          <div className="flex items-center gap-2 text-xs text-slate-500">
+            <span>Rows per page:</span>
+            <Select
+              value={String(pagination.pageSize)}
+              onValueChange={(v) =>
+                setPagination({ pageIndex: 0, pageSize: Number(v) })
+              }
+            >
+              <SelectTrigger className="h-7 w-16 text-xs">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {[25, 50, 100].map((n) => (
+                  <SelectItem key={n} value={String(n)} className="text-xs">
+                    {n}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-slate-500 tabular-nums">
+              Page {currentPage} of {totalPages}
+            </span>
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-7 px-2 text-xs"
+              onClick={() => table.previousPage()}
+              disabled={!table.getCanPreviousPage()}
+            >
+              ←
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-7 px-2 text-xs"
+              onClick={() => table.nextPage()}
+              disabled={!table.getCanNextPage()}
+            >
+              →
+            </Button>
+          </div>
         </div>
       </div>
 
-      {/* Pagination */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Button
-            variant="outline"
-            size="sm"
-            className="h-7 px-2.5 text-xs gap-1.5"
-            onClick={() => exportToCsv(companies)}
-            disabled={companies.length === 0}
-          >
-            <Download className="w-3 h-3" />
-            Export CSV ({companies.length})
-          </Button>
-        </div>
-        <div className="flex items-center gap-2 text-xs text-slate-500">
-          <span>Rows per page:</span>
-          <Select
-            value={String(pagination.pageSize)}
-            onValueChange={(v) =>
-              setPagination({ pageIndex: 0, pageSize: Number(v) })
-            }
-          >
-            <SelectTrigger className="h-7 w-16 text-xs">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {[25, 50, 100].map((n) => (
-                <SelectItem key={n} value={String(n)} className="text-xs">
-                  {n}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <span className="text-xs text-slate-500 tabular-nums">
-            Page {currentPage} of {totalPages}
-          </span>
-          <Button
-            variant="outline"
-            size="sm"
-            className="h-7 px-2 text-xs"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            ←
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            className="h-7 px-2 text-xs"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            →
-          </Button>
-        </div>
-      </div>
-    </div>
+      <AnnotationModal
+        company={editingCompany}
+        onClose={() => setEditingCompany(null)}
+        onSave={(id, ann) => {
+          setEditingCompany(null);
+          onAnnotationSave?.(id, ann);
+        }}
+      />
+    </>
   );
 }

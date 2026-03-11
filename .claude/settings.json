@@ -26,7 +26,13 @@
       "Bash(npm install --save-dev @types/react-simple-maps)",
       "Bash(npm list recharts)",
       "Bash(wc -l /Users/francescofiore/Coding/Reef/fastest-growing-companies/cfo-enricher/data/*.csv /Users/francescofiore/Coding/Reef/fastest-growing-companies/cfo-enricher/output/2026/enriched.csv)",
-      "Bash(grep -c \"\"\"fonte\"\": \"\"agent\"\"\" /Users/francescofiore/Coding/Reef/fastest-growing-companies/cfo-enricher/output/2026/enrichment_progress.jsonl)"
+      "Bash(grep -c \"\"\"fonte\"\": \"\"agent\"\"\" /Users/francescofiore/Coding/Reef/fastest-growing-companies/cfo-enricher/output/2026/enrichment_progress.jsonl)",
+      "Bash(ls -la /Users/francescofiore/Coding/Reef/fastest-growing-companies/cfo-enricher/*.py)",
+      "Bash(npm install:*)",
+      "Read(//Users/francescofiore/Coding/Reef/fastest-growing-companies/**)",
+      "Bash(/Users/francescofiore/Coding/Reef/fastest-growing-companies/dashboard/src/app/login/page.tsx:*)",
+      "Bash(/Users/francescofiore/Coding/Reef/fastest-growing-companies/dashboard/src/app/join-team/page.tsx:*)",
+      "Bash(grep -v \"^$\")"
     ]
   }
 }
