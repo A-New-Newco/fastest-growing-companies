@@ -10,6 +10,7 @@ import CampaignStatsSummary from "@/components/campaigns/CampaignStatsSummary";
 import CampaignContactsTable from "@/components/campaigns/CampaignContactsTable";
 import EditCampaignModal from "@/components/campaigns/EditCampaignModal";
 import AddContactsModal from "@/components/campaigns/AddContactsModal";
+import { getApiErrorMessage, isCampaign, parseJsonSafe } from "@/lib/http-client";
 import type { Campaign, CampaignContact } from "@/types";
 
 export default function CampaignDetailPage() {
@@ -19,21 +20,57 @@ export default function CampaignDetailPage() {
   const [campaign, setCampaign] = useState<Campaign | null>(null);
   const [contacts, setContacts] = useState<CampaignContact[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [editOpen, setEditOpen] = useState(false);
   const [addOpen, setAddOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
-    Promise.all([
-      fetch(`/api/campaigns/${id}`).then((r) => r.json()),
-      fetch(`/api/campaigns/${id}/contacts`).then((r) => r.json()),
-    ])
-      .then(([camp, ctcs]) => {
-        setCampaign(camp);
-        setContacts(ctcs);
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
+    let cancelled = false;
+    (async () => {
+      setLoading(true);
+      try {
+        const [campaignRes, contactsRes] = await Promise.all([
+          fetch(`/api/campaigns/${id}`),
+          fetch(`/api/campaigns/${id}/contacts`),
+        ]);
+        const [campaignPayload, contactsPayload] = await Promise.all([
+          parseJsonSafe(campaignRes),
+          parseJsonSafe(contactsRes),
+        ]);
+
+        if (!campaignRes.ok) {
+          throw new Error(getApiErrorMessage(campaignPayload, "Failed to load campaign"));
+        }
+        if (!contactsRes.ok) {
+          throw new Error(getApiErrorMessage(contactsPayload, "Failed to load contacts"));
+        }
+        if (!isCampaign(campaignPayload)) {
+          throw new Error("Invalid campaign response");
+        }
+        if (!Array.isArray(contactsPayload)) {
+          throw new Error("Invalid contacts response");
+        }
+
+        if (!cancelled) {
+          setCampaign(campaignPayload);
+          setContacts(contactsPayload as CampaignContact[]);
+          setError(null);
+        }
+      } catch (err) {
+        if (!cancelled) {
+          setCampaign(null);
+          setContacts([]);
+          setError(err instanceof Error ? err.message : "Failed to load campaign");
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
   }, [id]);
 
   const handleContactsChange = useCallback((updated: CampaignContact[]) => {
@@ -59,7 +96,14 @@ export default function CampaignDetailPage() {
     setDeleting(true);
     try {
       const res = await fetch(`/api/campaigns/${id}`, { method: "DELETE" });
-      if (res.ok) router.push("/campaigns");
+      if (res.ok) {
+        router.push("/campaigns");
+        return;
+      }
+      const payload = await parseJsonSafe(res);
+      throw new Error(getApiErrorMessage(payload, "Failed to delete campaign"));
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Failed to delete campaign");
     } finally {
       setDeleting(false);
     }
@@ -82,7 +126,7 @@ export default function CampaignDetailPage() {
   if (!campaign) {
     return (
       <div className="mx-auto max-w-screen-xl px-6 py-8">
-        <p className="text-slate-500">Campaign not found.</p>
+        <p className="text-slate-500">{error ?? "Campaign not found."}</p>
         <Link href="/campaigns" className="text-indigo-600 text-sm mt-2 inline-block">
           ← Back to campaigns
         </Link>

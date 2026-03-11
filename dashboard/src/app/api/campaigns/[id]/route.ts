@@ -4,6 +4,36 @@ import { createAdminSupabaseClient } from "@/lib/supabase/admin";
 
 type Params = { params: { id: string } };
 
+const SELECT_CAMPAIGN_WITH_OUTREACH = `
+  id, team_id, name, description, status, connection_note_template, quota_policy, pause_reason, integration_mode, created_by, created_at, updated_at,
+  campaign_contacts(status)
+`;
+
+function mapCampaignRow(row: Record<string, unknown>) {
+  const contacts = (row.campaign_contacts ?? []) as Array<{ status: string }>;
+  return {
+    id: row.id,
+    teamId: row.team_id,
+    name: row.name,
+    description: row.description,
+    status: row.status,
+    connectionNoteTemplate:
+      typeof row.connection_note_template === "string" ? row.connection_note_template : null,
+    quotaPolicy: typeof row.quota_policy === "string" ? row.quota_policy : "conservative",
+    pauseReason: typeof row.pause_reason === "string" ? row.pause_reason : null,
+    integrationMode: typeof row.integration_mode === "string" ? row.integration_mode : "dashboard",
+    createdBy: row.created_by,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+    totalContacts: contacts.length,
+    contactedCount: contacts.filter((c) => c.status !== "pending").length,
+    repliedCount: contacts.filter((c) =>
+      ["replied", "meeting_scheduled", "converted"].includes(c.status)
+    ).length,
+    convertedCount: contacts.filter((c) => c.status === "converted").length,
+  };
+}
+
 // GET /api/campaigns/[id]
 export async function GET(_req: NextRequest, { params }: Params) {
   const supabase = createServerSupabaseClient();
@@ -17,12 +47,7 @@ export async function GET(_req: NextRequest, { params }: Params) {
 
   const { data: row, error } = await supabase
     .from("campaigns")
-    .select(
-      `
-      id, team_id, name, description, status, connection_note_template, quota_policy, pause_reason, integration_mode, created_by, created_at, updated_at,
-      campaign_contacts(status)
-    `
-    )
+    .select(SELECT_CAMPAIGN_WITH_OUTREACH)
     .eq("id", params.id)
     .single();
 
@@ -30,27 +55,7 @@ export async function GET(_req: NextRequest, { params }: Params) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
-  const contacts = (row.campaign_contacts ?? []) as Array<{ status: string }>;
-  return NextResponse.json({
-    id: row.id,
-    teamId: row.team_id,
-    name: row.name,
-    description: row.description,
-    status: row.status,
-    connectionNoteTemplate: row.connection_note_template,
-    quotaPolicy: row.quota_policy,
-    pauseReason: row.pause_reason,
-    integrationMode: row.integration_mode,
-    createdBy: row.created_by,
-    createdAt: row.created_at,
-    updatedAt: row.updated_at,
-    totalContacts: contacts.length,
-    contactedCount: contacts.filter((c) => c.status !== "pending").length,
-    repliedCount: contacts.filter((c) =>
-      ["replied", "meeting_scheduled", "converted"].includes(c.status)
-    ).length,
-    convertedCount: contacts.filter((c) => c.status === "converted").length,
-  });
+  return NextResponse.json(mapCampaignRow(row as Record<string, unknown>));
 }
 
 // PATCH /api/campaigns/[id]
@@ -103,20 +108,8 @@ export async function PATCH(req: NextRequest, { params }: Params) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  return NextResponse.json({
-    id: data.id,
-    teamId: data.team_id,
-    name: data.name,
-    description: data.description,
-    status: data.status,
-    connectionNoteTemplate: data.connection_note_template,
-    quotaPolicy: data.quota_policy,
-    pauseReason: data.pause_reason,
-    integrationMode: data.integration_mode,
-    createdBy: data.created_by,
-    createdAt: data.created_at,
-    updatedAt: data.updated_at,
-  });
+  const campaign = mapCampaignRow(data as Record<string, unknown>);
+  return NextResponse.json(campaign);
 }
 
 // DELETE /api/campaigns/[id]

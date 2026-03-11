@@ -33,6 +33,9 @@
 - [x] Step 13: Campagne LinkedIn outreach — migration 003, tabelle `campaigns` + `campaign_contacts`, 8 API routes, 10 componenti, pagine `/campaigns` e `/campaigns/[id]`, row selection nell'Explorer → vedere `docs/features/CAMPAIGNS.md`
 - [x] Step 14: Docs restructure — `docs/` organizzato in `features/` e `architecture/`, regole di aggiornamento in `CLAUDE.md`
 - [x] Step 15: Data import from file — migration 004, tabelle `import_batches` + `field_mappings` + `imported_companies`, view `all_companies`, API `/api/imports/*`, wizard `FileUploadWizard` con LLM mapping (Groq), bottone "Import data" nell'Explorer → vedere `docs/features/IMPORTS.md`
+- [x] Step 16: Campaigns client hardening — validazione `res.ok` + shape checks sulle fetch `/api/campaigns*`, messaggi d'errore espliciti, fix crash `campaigns.filter is not a function`
+- [x] Step 17: Campaigns schema root-fix — aggiunta migration `006_campaign_outreach_columns.sql` per garantire le colonne outreach (`connection_note_template`, `quota_policy`, `pause_reason`, `integration_mode`) in tutti gli ambienti
+- [x] Step 18: Plugin outreach schema root-fix — aggiunta migration `007_plugin_outreach_backfill.sql` per riallineare anche claim metadata su `campaign_contacts` (`claimed_by`, `claim_expires_at`, `last_attempt_at`, `last_error_code`) e oggetti plugin correlati
 
 ---
 
@@ -60,3 +63,6 @@
 | 2026-03-11 | `companies_full` view per join dei dati azienda nei contacts | Evita dipendenza dalla struttura interna della tabella companies |
 | 2026-03-11 | `imported_companies` separata da `companies` | Dati esterni (DE, FR, ecc.) hanno schema diverso; `all_companies` view li unifica per l'Explorer |
 | 2026-03-11 | LLM mapping via Groq (fetch diretto, no SDK) | `llama-3.3-70b-versatile` con `response_format: json_object`; fallback manuale se API non disponibile |
+| 2026-03-11 | Guardie runtime su payload API campagne | Evita crash UI quando endpoint risponde con `{ error: ... }` su 401/403/500 |
+| 2026-03-11 | Migration 006 per colonne outreach campagne | Risolve alla fonte gli errori schema `column ... does not exist` riallineando il DB |
+| 2026-03-11 | Migration 007 plugin-outreach backfill | Mitiga ambienti con possibile salto di `005_plugin_outreach.sql` (versione duplicata) e riallinea lo schema claim/plugin |

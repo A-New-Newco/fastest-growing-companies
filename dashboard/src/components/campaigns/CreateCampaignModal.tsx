@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { getApiErrorMessage, isCampaign, parseJsonSafe } from "@/lib/http-client";
 import type { Campaign } from "@/types";
 
 interface Props {
@@ -35,10 +36,14 @@ export default function CreateCampaignModal({ open, onClose, onCreated }: Props)
         body: JSON.stringify({ name: name.trim(), description: description.trim() }),
       });
       if (!res.ok) {
-        const json = await res.json();
-        throw new Error(json.error ?? "Failed to create campaign");
+        const payload = await parseJsonSafe(res);
+        throw new Error(getApiErrorMessage(payload, "Failed to create campaign"));
       }
-      const campaign: Campaign = await res.json();
+      const payload = await parseJsonSafe(res);
+      if (!isCampaign(payload)) {
+        throw new Error("Invalid campaign response");
+      }
+      const campaign = payload;
       onCreated(campaign);
       handleClose();
     } catch (err) {

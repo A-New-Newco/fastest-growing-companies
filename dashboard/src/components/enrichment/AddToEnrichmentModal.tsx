@@ -11,17 +11,16 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Plus, ChevronRight } from "lucide-react";
-import { getApiErrorMessage, isCampaign, parseJsonSafe } from "@/lib/http-client";
-import CampaignStatusBadge from "./CampaignStatusBadge";
-import type { Campaign } from "@/types";
+import { Plus, ChevronRight, Loader2 } from "lucide-react";
+import SessionStatusBadge from "./SessionStatusBadge";
+import type { EnrichmentSession } from "@/types";
 
 interface SelectedCompany {
   id: string;
   azienda: string;
-  cfoNome: string | null;
-  cfoRuolo: string | null;
-  cfoLinkedin: string | null;
+  sitoWeb: string | null;
+  country: string;
+  dataOrigin: "curated" | "imported";
 }
 
 interface Props {
@@ -31,11 +30,11 @@ interface Props {
   onAdded: () => void;
 }
 
-export default function AddToCampaignModal({ open, selectedCompanies, onClose, onAdded }: Props) {
+export default function AddToEnrichmentModal({ open, selectedCompanies, onClose, onAdded }: Props) {
   const router = useRouter();
-  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
+  const [sessions, setSessions] = useState<EnrichmentSession[]>([]);
   const [loading, setLoading] = useState(false);
-  const [saving, setSaving] = useState<string | null>(null); // campaignId being saved
+  const [saving, setSaving] = useState<string | null>(null); // sessionId being saved
   const [newName, setNewName] = useState("");
   const [creatingNew, setCreatingNew] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -44,46 +43,44 @@ export default function AddToCampaignModal({ open, selectedCompanies, onClose, o
     if (!open) return;
     setLoading(true);
     setError(null);
-    fetch("/api/campaigns")
-      .then(async (response) => {
-        const payload = await parseJsonSafe(response);
-        if (!response.ok) {
-          throw new Error(getApiErrorMessage(payload, "Failed to load campaigns"));
-        }
-        if (!Array.isArray(payload)) {
-          throw new Error("Invalid campaigns response");
-        }
-        setCampaigns((payload as Campaign[]).filter((c) => c.status !== "archived"));
+    fetch("/api/enrichment-sessions")
+      .then(async (res) => {
+        if (!res.ok) throw new Error("Failed to load sessions");
+        const data: EnrichmentSession[] = await res.json();
+        // Only show sessions that can still accept companies
+        setSessions(data.filter((s) => s.status === "pending" || s.status === "paused"));
       })
       .catch((err: unknown) => {
-        setCampaigns([]);
-        setError(err instanceof Error ? err.message : "Failed to load campaigns");
+        setSessions([]);
+        setError(err instanceof Error ? err.message : "Failed to load sessions");
       })
       .finally(() => setLoading(false));
   }, [open]);
 
-  async function addToExisting(campaignId: string) {
-    setSaving(campaignId);
+  async function addToExisting(sessionId: string) {
+    setSaving(sessionId);
     setError(null);
     try {
-      const res = await fetch(`/api/campaigns/${campaignId}/contacts`, {
+      const res = await fetch(`/api/enrichment-sessions/${sessionId}/companies`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           companies: selectedCompanies.map((c) => ({
             companyId: c.id,
-            contactName: c.cfoNome,
-            contactRole: c.cfoRuolo,
-            contactLinkedin: c.cfoLinkedin,
+            companyOrigin: c.dataOrigin,
+            companyName: c.azienda,
+            companyWebsite: c.sitoWeb,
+            companyCountry: c.country,
           })),
         }),
       });
       if (!res.ok) {
-        const payload = await parseJsonSafe(res);
-        throw new Error(getApiErrorMessage(payload, "Failed"));
+        const json = await res.json().catch(() => ({}));
+        throw new Error((json as { error?: string }).error ?? "Failed to add");
       }
       onAdded();
       onClose();
+      router.push(`/enrichment/${sessionId}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unknown error");
     } finally {
@@ -96,43 +93,28 @@ export default function AddToCampaignModal({ open, selectedCompanies, onClose, o
     setCreatingNew(true);
     setError(null);
     try {
-      // Create campaign
-      const res = await fetch("/api/campaigns", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: newName.trim() }),
-      });
-      if (!res.ok) {
-        const payload = await parseJsonSafe(res);
-        throw new Error(getApiErrorMessage(payload, "Failed to create"));
-      }
-      const payload = await parseJsonSafe(res);
-      if (!isCampaign(payload)) {
-        throw new Error("Invalid campaign response");
-      }
-      const campaign = payload;
-
-      // Add contacts
-      const addRes = await fetch(`/api/campaigns/${campaign.id}/contacts`, {
+      const res = await fetch("/api/enrichment-sessions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          name: newName.trim(),
           companies: selectedCompanies.map((c) => ({
             companyId: c.id,
-            contactName: c.cfoNome,
-            contactRole: c.cfoRuolo,
-            contactLinkedin: c.cfoLinkedin,
+            companyOrigin: c.dataOrigin,
+            companyName: c.azienda,
+            companyWebsite: c.sitoWeb,
+            companyCountry: c.country,
           })),
         }),
       });
-      if (!addRes.ok) {
-        const addPayload = await parseJsonSafe(addRes);
-        throw new Error(getApiErrorMessage(addPayload, "Failed to add contacts"));
+      if (!res.ok) {
+        const json = await res.json().catch(() => ({}));
+        throw new Error((json as { error?: string }).error ?? "Failed to create session");
       }
-
+      const session: EnrichmentSession = await res.json();
       onAdded();
       onClose();
-      router.push(`/campaigns/${campaign.id}`);
+      router.push(`/enrichment/${session.id}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unknown error");
     } finally {
@@ -145,37 +127,39 @@ export default function AddToCampaignModal({ open, selectedCompanies, onClose, o
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>
-            Add {selectedCompanies.length} contact{selectedCompanies.length !== 1 ? "s" : ""} to campaign
+            Add {selectedCompanies.length} compan{selectedCompanies.length !== 1 ? "ies" : "y"} to enrichment
           </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4 py-1">
-          {/* Existing campaigns */}
+          {/* Existing sessions */}
           <div>
             <p className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-2">
-              Add to existing campaign
+              Add to existing session
             </p>
             {loading ? (
-              <p className="text-sm text-slate-400 py-3 text-center">Loading…</p>
-            ) : campaigns.length === 0 ? (
-              <p className="text-sm text-slate-400 py-3 text-center">No active campaigns yet</p>
+              <div className="flex items-center justify-center py-4">
+                <Loader2 className="w-4 h-4 animate-spin text-slate-400" />
+              </div>
+            ) : sessions.length === 0 ? (
+              <p className="text-sm text-slate-400 py-3 text-center">No pending or paused sessions</p>
             ) : (
               <div className="rounded-md border border-slate-200 divide-y divide-slate-100 max-h-48 overflow-y-auto">
-                {campaigns.map((c) => (
+                {sessions.map((s) => (
                   <button
-                    key={c.id}
-                    disabled={!!saving}
-                    onClick={() => addToExisting(c.id)}
+                    key={s.id}
+                    disabled={!!saving || creatingNew}
+                    onClick={() => addToExisting(s.id)}
                     className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-slate-50
                                transition-colors text-left disabled:opacity-60"
                   >
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-slate-800 truncate">{c.name}</p>
-                      <p className="text-xs text-slate-400">{c.totalContacts ?? 0} contacts</p>
+                      <p className="text-sm font-medium text-slate-800 truncate">{s.name}</p>
+                      <p className="text-xs text-slate-400">{s.totalCompanies} companies</p>
                     </div>
-                    <CampaignStatusBadge status={c.status} />
-                    {saving === c.id ? (
-                      <span className="text-xs text-slate-400">Adding…</span>
+                    <SessionStatusBadge status={s.status} />
+                    {saving === s.id ? (
+                      <Loader2 className="w-3.5 h-3.5 text-slate-400 animate-spin" />
                     ) : (
                       <ChevronRight className="w-4 h-4 text-slate-300" />
                     )}
@@ -191,26 +175,30 @@ export default function AddToCampaignModal({ open, selectedCompanies, onClose, o
             <div className="flex-grow border-t border-slate-200" />
           </div>
 
-          {/* Create new */}
+          {/* Create new session */}
           <div>
             <p className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-2">
-              Create new campaign
+              Create new session
             </p>
             <div className="flex gap-2">
               <Input
-                placeholder="Campaign name…"
+                placeholder="Session name…"
                 value={newName}
                 onChange={(e) => setNewName(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && createAndAdd()}
                 className="flex-1"
+                disabled={creatingNew}
               />
               <Button
                 onClick={createAndAdd}
-                disabled={!newName.trim() || creatingNew}
+                disabled={!newName.trim() || creatingNew || !!saving}
                 size="sm"
               >
-                <Plus className="w-4 h-4 mr-1" />
-                {creatingNew ? "Creating…" : "Create"}
+                {creatingNew ? (
+                  <><Loader2 className="w-3.5 h-3.5 mr-1 animate-spin" /> Creating…</>
+                ) : (
+                  <><Plus className="w-4 h-4 mr-1" /> Create</>
+                )}
               </Button>
             </div>
           </div>

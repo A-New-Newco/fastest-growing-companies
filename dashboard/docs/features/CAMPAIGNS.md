@@ -133,6 +133,7 @@ src/app/campaigns/
 ### File modificati
 - `src/types/index.ts` — tipi `Campaign`, `CampaignContact`, `CampaignStatus`, `ContactStatus`
 - `src/lib/constants.ts` — `CAMPAIGN_STATUS_META`, `CONTACT_STATUS_META`
+- `src/lib/http-client.ts` — helper shared per parsing JSON sicuro e messaggi errore API
 - `src/components/layout/Navbar.tsx` — aggiunto link "Campaigns"
 - `src/components/explorer/CompanyTable.tsx` — row selection opzionale + floating bar
 - `src/app/explorer/page.tsx` — toggle "Select" per attivare la selezione
@@ -182,6 +183,8 @@ src/app/campaigns/
 | Deduplicazione | Non è possibile aggiungere due volte la stessa azienda a una campagna (unique constraint + upsert API). Se già presente, l'indicatore "already in campaign" appare nell'AddContactsModal. |
 | Timestamps automatici | `contacted_at` viene settato solo alla prima transizione verso `contacted`. `replied_at` solo alla prima transizione verso `replied`/`meeting_scheduled`/`converted`. |
 | Optimistic updates | I cambi di status nella tabella sono immediati in UI; il PATCH avviene in background. In caso di errore la UI torna allo stato precedente. |
+| Robustezza API client | Le fetch client su `/api/campaigns*` validano sempre `res.ok` e la forma del payload (`Array.isArray` / object checks). In caso di errore API (`{ error: ... }`) la UI mostra un messaggio senza crash runtime. |
+| Requisito schema outreach | Le colonne outreach e metadata claim (`connection_note_template`, `quota_policy`, `pause_reason`, `integration_mode`, `claimed_by`, `claim_expires_at`, `last_attempt_at`, `last_error_code`) sono richieste dal backend campaigns/plugin. Applicare `supabase/migrations/007_plugin_outreach_backfill.sql` per riallineare lo schema in modo idempotente. |
 | Reset selezione Explorer | Quando i filtri cambiano, la selezione multipla viene azzerata automaticamente. |
 | Isolamento team | Le campagne sono visibili solo ai membri del proprio team (RLS). |
 

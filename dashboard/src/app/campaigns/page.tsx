@@ -5,22 +5,46 @@ import { Plus, Archive } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import CampaignCard from "@/components/campaigns/CampaignCard";
 import CreateCampaignModal from "@/components/campaigns/CreateCampaignModal";
+import { getApiErrorMessage, parseJsonSafe } from "@/lib/http-client";
 import type { Campaign } from "@/types";
 
 export default function CampaignsPage() {
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [createOpen, setCreateOpen] = useState(false);
   const [showArchived, setShowArchived] = useState(false);
 
   useEffect(() => {
-    fetch("/api/campaigns")
-      .then((r) => r.json())
-      .then((data: Campaign[]) => {
-        setCampaigns(data);
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
+    let cancelled = false;
+    (async () => {
+      setLoading(true);
+      try {
+        const response = await fetch("/api/campaigns");
+        const payload = await parseJsonSafe(response);
+        if (!response.ok) {
+          throw new Error(getApiErrorMessage(payload, "Failed to load campaigns"));
+        }
+        if (!Array.isArray(payload)) {
+          throw new Error("Invalid campaigns response");
+        }
+        if (!cancelled) {
+          setCampaigns(payload as Campaign[]);
+          setError(null);
+        }
+      } catch (err) {
+        if (!cancelled) {
+          setCampaigns([]);
+          setError(err instanceof Error ? err.message : "Failed to load campaigns");
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const visible = campaigns.filter((c) =>
@@ -64,6 +88,10 @@ export default function CampaignsPage() {
             <div key={i} className="h-44 rounded-xl border border-slate-100 bg-slate-50 animate-pulse" />
           ))}
         </div>
+      ) : error ? (
+        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          {error}
+        </div>
       ) : visible.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed
                         border-slate-200 py-20 text-center">
@@ -86,6 +114,7 @@ export default function CampaignsPage() {
         onClose={() => setCreateOpen(false)}
         onCreated={(campaign) => {
           setCampaigns((prev) => [campaign, ...prev]);
+          setError(null);
           setCreateOpen(false);
         }}
       />

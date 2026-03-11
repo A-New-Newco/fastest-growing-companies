@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Linkedin, Plus, Search } from "lucide-react";
 import { ALL_COUNTRIES_VALUE, normalizeCountryCode } from "@/lib/constants";
 import { useFilters } from "@/lib/filter-context";
+import { getApiErrorMessage, parseJsonSafe } from "@/lib/http-client";
 import type { CampaignContact } from "@/types";
 
 interface ContactRow {
@@ -53,14 +54,20 @@ export default function AddContactsModal({
         params.set("country", normalizeCountryCode(filters.country));
       }
       const res = await fetch(`/api/companies/search?${params}`);
-      if (!res.ok) throw new Error("Failed to load companies");
-      const data: Array<{
+      const payload = await parseJsonSafe(res);
+      if (!res.ok) {
+        throw new Error(getApiErrorMessage(payload, "Failed to load companies"));
+      }
+      if (!Array.isArray(payload)) {
+        throw new Error("Invalid companies response");
+      }
+      const data = payload as Array<{
         id: string;
         azienda: string;
         cfo_nome: string | null;
         cfo_ruolo: string | null;
         cfo_linkedin: string | null;
-      }> = await res.json();
+      }>;
       setRows(
         data.map((c) => ({
           companyId: c.id,
@@ -72,8 +79,10 @@ export default function AddContactsModal({
           alreadyAdded: existingContactCompanyIds.has(c.id),
         }))
       );
-    } catch {
-      setError("Could not load companies");
+      setError(null);
+    } catch (err) {
+      setRows([]);
+      setError(err instanceof Error ? err.message : "Could not load companies");
     } finally {
       setLoading(false);
     }
@@ -106,15 +115,19 @@ export default function AddContactsModal({
         }),
       });
       if (!res.ok) {
-        const json = await res.json();
-        throw new Error(json.error ?? "Failed to add contacts");
+        const payload = await parseJsonSafe(res);
+        throw new Error(getApiErrorMessage(payload, "Failed to add contacts"));
       }
       // Refresh contacts from server
       const contactsRes = await fetch(`/api/campaigns/${campaignId}/contacts`);
-      if (contactsRes.ok) {
-        const contacts: CampaignContact[] = await contactsRes.json();
-        onAdded(contacts);
+      const contactsPayload = await parseJsonSafe(contactsRes);
+      if (!contactsRes.ok) {
+        throw new Error(getApiErrorMessage(contactsPayload, "Failed to refresh contacts"));
       }
+      if (!Array.isArray(contactsPayload)) {
+        throw new Error("Invalid contacts response");
+      }
+      onAdded(contactsPayload as CampaignContact[]);
       onClose();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unknown error");

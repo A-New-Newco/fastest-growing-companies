@@ -42,6 +42,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { getApiErrorMessage, isRecord, parseJsonSafe } from "@/lib/http-client";
 import ContactStatusSelect from "./ContactStatusSelect";
 import type { CampaignContact, ContactStatus } from "@/types";
 
@@ -115,13 +116,17 @@ export default function CampaignContactsTable({ campaignId, contacts, onChange }
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(updates),
         });
+        const payload = await parseJsonSafe(res);
         if (!res.ok) {
           // Revert on error
           onChange(contacts);
-        } else {
-          const updated = await res.json();
-          onChange(contacts.map((c) => (c.id === contactId ? { ...c, ...updated } : c)));
+          return;
         }
+        if (!isRecord(payload)) {
+          onChange(contacts);
+          return;
+        }
+        onChange(contacts.map((c) => (c.id === contactId ? { ...c, ...payload } : c)));
       } catch {
         onChange(contacts);
       } finally {
@@ -181,8 +186,8 @@ export default function CampaignContactsTable({ campaignId, contacts, onChange }
       });
 
       if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err.error ?? "Failed to delete contacts");
+        const payload = await parseJsonSafe(res);
+        throw new Error(getApiErrorMessage(payload, "Failed to delete contacts"));
       }
 
       const selectedSet = new Set(selectedIds);

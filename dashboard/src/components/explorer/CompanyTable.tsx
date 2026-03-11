@@ -47,6 +47,7 @@ import { formatRevenue, formatGrowth } from "@/lib/data";
 import { ROLE_CATEGORY_META, CONFIDENCE_META } from "@/lib/constants";
 import AnnotationModal from "./AnnotationModal";
 import AddToCampaignModal from "@/components/campaigns/AddToCampaignModal";
+import AddToEnrichmentModal from "@/components/enrichment/AddToEnrichmentModal";
 
 const columnHelper = createColumnHelper<Company>();
 
@@ -108,6 +109,7 @@ export default function CompanyTable({
   const [editingCompany, setEditingCompany] = useState<Company | null>(null);
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [addToCampaignOpen, setAddToCampaignOpen] = useState(false);
+  const [addToEnrichmentOpen, setAddToEnrichmentOpen] = useState(false);
   const [deletingSelected, setDeletingSelected] = useState(false);
 
   // Reset selection when companies change (e.g. filter applied)
@@ -625,6 +627,16 @@ export default function CompanyTable({
             Add to campaign
           </button>
           <button
+            onClick={() => setAddToEnrichmentOpen(true)}
+            disabled={deletingSelected}
+            className="flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-500
+                       disabled:opacity-60 disabled:cursor-not-allowed
+                       text-white text-xs font-medium px-3 py-1.5 rounded-full transition-colors"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            Enrich
+          </button>
+          <button
             onClick={handleDeleteSelectedCompanies}
             disabled={deletingSelected || selectedImportedIds.length === 0}
             className="flex items-center gap-1.5 bg-red-600 hover:bg-red-500
@@ -662,6 +674,21 @@ export default function CompanyTable({
             cfoLinkedin: c.cfoLinkedin,
           }))}
           onClose={() => setAddToCampaignOpen(false)}
+          onAdded={() => setRowSelection({})}
+        />
+      )}
+
+      {addToEnrichmentOpen && (
+        <AddToEnrichmentModal
+          open={addToEnrichmentOpen}
+          selectedCompanies={selectedCompanies.map((c) => ({
+            id: c.id,
+            azienda: c.azienda,
+            sitoWeb: c.sitoWeb,
+            country: c.country,
+            dataOrigin: c.dataOrigin,
+          }))}
+          onClose={() => setAddToEnrichmentOpen(false)}
           onAdded={() => setRowSelection({})}
         />
       )}

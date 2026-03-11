@@ -18,6 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { CAMPAIGN_STATUS_META } from "@/lib/constants";
+import { getApiErrorMessage, parseJsonSafe } from "@/lib/http-client";
 import type { Campaign, CampaignStatus } from "@/types";
 
 const EDITABLE_STATUSES: CampaignStatus[] = ["draft", "active", "paused", "completed", "archived"];
@@ -56,8 +57,8 @@ export default function EditCampaignModal({ campaign, onClose, onSaved }: Props)
         }),
       });
       if (!res.ok) {
-        const json = await res.json();
-        throw new Error(json.error ?? "Failed to save");
+        const payload = await parseJsonSafe(res);
+        throw new Error(getApiErrorMessage(payload, "Failed to save"));
       }
       onSaved({ name: name.trim(), description: description.trim() || null, status });
       onClose();
