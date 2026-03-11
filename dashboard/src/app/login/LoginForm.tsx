@@ -1,12 +1,11 @@
 "use client"
 
 import { useState } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
+import { useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { createClientSupabaseClient } from "@/lib/supabase/client"
 
 export default function LoginForm() {
-  const router = useRouter()
   const searchParams = useSearchParams()
   const redirectTo = searchParams.get("redirectTo") ?? "/"
   const callbackError = searchParams.get("error")
@@ -36,8 +35,7 @@ export default function LoginForm() {
       return
     }
 
-    router.refresh()
-    router.push(redirectTo)
+    window.location.href = redirectTo
   }
 
   return (
