@@ -79,6 +79,15 @@ npx tsc --noEmit     # Type check
 
 **At the end of every session that implements a feature or makes significant changes, update `dashboard/docs/` accordingly.**
 
+### Mandatory feature-document workflow
+
+**When the user asks for a new feature, always create its feature document immediately (before or together with implementation).**
+
+- Create `dashboard/docs/features/<FEATURE_NAME>.md` the first time that feature is requested.
+- Treat that file as the single source of truth for the feature.
+- On every later change/refactor/fix related to that feature, update the same file in the same session.
+- Do not close the task without aligning docs and code.
+
 ### Folder structure
 
 ```
@@ -96,7 +105,7 @@ dashboard/docs/
 
 ### Rules
 
-1. **New feature** → create `dashboard/docs/features/<FEATURE_NAME>.md` covering:
+1. **New feature request from user** → **always** create `dashboard/docs/features/<FEATURE_NAME>.md` (if missing) and keep it updated across all subsequent related changes, covering:
    - Context and purpose
    - Data model (tables, columns, constraints)
    - File structure (new files + modified files)
