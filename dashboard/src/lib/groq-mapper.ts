@@ -9,7 +9,7 @@ INTERNAL DATA MODEL (map TO these fields — use exact field names):
 {
   "name": "string — company name (required)",
   "website": "string | null — company website URL",
-  "growth_rate": "number | null — CAGR percentage as a decimal, e.g. 4.26 means 4.26% (NOT 0.0426)",
+  "growth_rate": "number | null — CAGR percentage points, e.g. 4.26 means 4.26% (NOT 0.0426)",
   "sector": "string | null — industry sector or category",
   "region": "string | null — geographic region within the country",
   "city": "string | null — city where the company is headquartered",
@@ -36,7 +36,8 @@ RULES:
 5. "confidence" is a float 0.0–1.0 reflecting mapping certainty.
 6. Fields that are internal metadata (system IDs, source page URLs, raw score arrays) with no equivalent in the model go to extra_data unless clearly useless (internal DB IDs, nested score objects) — skip those with target_field: null.
 7. If the same target field is the best match for multiple source fields, map all of them but lower confidence on the secondary matches and add a note.
-8. The "source_name_suggestion" should be a lowercase slug identifying this dataset, e.g. "wachstumschampions_2026", "fast50_fr_2025".`;
+8. The "source_name_suggestion" should be a lowercase slug identifying this dataset, e.g. "wachstumschampions_2026", "fast50_fr_2025".
+9. For target field "growth_rate": if source values are already percentages (field names like pct/percent/%), keep as-is (transform: null). Use "divide by 100" only when source is clearly in basis points or another 0-100x scaled unit.`;
 
 export function buildUserMessage(parseResult: ParseResult, fileName: string): string {
   const lines: string[] = [
@@ -156,6 +157,20 @@ export function applyTransformHint(value: unknown, hint: string | null): unknown
   return value;
 }
 
+function shouldSkipTransformForGrowthRate(
+  sourceField: string,
+  target: string,
+  transform: string | null
+): boolean {
+  if (target !== "growth_rate" || !transform) return false;
+  const hint = transform.toLowerCase();
+  if (!hint.includes("divide by 100")) return false;
+
+  // If the source field explicitly denotes percentage values, keep them as-is.
+  const source = sourceField.toLowerCase();
+  return source.includes("pct") || source.includes("percent") || source.includes("%");
+}
+
 /** Known internal column names (everything except extra_data) */
 const KNOWN_COLUMNS = new Set([
   "name", "website", "growth_rate", "sector", "region", "city",
@@ -194,7 +209,10 @@ export function applyMapping(
     const { target, transform } = entry;
     if (!target) continue; // skip
 
-    const value = applyTransformHint(flatRecord[sourceField], transform);
+    const effectiveTransform = shouldSkipTransformForGrowthRate(sourceField, target, transform)
+      ? null
+      : transform;
+    const value = applyTransformHint(flatRecord[sourceField], effectiveTransform);
 
     if (target.startsWith("extra_data.")) {
       const key = target.slice("extra_data.".length);
