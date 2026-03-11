@@ -32,7 +32,8 @@
       "Read(//Users/francescofiore/Coding/Reef/fastest-growing-companies/**)",
       "Bash(/Users/francescofiore/Coding/Reef/fastest-growing-companies/dashboard/src/app/login/page.tsx:*)",
       "Bash(/Users/francescofiore/Coding/Reef/fastest-growing-companies/dashboard/src/app/join-team/page.tsx:*)",
-      "Bash(grep -v \"^$\")"
+      "Bash(grep -v \"^$\")",
+      "Bash(npx vercel:*)"
     ]
   }
 }

@@ -36,8 +36,8 @@ export default function LoginForm() {
       return
     }
 
-    router.push(redirectTo)
     router.refresh()
+    router.push(redirectTo)
   }
 
   return (
