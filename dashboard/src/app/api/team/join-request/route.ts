@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createServerSupabaseClient } from "@/lib/supabase/server"
+import { createAdminSupabaseClient } from "@/lib/supabase/admin"
 
 export async function POST(req: NextRequest) {
   const supabase = createServerSupabaseClient()
@@ -17,7 +18,19 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "team_id is required" }, { status: 400 })
   }
 
-  const { data, error } = await supabase
+  const admin = createAdminSupabaseClient()
+
+  // Ensure the profile row exists (may be missing if trigger wasn't active at signup)
+  await admin.from("profiles").upsert(
+    {
+      id: user.id,
+      email: user.email!,
+      full_name: user.user_metadata?.full_name ?? null,
+    },
+    { onConflict: "id" }
+  )
+
+  const { data, error } = await admin
     .from("join_requests")
     .upsert(
       {

@@ -1,8 +1,8 @@
-import { createServerSupabaseClient } from "@/lib/supabase/server"
+import { createAdminSupabaseClient } from "@/lib/supabase/admin"
 import RequestsClient from "./RequestsClient"
 
 export default async function AdminRequestsPage() {
-  const supabase = createServerSupabaseClient()
+  const supabase = createAdminSupabaseClient()
 
   const { data: requests } = await supabase
     .from("join_requests")

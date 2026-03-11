@@ -15,8 +15,8 @@ interface JoinRequest {
   message: string | null
   created_at: string
   team_id: string
-  profiles: Profile[] | null
-  teams: { name: string }[] | null
+  profiles: Profile | Profile[] | null
+  teams: { name: string } | { name: string }[] | null
 }
 
 export default function RequestsClient({ requests }: { requests: JoinRequest[] }) {
@@ -61,8 +61,8 @@ export default function RequestsClient({ requests }: { requests: JoinRequest[] }
       ) : (
         <div className="space-y-3 max-w-2xl">
           {activeRequests.map((req) => {
-            const profile = req.profiles?.[0]
-            const team = req.teams?.[0]
+            const profile = Array.isArray(req.profiles) ? req.profiles[0] : req.profiles
+            const team = Array.isArray(req.teams) ? req.teams[0] : req.teams
             return (
               <div key={req.id} className="bg-white rounded-xl border border-slate-200 shadow-sm p-4">
                 <div className="flex items-start justify-between gap-4">
