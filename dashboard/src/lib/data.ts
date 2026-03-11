@@ -40,6 +40,7 @@ interface CompanyFullRow {
   contact_left: boolean | null;
   low_quality: boolean | null;
   annotation_note: string | null;
+  data_origin: string | null;
 }
 
 const SECTOR_TRANSLATIONS: Record<string, string> = {
@@ -156,6 +157,7 @@ function mapRow(row: CompanyFullRow): Company {
     confidenza,
     cfoFound,
     hasRealCfo,
+    dataOrigin: row.data_origin === "imported" ? "imported" : "curated",
     annotation,
   };
 }
@@ -165,11 +167,15 @@ export async function loadCompanies(
   country: string = DEFAULT_COUNTRY
 ): Promise<Company[]> {
   const supabase = createClientSupabaseClient();
-  let query = supabase
-    .from("companies_full")
+
+  // Query the unified view which includes both curated and imported companies.
+  // Imported companies are team-scoped via RLS enforced in the view definition.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let query = (supabase as any)
+    .from("all_companies")
     .select("*")
     .eq("year", year)
-    .order("rank", { ascending: true });
+    .order("rank", { ascending: true, nullsFirst: false });
 
   if (country !== ALL_COUNTRIES_VALUE) {
     query = query.eq("country", normalizeCountryCode(country));
@@ -183,14 +189,15 @@ export async function loadCompanies(
 
 export async function loadAvailableCountries(year = 2026): Promise<string[]> {
   const supabase = createClientSupabaseClient();
-  const { data, error } = await supabase
-    .from("companies_full")
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data, error } = await (supabase as any)
+    .from("all_companies")
     .select("country")
     .eq("year", year);
 
   if (error) throw new Error(`Failed to load countries: ${error.message}`);
 
-  return [...new Set((data ?? []).map((r) => normalizeCountryCode(r.country)))].sort();
+  return [...new Set((data as Array<{ country: string | null }> ?? []).map((r) => normalizeCountryCode(r.country)))].sort();
 }
 
 // ── Annotation mutations ───────────────────────────────────────────────────────

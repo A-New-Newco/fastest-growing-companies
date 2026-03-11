@@ -32,6 +32,7 @@
 - [x] Step 12: Team-scoped annotations — migration 002, `annotations` table con `team_id`, API `/api/annotations`, AnnotationModal
 - [x] Step 13: Campagne LinkedIn outreach — migration 003, tabelle `campaigns` + `campaign_contacts`, 8 API routes, 10 componenti, pagine `/campaigns` e `/campaigns/[id]`, row selection nell'Explorer → vedere `docs/features/CAMPAIGNS.md`
 - [x] Step 14: Docs restructure — `docs/` organizzato in `features/` e `architecture/`, regole di aggiornamento in `CLAUDE.md`
+- [x] Step 15: Data import from file — migration 004, tabelle `import_batches` + `field_mappings` + `imported_companies`, view `all_companies`, API `/api/imports/*`, wizard `FileUploadWizard` con LLM mapping (Groq), bottone "Import data" nell'Explorer → vedere `docs/features/IMPORTS.md`
 
 ---
 
@@ -57,3 +58,5 @@
 | 2026-03-11 | Campaign contacts stored separately from companies | Permette tracking per-campagna, deduplicazione, e future integrazioni con il plugin |
 | 2026-03-11 | Optimistic updates per status contatto | Evita latenza percepita; rollback su errore |
 | 2026-03-11 | `companies_full` view per join dei dati azienda nei contacts | Evita dipendenza dalla struttura interna della tabella companies |
+| 2026-03-11 | `imported_companies` separata da `companies` | Dati esterni (DE, FR, ecc.) hanno schema diverso; `all_companies` view li unifica per l'Explorer |
+| 2026-03-11 | LLM mapping via Groq (fetch diretto, no SDK) | `llama-3.3-70b-versatile` con `response_format: json_object`; fallback manuale se API non disponibile |

@@ -10,7 +10,8 @@ import {
 import type { Annotation, Company } from "@/types";
 import { useFilters } from "@/lib/filter-context";
 import { cn } from "@/lib/utils";
-import { TableIcon, BarChart2, CheckSquare } from "lucide-react";
+import { TableIcon, BarChart2, CheckSquare, Upload } from "lucide-react";
+import FileUploadWizard from "@/components/imports/FileUploadWizard";
 import SidebarFilter from "@/components/explorer/SidebarFilter";
 import CompanyTable from "@/components/explorer/CompanyTable";
 import CfoPresenceBySettore from "@/components/charts/CfoPresenceBySettore";
@@ -90,7 +91,16 @@ export default function ExplorerPage() {
   const [loading, setLoading] = useState(true);
   const [view, setView] = useState<View>("table");
   const [selectionMode, setSelectionMode] = useState(false);
+  const [importWizardOpen, setImportWizardOpen] = useState(false);
   const { filters, setFilters } = useFilters();
+
+  function handleImportComplete(importedCount: number) {
+    // Reload companies to include newly imported data
+    loadCompanies(2026, filters.country)
+      .then(setCompanies)
+      .catch(console.error);
+    console.log(`Import complete: ${importedCount} companies added`);
+  }
 
   useEffect(() => {
     let cancelled = false;
@@ -121,6 +131,11 @@ export default function ExplorerPage() {
           : c
       )
     );
+  }
+
+  function handleCompaniesDeleted(companyIds: string[]) {
+    const deletedSet = new Set(companyIds);
+    setCompanies((prev) => prev.filter((c) => !deletedSet.has(c.id)));
   }
 
   const settori = useMemo(() => getUniqueSettori(companies), [companies]);
@@ -201,6 +216,15 @@ export default function ExplorerPage() {
             {" / "}
             {companies.length} companies
           </span>
+
+          {/* Import data button */}
+          <button
+            onClick={() => setImportWizardOpen(true)}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md border border-slate-200 text-slate-500 hover:text-slate-700 hover:border-slate-300 transition-all"
+          >
+            <Upload className="w-3.5 h-3.5" />
+            Import data
+          </button>
         </div>
 
         {/* Scrollable content */}
@@ -215,6 +239,7 @@ export default function ExplorerPage() {
             <CompanyTable
               companies={filtered}
               onAnnotationSave={handleAnnotationSave}
+              onCompaniesDeleted={handleCompaniesDeleted}
               selectionMode={selectionMode}
             />
           ) : (
@@ -222,6 +247,12 @@ export default function ExplorerPage() {
           )}
         </div>
       </div>
+
+      <FileUploadWizard
+        open={importWizardOpen}
+        onClose={() => setImportWizardOpen(false)}
+        onImportComplete={handleImportComplete}
+      />
     </div>
   );
 }

@@ -39,6 +39,7 @@ export interface Company {
   confidenza: Confidenza;
   cfoFound: boolean; // true if any contact found
   hasRealCfo: boolean; // true if CFO/DAF or Finance Manager + medium/high confidence
+  dataOrigin: "curated" | "imported";
   annotation?: Annotation;
 }
 
@@ -159,6 +160,114 @@ export interface UpdateContactInput {
   contactName?: string;
   contactRole?: string;
   contactLinkedin?: string;
+}
+
+// ── Import types ──────────────────────────────────────────────────────────────
+
+export type ImportBatchStatus = "pending" | "mapping" | "importing" | "done" | "failed";
+export type FieldMappingStatus = "pending_review" | "approved" | "rejected";
+
+export interface ImportBatch {
+  id: string;
+  teamId: string;
+  sourceName: string;
+  countryCode: string;
+  year: number;
+  fileName: string;
+  fileFormat: "json" | "jsonl" | "csv";
+  totalRecords: number | null;
+  importedCount: number;
+  skippedCount: number;
+  status: ImportBatchStatus;
+  createdBy: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** Single entry in the LLM-generated field mapping */
+export interface FieldMappingEntry {
+  /** Internal field name, 'extra_data.<key>', or null (skip) */
+  target: string | null;
+  /** Human-readable transform hint, e.g. "parse as integer", or null */
+  transform: string | null;
+  /** LLM confidence 0.0–1.0 */
+  confidence: number;
+}
+
+export interface FieldMapping {
+  id: string;
+  batchId: string;
+  teamId: string;
+  /** Array of dot-notation field paths observed in the source file */
+  sourceSchema: string[];
+  /** Map: source_field_path → FieldMappingEntry */
+  mapping: Record<string, FieldMappingEntry>;
+  status: FieldMappingStatus;
+  approvedBy: string | null;
+  approvedAt: string | null;
+  llmModel: string | null;
+  createdBy: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ImportedCompany {
+  id: string;
+  teamId: string;
+  batchId: string;
+  sourceName: string;
+  sourceKey: string;
+  name: string;
+  website: string | null;
+  countryCode: string;
+  region: string | null;
+  city: string | null;
+  sector: string | null;
+  growthRate: number | null;
+  revenueA: number | null;
+  revenueB: number | null;
+  year: number;
+  nationalRank: number | null;
+  foundationYear: number | null;
+  description: string | null;
+  employeesStart: number | null;
+  employeesEnd: number | null;
+  isListed: boolean | null;
+  cfoNome: string | null;
+  cfoRuolo: string | null;
+  cfoLinkedin: string | null;
+  cfoConfidenza: string | null;
+  extraData: Record<string, unknown>;
+  importedBy: string;
+  importedAt: string;
+  updatedAt: string;
+}
+
+/** Shape of a single field extracted from the uploaded file for LLM analysis */
+export interface ParsedField {
+  name: string;
+  sampleValue: unknown;
+  inferredType: "string" | "number" | "boolean" | "array" | "object" | "null";
+}
+
+/** Result of parsing the uploaded file (sample only) */
+export interface ParseResult {
+  format: "json" | "jsonl" | "csv";
+  totalRows: number;
+  fields: ParsedField[];
+}
+
+/** Raw LLM output from Groq for field mapping */
+export interface FieldMappingResult {
+  mappings: Array<{
+    source_field: string;
+    target_field: string | null;
+    transform: string | null;
+    confidence: number;
+  }>;
+  extra_fields: string[];
+  source_name_suggestion: string;
+  notes: string | null;
 }
 
 // ── Auth / Team types ─────────────────────────────────────────────────────────

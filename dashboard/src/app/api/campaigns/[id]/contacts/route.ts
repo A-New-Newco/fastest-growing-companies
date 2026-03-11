@@ -123,3 +123,70 @@ export async function POST(req: NextRequest, { params }: Params) {
 
   return NextResponse.json({ inserted: data?.length ?? 0 });
 }
+
+// DELETE /api/campaigns/[id]/contacts — bulk delete contacts
+export async function DELETE(req: NextRequest, { params }: Params) {
+  const supabase = createServerSupabaseClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  // Verify campaign exists and user has access (RLS enforces team scope)
+  const { data: campaign } = await supabase
+    .from("campaigns")
+    .select("id")
+    .eq("id", params.id)
+    .maybeSingle();
+
+  if (!campaign) {
+    return NextResponse.json({ error: "Campaign not found" }, { status: 404 });
+  }
+
+  const body = await req.json().catch(() => null);
+  const requestedIds = Array.isArray(body?.contactIds)
+    ? body.contactIds.filter((id: unknown): id is string => typeof id === "string" && id.trim().length > 0)
+    : [];
+  const contactIds = [...new Set(requestedIds)];
+
+  if (contactIds.length === 0) {
+    return NextResponse.json({ error: "contactIds array is required" }, { status: 400 });
+  }
+
+  const { data: existing, error: existingError } = await supabase
+    .from("campaign_contacts")
+    .select("id")
+    .eq("campaign_id", params.id)
+    .in("id", contactIds);
+
+  if (existingError) {
+    return NextResponse.json({ error: existingError.message }, { status: 500 });
+  }
+
+  const deletableIds = (existing ?? []).map((row) => row.id);
+
+  if (deletableIds.length === 0) {
+    return NextResponse.json({ error: "No matching contacts found" }, { status: 404 });
+  }
+
+  const admin = createAdminSupabaseClient();
+  const { error: deleteError } = await admin
+    .from("campaign_contacts")
+    .delete()
+    .eq("campaign_id", params.id)
+    .in("id", deletableIds);
+
+  if (deleteError) {
+    return NextResponse.json({ error: deleteError.message }, { status: 500 });
+  }
+
+  return NextResponse.json({
+    deletedIds: deletableIds,
+    deletedCount: deletableIds.length,
+    requestedCount: contactIds.length,
+    ignoredCount: contactIds.length - deletableIds.length,
+  });
+}

@@ -23,6 +23,7 @@ import {
   ThumbsDown,
   StickyNote,
   Plus,
+  Trash2,
   X,
 } from "lucide-react";
 import {
@@ -52,6 +53,7 @@ const columnHelper = createColumnHelper<Company>();
 interface CompanyTableProps {
   companies: Company[];
   onAnnotationSave?: (companyId: string, annotation: Omit<Annotation, "companyId">) => void;
+  onCompaniesDeleted?: (companyIds: string[]) => void;
   // Selection mode (optional — campaigns feature)
   selectionMode?: boolean;
 }
@@ -95,12 +97,18 @@ function exportToCsv(companies: Company[]) {
   URL.revokeObjectURL(url);
 }
 
-export default function CompanyTable({ companies, onAnnotationSave, selectionMode = false }: CompanyTableProps) {
+export default function CompanyTable({
+  companies,
+  onAnnotationSave,
+  onCompaniesDeleted,
+  selectionMode = false,
+}: CompanyTableProps) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 25 });
   const [editingCompany, setEditingCompany] = useState<Company | null>(null);
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [addToCampaignOpen, setAddToCampaignOpen] = useState(false);
+  const [deletingSelected, setDeletingSelected] = useState(false);
 
   // Reset selection when companies change (e.g. filter applied)
   useEffect(() => {
@@ -113,6 +121,70 @@ export default function CompanyTable({ companies, onAnnotationSave, selectionMod
     () => companies.filter((c) => rowSelection[c.id]),
     [companies, rowSelection]
   );
+  const selectedImportedCompanies = useMemo(
+    () => selectedCompanies.filter((c) => c.dataOrigin === "imported"),
+    [selectedCompanies]
+  );
+  const selectedImportedIds = useMemo(
+    () => selectedImportedCompanies.map((c) => c.id),
+    [selectedImportedCompanies]
+  );
+  const selectedCuratedCount = selectedIds.length - selectedImportedIds.length;
+  const allSelected = companies.length > 0 && selectedIds.length === companies.length;
+
+  async function handleDeleteSelectedCompanies() {
+    if (selectedImportedIds.length === 0) {
+      alert("Only imported companies can be deleted.");
+      return;
+    }
+
+    const confirmationMessage =
+      selectedCuratedCount > 0
+        ? `Only imported companies can be deleted. Delete ${selectedImportedIds.length} imported selected companies?`
+        : `Delete ${selectedImportedIds.length} selected compan${selectedImportedIds.length === 1 ? "y" : "ies"}?`;
+
+    if (!confirm(confirmationMessage)) return;
+
+    setDeletingSelected(true);
+
+    try {
+      const res = await fetch("/api/companies", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ companyIds: selectedImportedIds }),
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error ?? "Failed to delete companies");
+      }
+
+      const result = await res.json();
+      const deletedIds: string[] = Array.isArray(result.deletedIds)
+        ? result.deletedIds
+        : selectedImportedIds;
+
+      onCompaniesDeleted?.(deletedIds);
+
+      setRowSelection((prev) => {
+        const next = { ...prev };
+        for (const id of deletedIds) delete next[id];
+        return next;
+      });
+    } catch (error) {
+      alert(error instanceof Error ? error.message : "Failed to delete companies");
+    } finally {
+      setDeletingSelected(false);
+    }
+  }
+
+  function handleSelectAllCompanies() {
+    const next: RowSelectionState = {};
+    for (const company of companies) {
+      next[company.id] = true;
+    }
+    setRowSelection(next);
+  }
 
   const checkboxColumn = useMemo(
     () =>
@@ -121,11 +193,12 @@ export default function CompanyTable({ companies, onAnnotationSave, selectionMod
         header: ({ table }) => (
           <input
             type="checkbox"
-            checked={table.getIsAllPageRowsSelected()}
+            checked={table.getIsAllRowsSelected()}
             ref={(el) => {
-              if (el) el.indeterminate = table.getIsSomePageRowsSelected();
+              if (el) el.indeterminate = table.getIsSomeRowsSelected();
             }}
-            onChange={table.getToggleAllPageRowsSelectedHandler()}
+            onChange={table.getToggleAllRowsSelectedHandler()}
+            disabled={deletingSelected}
             className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-400 cursor-pointer"
           />
         ),
@@ -135,12 +208,13 @@ export default function CompanyTable({ companies, onAnnotationSave, selectionMod
             checked={row.getIsSelected()}
             onChange={row.getToggleSelectedHandler()}
             onClick={(e) => e.stopPropagation()}
+            disabled={deletingSelected}
             className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-400 cursor-pointer"
           />
         ),
         size: 40,
       }),
-    []
+    [deletingSelected]
   );
 
   const dataColumns = useMemo(
@@ -194,20 +268,27 @@ export default function CompanyTable({ companies, onAnnotationSave, selectionMod
         cell: (info) => {
           const row = info.row.original;
           return (
-            <div className="flex items-center gap-1.5 group">
-              <span className="font-medium text-slate-900 text-sm">
-                {info.getValue()}
-              </span>
-              {row.sitoWeb && row.sitoWeb !== "n/a" && (
-                <a
-                  href={row.sitoWeb}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={(e) => e.stopPropagation()}
-                  className="opacity-0 group-hover:opacity-100 transition-opacity text-slate-400 hover:text-indigo-500"
-                >
-                  <ExternalLink className="w-3 h-3" />
-                </a>
+            <div className="flex flex-col gap-0.5">
+              <div className="flex items-center gap-1.5 group">
+                <span className="font-medium text-slate-900 text-sm">
+                  {info.getValue()}
+                </span>
+                {row.sitoWeb && row.sitoWeb !== "n/a" && (
+                  <a
+                    href={row.sitoWeb}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={(e) => e.stopPropagation()}
+                    className="opacity-0 group-hover:opacity-100 transition-opacity text-slate-400 hover:text-indigo-500"
+                  >
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                )}
+              </div>
+              {row.sourceName && (
+                <span className="text-[10px] font-mono text-slate-400 leading-none">
+                  {row.sourceName}
+                </span>
               )}
             </div>
           );
@@ -447,6 +528,28 @@ export default function CompanyTable({ companies, onAnnotationSave, selectionMod
               <Download className="w-3 h-3" />
               Export CSV ({companies.length})
             </Button>
+            {selectionMode && companies.length > 0 && !allSelected && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-7 px-2.5 text-xs gap-1.5"
+                onClick={handleSelectAllCompanies}
+                disabled={deletingSelected}
+              >
+                Select all ({companies.length})
+              </Button>
+            )}
+            {selectionMode && allSelected && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-7 px-2.5 text-xs gap-1.5"
+                onClick={() => setRowSelection({})}
+                disabled={deletingSelected}
+              >
+                Clear all
+              </Button>
+            )}
           </div>
           <div className="flex items-center gap-2 text-xs text-slate-500">
             <span>Rows per page:</span>
@@ -513,11 +616,28 @@ export default function CompanyTable({ companies, onAnnotationSave, selectionMod
           <div className="w-px h-4 bg-slate-600" />
           <button
             onClick={() => setAddToCampaignOpen(true)}
+            disabled={deletingSelected}
             className="flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-500
+                       disabled:opacity-60 disabled:cursor-not-allowed
                        text-white text-xs font-medium px-3 py-1.5 rounded-full transition-colors"
           >
             <Plus className="w-3.5 h-3.5" />
             Add to campaign
+          </button>
+          <button
+            onClick={handleDeleteSelectedCompanies}
+            disabled={deletingSelected || selectedImportedIds.length === 0}
+            className="flex items-center gap-1.5 bg-red-600 hover:bg-red-500
+                       disabled:opacity-60 disabled:cursor-not-allowed
+                       text-white text-xs font-medium px-3 py-1.5 rounded-full transition-colors"
+            title={
+              selectedImportedIds.length === 0
+                ? "Only imported companies can be deleted"
+                : "Delete selected companies"
+            }
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+            {deletingSelected ? "Deleting…" : `Delete selected (${selectedImportedIds.length})`}
           </button>
         </div>
       )}

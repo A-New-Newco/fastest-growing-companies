@@ -36,10 +36,12 @@
       "Bash(npx vercel:*)",
       "Bash(npx tsc:*)",
       "Bash(ls /Users/francescofiore/Coding/Reef/fastest-growing-companies/dashboard/src/app/api/campaigns/[id]/)",
-      "Bash(ls /Users/francescofiore/Coding/Reef/fastest-growing-companies/dashboard/src/app/campaigns/[id])"
+      "Bash(ls /Users/francescofiore/Coding/Reef/fastest-growing-companies/dashboard/src/app/campaigns/[id])",
+      "Bash(node -e \"require\\(''groq-sdk''\\)\")"
     ],
     "additionalDirectories": [
-      "/Users/francescofiore/Coding/Reef/fastest-growing-companies/dashboard/src/app/campaigns"
+      "/Users/francescofiore/Coding/Reef/fastest-growing-companies/dashboard/src/app/campaigns",
+      "/Users/francescofiore/Coding/Reef/fastest-growing-companies/dashboard/src/app/api/imports/[batchId]"
     ]
   }
 }

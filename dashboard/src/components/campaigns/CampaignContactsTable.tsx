@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import {
   useReactTable,
   getCoreRowModel,
@@ -9,6 +9,7 @@ import {
   flexRender,
   createColumnHelper,
   type SortingState,
+  type RowSelectionState,
 } from "@tanstack/react-table";
 import {
   ArrowUpDown,
@@ -87,6 +88,19 @@ export default function CampaignContactsTable({ campaignId, contacts, onChange }
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 25 });
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
+  const [deletingSelection, setDeletingSelection] = useState(false);
+
+  useEffect(() => {
+    const validIds = new Set(contacts.map((c) => c.id));
+    setRowSelection((prev) => {
+      const next: RowSelectionState = {};
+      for (const [id, selected] of Object.entries(prev)) {
+        if (selected && validIds.has(id)) next[id] = true;
+      }
+      return next;
+    });
+  }, [contacts]);
 
   const updateContact = useCallback(
     async (contactId: string, updates: Partial<CampaignContact> & Record<string, unknown>) => {
@@ -134,8 +148,80 @@ export default function CampaignContactsTable({ campaignId, contacts, onChange }
     [campaignId, contacts, onChange]
   );
 
+  const selectedIds = useMemo(
+    () => Object.keys(rowSelection).filter((id) => rowSelection[id]),
+    [rowSelection]
+  );
+  const allSelected = contacts.length > 0 && selectedIds.length === contacts.length;
+
+  const selectAllContacts = useCallback(() => {
+    const next: RowSelectionState = {};
+    for (const contact of contacts) {
+      next[contact.id] = true;
+    }
+    setRowSelection(next);
+  }, [contacts]);
+
+  const deleteSelectedContacts = useCallback(async () => {
+    if (selectedIds.length === 0) return;
+    if (
+      !confirm(
+        `Remove ${selectedIds.length} selected contact${selectedIds.length === 1 ? "" : "s"} from this campaign?`
+      )
+    ) {
+      return;
+    }
+
+    setDeletingSelection(true);
+    try {
+      const res = await fetch(`/api/campaigns/${campaignId}/contacts`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ contactIds: selectedIds }),
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error ?? "Failed to delete contacts");
+      }
+
+      const selectedSet = new Set(selectedIds);
+      onChange(contacts.filter((c) => !selectedSet.has(c.id)));
+      setRowSelection({});
+    } catch (error) {
+      alert(error instanceof Error ? error.message : "Failed to delete contacts");
+    } finally {
+      setDeletingSelection(false);
+    }
+  }, [campaignId, contacts, onChange, selectedIds]);
+
   const columns = useMemo(
     () => [
+      columnHelper.display({
+        id: "select",
+        header: ({ table }) => (
+          <input
+            type="checkbox"
+            checked={table.getIsAllRowsSelected()}
+            ref={(el) => {
+              if (el) el.indeterminate = table.getIsSomeRowsSelected();
+            }}
+            onChange={table.getToggleAllRowsSelectedHandler()}
+            disabled={deletingSelection}
+            className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-400 cursor-pointer"
+          />
+        ),
+        cell: ({ row }) => (
+          <input
+            type="checkbox"
+            checked={row.getIsSelected()}
+            onChange={row.getToggleSelectedHandler()}
+            onClick={(e) => e.stopPropagation()}
+            disabled={deletingSelection}
+            className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-400 cursor-pointer"
+          />
+        ),
+      }),
       columnHelper.accessor("companyName", {
         header: ({ column }) => (
           <button
@@ -229,7 +315,7 @@ export default function CampaignContactsTable({ campaignId, contacts, onChange }
           <button
             className="opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded
                        text-slate-400 hover:text-red-500 hover:bg-red-50"
-            disabled={deletingId === row.original.id}
+            disabled={deletingId === row.original.id || deletingSelection}
             onClick={() => {
               if (confirm(`Remove ${row.original.companyName ?? "this contact"} from the campaign?`)) {
                 deleteContact(row.original.id);
@@ -242,18 +328,21 @@ export default function CampaignContactsTable({ campaignId, contacts, onChange }
         ),
       }),
     ],
-    [updateContact, deleteContact, updatingId, deletingId]
+    [updateContact, deleteContact, updatingId, deletingId, deletingSelection]
   );
 
   const table = useReactTable({
     data: contacts,
     columns,
-    state: { sorting, pagination },
+    state: { sorting, pagination, rowSelection },
     onSortingChange: setSorting,
     onPaginationChange: setPagination,
+    onRowSelectionChange: setRowSelection,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
+    getRowId: (row) => row.id,
+    enableRowSelection: true,
   });
 
   return (
@@ -263,14 +352,44 @@ export default function CampaignContactsTable({ campaignId, contacts, onChange }
         <p className="text-xs text-slate-500">
           {contacts.length} contact{contacts.length !== 1 ? "s" : ""}
         </p>
-        <button
-          className="flex items-center gap-1.5 text-xs text-slate-500 hover:text-slate-800
-                     px-2.5 py-1.5 rounded-md hover:bg-slate-100 transition-colors"
-          onClick={() => exportToCsv(contacts)}
-        >
-          <Download className="w-3.5 h-3.5" />
-          Export CSV
-        </button>
+        <div className="flex items-center gap-2">
+          {!allSelected && contacts.length > 0 && (
+            <button
+              className="text-xs text-slate-500 hover:text-slate-800 px-2.5 py-1.5 rounded-md border border-slate-200 hover:bg-slate-100 transition-colors"
+              onClick={selectAllContacts}
+              disabled={deletingSelection}
+            >
+              Select all ({contacts.length})
+            </button>
+          )}
+          {selectedIds.length > 0 && (
+            <>
+              <button
+                className="flex items-center gap-1.5 text-xs text-red-600 hover:text-red-700
+                           px-2.5 py-1.5 rounded-md border border-red-200 hover:bg-red-50 transition-colors"
+                onClick={deleteSelectedContacts}
+                disabled={deletingSelection}
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                {deletingSelection ? "Deleting…" : `Delete selected (${selectedIds.length})`}
+              </button>
+              <button
+                className="text-xs text-slate-500 hover:text-slate-800 px-2 py-1.5 rounded-md hover:bg-slate-100 transition-colors"
+                onClick={() => setRowSelection({})}
+              >
+                Clear
+              </button>
+            </>
+          )}
+          <button
+            className="flex items-center gap-1.5 text-xs text-slate-500 hover:text-slate-800
+                       px-2.5 py-1.5 rounded-md hover:bg-slate-100 transition-colors"
+            onClick={() => exportToCsv(contacts)}
+          >
+            <Download className="w-3.5 h-3.5" />
+            Export CSV
+          </button>
+        </div>
       </div>
 
       <div className="rounded-lg border border-slate-200 overflow-hidden">
@@ -304,6 +423,7 @@ export default function CampaignContactsTable({ campaignId, contacts, onChange }
                 <TableRow
                   key={row.id}
                   className="group hover:bg-slate-50/80 border-slate-100"
+                  data-state={row.getIsSelected() ? "selected" : undefined}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id} className="py-2.5 text-xs">

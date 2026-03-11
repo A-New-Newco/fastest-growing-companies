@@ -139,6 +139,46 @@ export function getCountryLabel(code: string): string {
   return COUNTRY_LABELS[normalized] ?? normalized;
 }
 
+// ── Import: target field registry ────────────────────────────────────────────
+/** All internal fields the LLM can map source fields to */
+export const IMPORT_TARGET_FIELDS: Record<string, { label: string; required?: boolean }> = {
+  name:            { label: "Company Name",      required: true },
+  website:         { label: "Website" },
+  growth_rate:     { label: "Growth Rate (%)" },
+  sector:          { label: "Sector / Industry" },
+  region:          { label: "Region" },
+  city:            { label: "City" },
+  national_rank:   { label: "National Rank" },
+  source_key:      { label: "Source Key (unique ID)" },
+  revenue_a:       { label: "Revenue Start (K€)" },
+  revenue_b:       { label: "Revenue End (K€)" },
+  year:            { label: "Year" },
+  description:     { label: "Description" },
+  foundation_year: { label: "Foundation Year" },
+  employees_start: { label: "Employees Start" },
+  employees_end:   { label: "Employees End" },
+  is_listed:       { label: "Publicly Listed" },
+  extra_data:      { label: "Extra Data (unmapped)" },
+};
+
+/** Countries available in the import wizard (ISO 3166-1 alpha-2) */
+export const SUPPORTED_COUNTRIES: Array<{ code: string; label: string }> = [
+  { code: "IT", label: "Italy" },
+  { code: "DE", label: "Germany" },
+  { code: "FR", label: "France" },
+  { code: "NL", label: "Netherlands" },
+  { code: "ES", label: "Spain" },
+  { code: "BE", label: "Belgium" },
+  { code: "AT", label: "Austria" },
+  { code: "CH", label: "Switzerland" },
+  { code: "GB", label: "United Kingdom" },
+  { code: "US", label: "United States" },
+  { code: "PL", label: "Poland" },
+  { code: "SE", label: "Sweden" },
+  { code: "DK", label: "Denmark" },
+  { code: "NO", label: "Norway" },
+];
+
 // ── Filter defaults ────────────────────────────────────────────────────────────
 export const DEFAULT_FILTER_STATE = {
   country: DEFAULT_COUNTRY,
