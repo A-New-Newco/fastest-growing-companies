@@ -793,10 +793,12 @@ export default function CompanyTable({
               cfoNome: c.cfoNome!,
               dataOrigin: c.dataOrigin,
             }))}
-          onClose={() => setLinkedInSearchOpen(false)}
+          onClose={() => {
+            setLinkedInSearchOpen(false);
+            setRowSelection({});
+          }}
           onLinkedInUpdate={(id, url) => {
             onLinkedInUpdate?.(id, url);
-            setRowSelection({});
           }}
         />
       )}

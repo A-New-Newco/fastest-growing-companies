@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { Linkedin, Search, Check, X, Loader2, ExternalLink } from "lucide-react";
+import { useRef, useState } from "react";
+import { Linkedin, Search, Check, X, Loader2, ExternalLink, StopCircle } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -17,7 +17,7 @@ interface SearchCompany {
   dataOrigin: "curated" | "imported";
 }
 
-type RowStatus = "idle" | "searching" | "found" | "not_found";
+type RowStatus = "idle" | "searching" | "found" | "not_found" | "cancelled";
 
 interface RowState {
   status: RowStatus;
@@ -44,25 +44,52 @@ export default function LinkedInSearchModal({
   );
   const [running, setRunning] = useState(false);
   const [done, setDone] = useState(false);
+  const [cancelled, setCancelled] = useState(false);
   const [processedCount, setProcessedCount] = useState(0);
+  const abortRef = useRef<AbortController | null>(null);
 
   const total = selectedCompanies.length;
   const foundCount = Object.values(rows).filter((r) => r.status === "found").length;
+  const cancelledCount = Object.values(rows).filter((r) => r.status === "cancelled").length;
   const allDone =
     done ||
     selectedCompanies.every((c) => {
       const s = rows[c.id]?.status;
-      return s === "found" || s === "not_found";
+      return s === "found" || s === "not_found" || s === "cancelled";
     });
 
   const progressPct = total > 0 ? Math.round((processedCount / total) * 100) : 0;
 
+  function stopSearch() {
+    abortRef.current?.abort();
+  }
+
   async function runSearch() {
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     setRunning(true);
     setDone(false);
+    setCancelled(false);
     setProcessedCount(0);
 
     for (let i = 0; i < selectedCompanies.length; i++) {
+      // Check if cancelled before starting next company
+      if (controller.signal.aborted) {
+        // Mark remaining idle companies as cancelled
+        setRows((prev) => {
+          const next = { ...prev };
+          for (let j = i; j < selectedCompanies.length; j++) {
+            const id = selectedCompanies[j].id;
+            if (next[id]?.status === "idle") {
+              next[id] = { status: "cancelled", linkedinUrl: null };
+            }
+          }
+          return next;
+        });
+        break;
+      }
+
       const company = selectedCompanies[i];
 
       setRows((prev) => ({
@@ -73,6 +100,7 @@ export default function LinkedInSearchModal({
       try {
         const res = await fetch("/api/linkedin-search", {
           method: "POST",
+          signal: controller.signal,
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             companyId: company.id,
@@ -96,7 +124,22 @@ export default function LinkedInSearchModal({
             [company.id]: { status: "not_found", linkedinUrl: null },
           }));
         }
-      } catch {
+      } catch (err) {
+        if (err instanceof DOMException && err.name === "AbortError") {
+          // Mark current company and all remaining as cancelled
+          setRows((prev) => {
+            const next = { ...prev };
+            for (let j = i; j < selectedCompanies.length; j++) {
+              const id = selectedCompanies[j].id;
+              if (next[id]?.status === "idle" || next[id]?.status === "searching") {
+                next[id] = { status: "cancelled", linkedinUrl: null };
+              }
+            }
+            return next;
+          });
+          setCancelled(true);
+          break;
+        }
         setRows((prev) => ({
           ...prev,
           [company.id]: { status: "not_found", linkedinUrl: null },
@@ -106,6 +149,7 @@ export default function LinkedInSearchModal({
       setProcessedCount(i + 1);
     }
 
+    abortRef.current = null;
     setRunning(false);
     setDone(true);
   }
@@ -134,6 +178,14 @@ export default function LinkedInSearchModal({
                   <Loader2 className="w-3 h-3 animate-spin text-blue-500" />
                   Searching… {processedCount} / {total}
                 </span>
+              ) : cancelled ? (
+                <span className="text-slate-600 font-medium">
+                  Stopped —{" "}
+                  <span className="text-emerald-600">{foundCount} found</span>
+                  {cancelledCount > 0 && (
+                    <span className="text-slate-400"> · {cancelledCount} skipped</span>
+                  )}
+                </span>
               ) : (
                 <span className="text-slate-600 font-medium">
                   Done —{" "}
@@ -151,7 +203,9 @@ export default function LinkedInSearchModal({
             <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
               <div
                 className={`h-full rounded-full transition-all duration-300 ${
-                  allDone && foundCount === 0
+                  allDone && cancelled
+                    ? "bg-amber-400"
+                    : allDone && foundCount === 0
                     ? "bg-slate-300"
                     : allDone
                     ? "bg-emerald-500"
@@ -175,6 +229,8 @@ export default function LinkedInSearchModal({
                     ? "bg-emerald-50"
                     : row.status === "searching"
                     ? "bg-blue-50"
+                    : row.status === "cancelled"
+                    ? "bg-amber-50"
                     : "bg-slate-50"
                 }`}
               >
@@ -191,6 +247,9 @@ export default function LinkedInSearchModal({
                   )}
                   {row.status === "not_found" && (
                     <X className="w-3.5 h-3.5 text-slate-400" />
+                  )}
+                  {row.status === "cancelled" && (
+                    <X className="w-3.5 h-3.5 text-amber-400" />
                   )}
                 </div>
 
@@ -222,6 +281,9 @@ export default function LinkedInSearchModal({
                 {row.status === "searching" && (
                   <span className="text-xs text-blue-400 flex-shrink-0">searching…</span>
                 )}
+                {row.status === "cancelled" && (
+                  <span className="text-xs text-amber-500 flex-shrink-0">skipped</span>
+                )}
               </div>
             );
           })}
@@ -238,24 +300,25 @@ export default function LinkedInSearchModal({
           >
             {allDone ? "Close" : "Cancel"}
           </Button>
-          {!allDone && (
+          {running && (
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={stopSearch}
+              className="text-xs border-amber-300 text-amber-600 hover:bg-amber-50"
+            >
+              <StopCircle className="w-3.5 h-3.5 mr-1.5" />
+              Stop
+            </Button>
+          )}
+          {!allDone && !running && (
             <Button
               size="sm"
               onClick={runSearch}
-              disabled={running}
               className="text-xs bg-blue-600 hover:bg-blue-500 text-white"
             >
-              {running ? (
-                <>
-                  <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />
-                  Searching…
-                </>
-              ) : (
-                <>
-                  <Search className="w-3.5 h-3.5 mr-1.5" />
-                  Start Search
-                </>
-              )}
+              <Search className="w-3.5 h-3.5 mr-1.5" />
+              {cancelled ? "Restart" : "Start Search"}
             </Button>
           )}
         </div>

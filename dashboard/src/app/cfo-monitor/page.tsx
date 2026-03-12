@@ -489,7 +489,8 @@ export default function CfoMonitorPage() {
   // Toolbar state (live tab only)
   const selectedResults = displayedResults.filter((r) => selected.has(r.rank));
   const canReprocess = activeTab === "live" && selectedResults.some((r) => r.cfo_nome && !r.cfo_linkedin);
-  const canImport = activeTab === "live" && selectedResults.length > 0 && !!status?.dataset_id;
+  const canImport = selectedResults.length > 0 && !!status?.dataset_id;
+  const canImportAll = !!status?.dataset_id && displayedResults.length > 0;
   const liSearchCandidates = selectedResults.filter((r) => r.cfo_nome && !r.cfo_linkedin);
   const canLiSearch = activeTab === "live" && liSearchCandidates.length > 0;
   const allSelected = displayedResults.length > 0 && selected.size === displayedResults.length;
@@ -697,62 +698,60 @@ export default function CfoMonitorPage() {
                   ))}
                 </div>
 
-                {/* Toolbar — live tab only */}
-                {activeTab === "live" && (
-                  <div className="flex items-center gap-2 flex-wrap py-2">
-                    {selected.size > 0 && (
-                      <>
-                        {canLiSearch && (
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="h-7 text-xs border-blue-200 text-blue-600 hover:bg-blue-50"
-                            onClick={() => setLiSearchModalOpen(true)}
-                          >
-                            Find LinkedIn ({liSearchCandidates.length})
-                          </Button>
-                        )}
-                        {canReprocess && (
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="h-7 text-xs border-slate-200 text-slate-600"
-                            disabled={reprocessingBulk}
-                            onClick={() => handleReprocessBulk(displayedResults)}
-                          >
-                            {reprocessingBulk
-                              ? "Re-running…"
-                              : `Re-run agent (${selectedResults.filter((r) => r.cfo_nome && !r.cfo_linkedin).length})`}
-                          </Button>
-                        )}
-                        {canImport && (
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="h-7 text-xs border-indigo-200 text-indigo-600 hover:bg-indigo-50"
-                            disabled={importing}
-                            onClick={() => handleImport(selectedResults)}
-                          >
-                            {importing ? "Importing…" : `Import Selected (${selected.size})`}
-                          </Button>
-                        )}
-                      </>
-                    )}
-                    {status?.dataset_id && liveResults.length > 0 && (
-                      <Button
-                        size="sm"
-                        className="h-7 text-xs bg-indigo-600 hover:bg-indigo-500 text-white"
-                        disabled={importing}
-                        onClick={() => handleImport(liveResults)}
-                      >
-                        {importing ? "Importing…" : "Import All"}
-                      </Button>
-                    )}
-                  </div>
-                )}
+                {/* Toolbar */}
+                <div className="flex items-center gap-2 flex-wrap py-2">
+                  {selected.size > 0 && (
+                    <>
+                      {canLiSearch && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="h-7 text-xs border-blue-200 text-blue-600 hover:bg-blue-50"
+                          onClick={() => setLiSearchModalOpen(true)}
+                        >
+                          Find LinkedIn ({liSearchCandidates.length})
+                        </Button>
+                      )}
+                      {canReprocess && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="h-7 text-xs border-slate-200 text-slate-600"
+                          disabled={reprocessingBulk}
+                          onClick={() => handleReprocessBulk(displayedResults)}
+                        >
+                          {reprocessingBulk
+                            ? "Re-running…"
+                            : `Re-run agent (${selectedResults.filter((r) => r.cfo_nome && !r.cfo_linkedin).length})`}
+                        </Button>
+                      )}
+                      {canImport && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="h-7 text-xs border-indigo-200 text-indigo-600 hover:bg-indigo-50"
+                          disabled={importing}
+                          onClick={() => handleImport(selectedResults)}
+                        >
+                          {importing ? "Importing…" : `Import Selected (${selected.size})`}
+                        </Button>
+                      )}
+                    </>
+                  )}
+                  {canImportAll && (
+                    <Button
+                      size="sm"
+                      className="h-7 text-xs bg-indigo-600 hover:bg-indigo-500 text-white"
+                      disabled={importing}
+                      onClick={() => handleImport(displayedResults)}
+                    >
+                      {importing ? "Importing…" : "Import All"}
+                    </Button>
+                  )}
+                </div>
               </div>
 
-              {importMsg && activeTab === "live" && (
+              {importMsg && (
                 <p className={`text-xs px-4 pt-2 ${importMsg.includes("failed") || importMsg.includes("Failed") ? "text-red-600" : "text-emerald-600"}`}>
                   {importMsg}
                 </p>
@@ -764,7 +763,6 @@ export default function CfoMonitorPage() {
                     <thead className="sticky top-0 bg-white border-b border-slate-200 z-10">
                       <tr className="text-slate-500 text-left">
                         <th className="px-3 py-2.5 w-8">
-                          {activeTab === "live" && (
                           <input
                             type="checkbox"
                             className="rounded border-slate-300 accent-indigo-600"
@@ -772,7 +770,6 @@ export default function CfoMonitorPage() {
                             ref={(el) => { if (el) el.indeterminate = someSelected; }}
                             onChange={() => toggleSelectAll(displayedResults)}
                           />
-                          )}
                         </th>
                         <th className="px-3 py-2.5 font-medium w-10">#</th>
                         <th className="px-3 py-2.5 font-medium">Company</th>

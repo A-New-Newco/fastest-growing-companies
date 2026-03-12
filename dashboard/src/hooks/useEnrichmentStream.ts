@@ -211,7 +211,10 @@ export function useEnrichmentStream({
     });
 
     es.addEventListener("error", (e) => {
-      dispatch({ type: "SET_ERROR", message: "Stream error: " + JSON.stringify(e) });
+      const serverMsg = (e as MessageEvent).data
+        ? (JSON.parse((e as MessageEvent).data) as { message?: string }).message
+        : null;
+      dispatch({ type: "SET_ERROR", message: serverMsg ?? "Stream connection lost" });
       es.close();
       esRef.current = null;
       dispatch({ type: "SET_CONNECTED", value: false });
