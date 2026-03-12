@@ -68,6 +68,7 @@ const NAV_LINKS = [
   { href: "/explorer", label: "Explorer" },
   { href: "/campaigns", label: "Campaigns" },
   { href: "/enrichment", label: "Enrichment" },
+  { href: "/cfo-monitor", label: "CFO Monitor" },
 ];
 
 const ADMIN_LINKS = [
