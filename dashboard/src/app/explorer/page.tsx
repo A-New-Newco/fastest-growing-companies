@@ -138,6 +138,12 @@ export default function ExplorerPage() {
     setCompanies((prev) => prev.filter((c) => !deletedSet.has(c.id)));
   }
 
+  function handleLinkedInUpdate(companyId: string, linkedinUrl: string) {
+    setCompanies((prev) =>
+      prev.map((c) => (c.id === companyId ? { ...c, cfoLinkedin: linkedinUrl } : c))
+    );
+  }
+
   const settori = useMemo(() => getUniqueSettori(companies), [companies]);
   const regioni = useMemo(() => getUniqueRegioni(companies), [companies]);
 
@@ -240,6 +246,7 @@ export default function ExplorerPage() {
               companies={filtered}
               onAnnotationSave={handleAnnotationSave}
               onCompaniesDeleted={handleCompaniesDeleted}
+              onLinkedInUpdate={handleLinkedInUpdate}
               selectionMode={selectionMode}
             />
           ) : (

@@ -43,7 +43,12 @@
       "Bash(/Users/francescofiore/Coding/Reef/fastest-growing-companies/dashboard/docs/architecture/DATABASE.md:*)",
       "Bash(chmod +x /Users/francescofiore/Coding/Reef/fastest-growing-companies/cfo-enricher/start.sh)",
       "Bash(uv sync:*)",
-      "Bash(uv run:*)"
+      "Bash(uv run:*)",
+      "Bash(find /Users/francescofiore/Coding/Reef/fastest-growing-companies -name seed* -o -name *schema*)",
+      "WebFetch(domain:mlqqpqyxxmhxbcgcwyoi.supabase.co)",
+      "mcp__supabase__list_tables",
+      "mcp__supabase__execute_sql",
+      "Bash(node -e \"const l = require\\(''lucide-react''\\); console.log\\(''BriefcaseBusiness'' in l, ''Briefcase'' in l, ''UserRound'' in l, ''DollarSign'' in l\\)\")"
     ],
     "additionalDirectories": [
       "/Users/francescofiore/Coding/Reef/fastest-growing-companies/dashboard/src/app/campaigns",

@@ -191,3 +191,35 @@ Gestisce anche il refresh automatico del token Supabase via `supabase.auth.getUs
 `session_start`, `company_start`, `log`, `company_done`, `session_progress`, `heartbeat`, `session_complete`, `session_paused`, `error`
 
 See `dashboard/docs/features/ENRICHMENT_SESSIONS.md` for full event payloads.
+
+---
+
+## LinkedIn Search (aggiunto 2026-03-12)
+
+### `POST /api/linkedin-search`
+Cerca il profilo LinkedIn di un contatto tramite Groq `compound-beta-mini` (web search Brave). Salva il risultato nel campo `cfo_linkedin` del record sorgente.
+
+**Body:**
+```json
+{
+  "companyId": "uuid",
+  "companyName": "string",
+  "contactName": "string",
+  "dataOrigin": "curated" | "imported"
+}
+```
+
+**Response:**
+```json
+{
+  "linkedinUrl": "https://www.linkedin.com/in/slug | null",
+  "found": true | false,
+  "query": "CompanyName ContactName site:linkedin.com"
+}
+```
+
+**Save target:**
+- `curated` → `UPDATE contacts SET linkedin = $url WHERE company_id = $id`
+- `imported` → `UPDATE imported_companies SET cfo_linkedin = $url WHERE id = $id`
+
+See `dashboard/docs/features/LINKEDIN_SEARCH.md`.

@@ -25,6 +25,10 @@ import {
   Plus,
   Trash2,
   X,
+  Search,
+  Loader2,
+  Check,
+  XCircle,
 } from "lucide-react";
 import {
   Table,
@@ -48,6 +52,7 @@ import { ROLE_CATEGORY_META, CONFIDENCE_META } from "@/lib/constants";
 import AnnotationModal from "./AnnotationModal";
 import AddToCampaignModal from "@/components/campaigns/AddToCampaignModal";
 import AddToEnrichmentModal from "@/components/enrichment/AddToEnrichmentModal";
+import LinkedInSearchModal from "@/components/linkedin/LinkedInSearchModal";
 
 const columnHelper = createColumnHelper<Company>();
 
@@ -55,6 +60,7 @@ interface CompanyTableProps {
   companies: Company[];
   onAnnotationSave?: (companyId: string, annotation: Omit<Annotation, "companyId">) => void;
   onCompaniesDeleted?: (companyIds: string[]) => void;
+  onLinkedInUpdate?: (companyId: string, linkedinUrl: string) => void;
   // Selection mode (optional — campaigns feature)
   selectionMode?: boolean;
 }
@@ -102,6 +108,7 @@ export default function CompanyTable({
   companies,
   onAnnotationSave,
   onCompaniesDeleted,
+  onLinkedInUpdate,
   selectionMode = false,
 }: CompanyTableProps) {
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -110,6 +117,9 @@ export default function CompanyTable({
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [addToCampaignOpen, setAddToCampaignOpen] = useState(false);
   const [addToEnrichmentOpen, setAddToEnrichmentOpen] = useState(false);
+  const [linkedInSearchOpen, setLinkedInSearchOpen] = useState(false);
+  const [linkedInSearchingId, setLinkedInSearchingId] = useState<string | null>(null);
+  const [linkedInRowResult, setLinkedInRowResult] = useState<Record<string, "found" | "not_found">>({});
   const [deletingSelected, setDeletingSelected] = useState(false);
 
   // Reset selection when companies change (e.g. filter applied)
@@ -177,6 +187,45 @@ export default function CompanyTable({
       alert(error instanceof Error ? error.message : "Failed to delete companies");
     } finally {
       setDeletingSelected(false);
+    }
+  }
+
+  async function handleSingleLinkedInSearch(company: Company) {
+    if (!company.cfoNome) return;
+    setLinkedInSearchingId(company.id);
+    try {
+      const res = await fetch("/api/linkedin-search", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          companyId: company.id,
+          companyName: company.azienda,
+          contactName: company.cfoNome,
+          dataOrigin: company.dataOrigin,
+        }),
+      });
+      const data = await res.json();
+      if (res.ok && data.found) {
+        setLinkedInRowResult((prev) => ({ ...prev, [company.id]: "found" }));
+        onLinkedInUpdate?.(company.id, data.linkedinUrl);
+        // Clear indicator after 3 s
+        setTimeout(() => setLinkedInRowResult((prev) => {
+          const next = { ...prev };
+          delete next[company.id];
+          return next;
+        }), 3000);
+      } else {
+        setLinkedInRowResult((prev) => ({ ...prev, [company.id]: "not_found" }));
+        setTimeout(() => setLinkedInRowResult((prev) => {
+          const next = { ...prev };
+          delete next[company.id];
+          return next;
+        }), 3000);
+      }
+    } catch {
+      setLinkedInRowResult((prev) => ({ ...prev, [company.id]: "not_found" }));
+    } finally {
+      setLinkedInSearchingId(null);
     }
   }
 
@@ -396,23 +445,67 @@ export default function CompanyTable({
         },
         size: 80,
       }),
-      // Edit / annotate button
+      // Actions column: LinkedIn search + annotate
       columnHelper.display({
         id: "edit",
         header: "",
-        cell: (info) => (
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              setEditingCompany(info.row.original);
-            }}
-            className="opacity-0 group-hover/row:opacity-100 transition-opacity p-1 rounded hover:bg-slate-100 text-slate-400 hover:text-indigo-500"
-            title="Annotate"
-          >
-            <Pencil className="w-3 h-3" />
-          </button>
-        ),
-        size: 36,
+        cell: (info) => {
+          const company = info.row.original;
+          const isSearching = linkedInSearchingId === company.id;
+          const rowResult = linkedInRowResult[company.id];
+          // Keep visible while searching or showing a transient result
+          const forceVisible = isSearching || !!rowResult;
+          return (
+            <div
+              className={`flex items-center gap-0.5 transition-opacity ${
+                forceVisible
+                  ? "opacity-100"
+                  : "opacity-0 group-hover/row:opacity-100"
+              }`}
+            >
+              {company.cfoNome && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleSingleLinkedInSearch(company);
+                  }}
+                  disabled={isSearching}
+                  className="p-1 rounded hover:bg-slate-100 disabled:cursor-not-allowed"
+                  title={
+                    isSearching
+                      ? "Searching…"
+                      : rowResult === "found"
+                      ? "LinkedIn found — click to search again"
+                      : rowResult === "not_found"
+                      ? "Not found — click to retry"
+                      : "Find LinkedIn profile"
+                  }
+                >
+                  {isSearching ? (
+                    <Loader2 className="w-3 h-3 animate-spin text-blue-500" />
+                  ) : rowResult === "found" ? (
+                    <Check className="w-3 h-3 text-emerald-500" />
+                  ) : rowResult === "not_found" ? (
+                    <XCircle className="w-3 h-3 text-slate-400" />
+                  ) : (
+                    <Search className="w-3 h-3 text-slate-400 hover:text-blue-500" />
+                  )}
+                </button>
+              )}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setEditingCompany(company);
+                }}
+                className="p-1 rounded hover:bg-slate-100 text-slate-400 hover:text-indigo-500"
+                title="Annotate"
+              >
+                <Pencil className="w-3 h-3" />
+              </button>
+            </div>
+          );
+        },
+        size: 56,
       }),
     ],
     []
@@ -637,6 +730,17 @@ export default function CompanyTable({
             Enrich
           </button>
           <button
+            onClick={() => setLinkedInSearchOpen(true)}
+            disabled={deletingSelected || selectedCompanies.filter((c) => c.cfoNome).length === 0}
+            className="flex items-center gap-1.5 bg-blue-600 hover:bg-blue-500
+                       disabled:opacity-60 disabled:cursor-not-allowed
+                       text-white text-xs font-medium px-3 py-1.5 rounded-full transition-colors"
+            title="Find LinkedIn profiles for selected contacts"
+          >
+            <Linkedin className="w-3.5 h-3.5" />
+            Find LinkedIn
+          </button>
+          <button
             onClick={handleDeleteSelectedCompanies}
             disabled={deletingSelected || selectedImportedIds.length === 0}
             className="flex items-center gap-1.5 bg-red-600 hover:bg-red-500
@@ -675,6 +779,25 @@ export default function CompanyTable({
           }))}
           onClose={() => setAddToCampaignOpen(false)}
           onAdded={() => setRowSelection({})}
+        />
+      )}
+
+      {linkedInSearchOpen && (
+        <LinkedInSearchModal
+          open={linkedInSearchOpen}
+          selectedCompanies={selectedCompanies
+            .filter((c) => c.cfoNome)
+            .map((c) => ({
+              id: c.id,
+              azienda: c.azienda,
+              cfoNome: c.cfoNome!,
+              dataOrigin: c.dataOrigin,
+            }))}
+          onClose={() => setLinkedInSearchOpen(false)}
+          onLinkedInUpdate={(id, url) => {
+            onLinkedInUpdate?.(id, url);
+            setRowSelection({});
+          }}
         />
       )}
 

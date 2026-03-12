@@ -23,6 +23,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
+import CompanyDetailModal from "./CompanyDetailModal";
 import {
   type CompanyResult,
   type Dataset,
@@ -37,6 +38,7 @@ import {
   startRun,
   stopRun,
 } from "@/lib/enrichment-client";
+import LinkedInSearchModal from "@/components/linkedin/LinkedInSearchModal";
 
 // ---------------------------------------------------------------------------
 // localStorage helpers (SSR-safe)
@@ -151,6 +153,14 @@ export default function CfoMonitorPage() {
   const [importMsg, setImportMsg] = useState<string | null>(null);
   const [reprocessingRanks, setReprocessingRanks] = useState<Set<number>>(new Set());
   const reprocessingBulk = reprocessingRanks.size > 0;
+
+  // LinkedIn fast-search state
+  const [liSearchingRanks, setLiSearchingRanks] = useState<Set<number>>(new Set());
+  const [liRowResult, setLiRowResult] = useState<Record<number, "found" | "not_found">>({});
+  const [liSearchModalOpen, setLiSearchModalOpen] = useState(false);
+
+  // Detail modal
+  const [detailCompany, setDetailCompany] = useState<CompanyResult | null>(null);
 
   const esRef = useRef<EventSource | null>(null);
 
@@ -392,6 +402,40 @@ export default function CfoMonitorPage() {
   };
 
   // ------------------------------------------------------------------
+  // LinkedIn fast search (single row — no DB save, update in-memory only)
+  // ------------------------------------------------------------------
+  const handleLiSearchOne = async (r: CompanyResult) => {
+    if (!r.cfo_nome || liSearchingRanks.has(r.rank)) return;
+    setLiSearchingRanks((prev) => new Set([...prev, r.rank]));
+    try {
+      const res = await fetch("/api/linkedin-search", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          companyName: r.azienda,
+          contactName: r.cfo_nome,
+          // No companyId — skip DB save; the user will import results separately
+        }),
+      });
+      const data = await res.json();
+      if (res.ok && data.found) {
+        setResults((prev) =>
+          prev.map((row) => row.rank === r.rank ? { ...row, cfo_linkedin: data.linkedinUrl } : row)
+        );
+        setLiRowResult((prev) => ({ ...prev, [r.rank]: "found" }));
+        setTimeout(() => setLiRowResult((prev) => { const n = { ...prev }; delete n[r.rank]; return n; }), 3000);
+      } else {
+        setLiRowResult((prev) => ({ ...prev, [r.rank]: "not_found" }));
+        setTimeout(() => setLiRowResult((prev) => { const n = { ...prev }; delete n[r.rank]; return n; }), 3000);
+      }
+    } catch {
+      setLiRowResult((prev) => ({ ...prev, [r.rank]: "not_found" }));
+    } finally {
+      setLiSearchingRanks((prev) => { const n = new Set(prev); n.delete(r.rank); return n; });
+    }
+  };
+
+  // ------------------------------------------------------------------
   // Derived values
   // ------------------------------------------------------------------
   const isRunning = status?.status === "running";
@@ -419,6 +463,8 @@ export default function CfoMonitorPage() {
   const selectedResults = results.filter((r) => selected.has(r.rank));
   const canReprocess = selectedResults.some((r) => r.cfo_nome && !r.cfo_linkedin);
   const canImport = selectedResults.length > 0 && !!status?.dataset_id;
+  const liSearchCandidates = selectedResults.filter((r) => r.cfo_nome && !r.cfo_linkedin);
+  const canLiSearch = liSearchCandidates.length > 0;
   const allSelected = results.length > 0 && selected.size === results.length;
   const someSelected = selected.size > 0 && selected.size < results.length;
 
@@ -613,6 +659,16 @@ export default function CfoMonitorPage() {
                   <div className="flex items-center gap-2 flex-wrap pb-1">
                     {selected.size > 0 && (
                       <>
+                        {canLiSearch && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="h-7 text-xs border-blue-200 text-blue-600 hover:bg-blue-50"
+                            onClick={() => setLiSearchModalOpen(true)}
+                          >
+                            Find LinkedIn ({liSearchCandidates.length})
+                          </Button>
+                        )}
                         {canReprocess && (
                           <Button
                             size="sm"
@@ -622,8 +678,8 @@ export default function CfoMonitorPage() {
                             onClick={handleReprocessBulk}
                           >
                             {reprocessingBulk
-                              ? "Searching…"
-                              : `Re-run LinkedIn (${selectedResults.filter((r) => r.cfo_nome && !r.cfo_linkedin).length})`}
+                              ? "Re-running…"
+                              : `Re-run agent (${selectedResults.filter((r) => r.cfo_nome && !r.cfo_linkedin).length})`}
                           </Button>
                         )}
                         {canImport && (
@@ -703,7 +759,13 @@ export default function CfoMonitorPage() {
                           </td>
                           <td className="px-3 py-2 text-slate-400">{r.rank}</td>
                           <td className="px-3 py-2 max-w-[140px]">
-                            <span className="block truncate font-medium text-slate-800">{r.azienda}</span>
+                            <button
+                              onClick={() => setDetailCompany(r)}
+                              className="block truncate font-medium text-slate-800 hover:text-indigo-600 transition-colors duration-150 cursor-pointer text-left w-full"
+                              title="View details"
+                            >
+                              {r.azienda}
+                            </button>
                           </td>
                           <td className="px-3 py-2 max-w-[130px]">
                             {r.cfo_nome ? (
@@ -748,12 +810,32 @@ export default function CfoMonitorPage() {
                           <td className="px-3 py-2 text-right">
                             {r.cfo_nome && !r.cfo_linkedin && (
                               <button
-                                onClick={() => handleReprocessOne(r)}
-                                disabled={reprocessingRanks.has(r.rank)}
-                                title="Find LinkedIn profile"
-                                className="rounded px-1.5 py-0.5 text-[10px] font-medium border border-slate-200 text-slate-500 hover:border-indigo-300 hover:text-indigo-600 disabled:opacity-40 transition-colors"
+                                onClick={() => handleLiSearchOne(r)}
+                                disabled={liSearchingRanks.has(r.rank)}
+                                title={
+                                  liSearchingRanks.has(r.rank)
+                                    ? "Searching…"
+                                    : liRowResult[r.rank] === "found"
+                                    ? "Found!"
+                                    : liRowResult[r.rank] === "not_found"
+                                    ? "Not found — retry"
+                                    : "Find LinkedIn (fast web search)"
+                                }
+                                className={`rounded px-1.5 py-0.5 text-[10px] font-medium border transition-colors disabled:opacity-40 ${
+                                  liRowResult[r.rank] === "found"
+                                    ? "border-emerald-200 text-emerald-600 bg-emerald-50"
+                                    : liRowResult[r.rank] === "not_found"
+                                    ? "border-slate-200 text-slate-400"
+                                    : "border-blue-200 text-blue-600 hover:bg-blue-50"
+                                }`}
                               >
-                                {reprocessingRanks.has(r.rank) ? "…" : "LI"}
+                                {liSearchingRanks.has(r.rank)
+                                  ? "…"
+                                  : liRowResult[r.rank] === "found"
+                                  ? "✓"
+                                  : liRowResult[r.rank] === "not_found"
+                                  ? "✗"
+                                  : "LI"}
                               </button>
                             )}
                           </td>
@@ -859,6 +941,30 @@ export default function CfoMonitorPage() {
           </div>
         </div>
       )}
+
+      {liSearchModalOpen && (
+        <LinkedInSearchModal
+          open={liSearchModalOpen}
+          selectedCompanies={liSearchCandidates.map((r) => ({
+            id: String(r.rank),       // rank used as surrogate key — no DB save in monitor context
+            azienda: r.azienda,
+            cfoNome: r.cfo_nome!,
+            dataOrigin: "curated",    // irrelevant — companyId is absent so no DB write
+          }))}
+          onClose={() => setLiSearchModalOpen(false)}
+          onLinkedInUpdate={(rankStr, linkedinUrl) => {
+            const rank = Number(rankStr);
+            setResults((prev) =>
+              prev.map((row) => row.rank === rank ? { ...row, cfo_linkedin: linkedinUrl } : row)
+            );
+          }}
+        />
+      )}
+
+      <CompanyDetailModal
+        company={detailCompany}
+        onClose={() => setDetailCompany(null)}
+      />
     </div>
   );
 }
