@@ -10,7 +10,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Leader della Crescita 2026 — Dashboard",
+  title: "Leaders of Growth 2026 — Dashboard",
   description:
     "Business intelligence dashboard for Italy's fastest growing companies — Il Sole 24 Ore ranking 2026.",
 };
@@ -22,10 +22,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={inter.variable}>
-      <body className="font-sans antialiased bg-slate-50 text-slate-900 min-h-screen">
+      <body className="font-sans antialiased text-slate-900">
         <ClientProviders>
-          <Navbar />
-          <main>{children}</main>
+          <div className="flex h-screen overflow-hidden">
+            <Navbar />
+            <main className="flex-1 overflow-auto bg-slate-50">{children}</main>
+          </div>
         </ClientProviders>
       </body>
     </html>

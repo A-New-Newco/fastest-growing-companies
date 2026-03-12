@@ -7,10 +7,11 @@ import {
   getUniqueSettori,
   getUniqueRegioni,
 } from "@/lib/data";
-import type { Company } from "@/types";
+import type { Annotation, Company } from "@/types";
 import { useFilters } from "@/lib/filter-context";
 import { cn } from "@/lib/utils";
-import { TableIcon, BarChart2 } from "lucide-react";
+import { TableIcon, BarChart2, CheckSquare, Upload } from "lucide-react";
+import FileUploadWizard from "@/components/imports/FileUploadWizard";
 import SidebarFilter from "@/components/explorer/SidebarFilter";
 import CompanyTable from "@/components/explorer/CompanyTable";
 import CfoPresenceBySettore from "@/components/charts/CfoPresenceBySettore";
@@ -89,13 +90,59 @@ export default function ExplorerPage() {
   const [companies, setCompanies] = useState<Company[]>([]);
   const [loading, setLoading] = useState(true);
   const [view, setView] = useState<View>("table");
+  const [selectionMode, setSelectionMode] = useState(false);
+  const [importWizardOpen, setImportWizardOpen] = useState(false);
   const { filters, setFilters } = useFilters();
 
-  useEffect(() => {
-    loadCompanies()
+  function handleImportComplete(importedCount: number) {
+    // Reload companies to include newly imported data
+    loadCompanies(2026, filters.country)
       .then(setCompanies)
-      .finally(() => setLoading(false));
-  }, []);
+      .catch(console.error);
+    console.log(`Import complete: ${importedCount} companies added`);
+  }
+
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+
+    loadCompanies(2026, filters.country)
+      .then((rows) => {
+        if (!cancelled) setCompanies(rows);
+      })
+      .catch(console.error)
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [filters.country]);
+
+  function handleAnnotationSave(
+    companyId: string,
+    annotation: Omit<Annotation, "companyId">
+  ) {
+    setCompanies((prev) =>
+      prev.map((c) =>
+        c.id === companyId
+          ? { ...c, annotation: { companyId, ...annotation } }
+          : c
+      )
+    );
+  }
+
+  function handleCompaniesDeleted(companyIds: string[]) {
+    const deletedSet = new Set(companyIds);
+    setCompanies((prev) => prev.filter((c) => !deletedSet.has(c.id)));
+  }
+
+  function handleLinkedInUpdate(companyId: string, linkedinUrl: string) {
+    setCompanies((prev) =>
+      prev.map((c) => (c.id === companyId ? { ...c, cfoLinkedin: linkedinUrl } : c))
+    );
+  }
 
   const settori = useMemo(() => getUniqueSettori(companies), [companies]);
   const regioni = useMemo(() => getUniqueRegioni(companies), [companies]);
@@ -106,7 +153,7 @@ export default function ExplorerPage() {
   );
 
   return (
-    <div className="flex h-[calc(100vh-3.5rem)]">
+    <div className="flex h-full">
       {/* ── Left sidebar ──────────────────────────────────────────────────── */}
       <aside className="w-[250px] xl:w-[270px] flex-shrink-0 border-r border-slate-200 bg-white overflow-y-auto">
         {loading ? (
@@ -154,11 +201,36 @@ export default function ExplorerPage() {
             </button>
           </div>
 
+          {/* Selection mode toggle (table view only) */}
+          {view === "table" && (
+            <button
+              onClick={() => setSelectionMode((v) => !v)}
+              className={cn(
+                "flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md border transition-all",
+                selectionMode
+                  ? "border-indigo-400 bg-indigo-50 text-indigo-700"
+                  : "border-slate-200 text-slate-500 hover:text-slate-700 hover:border-slate-300"
+              )}
+            >
+              <CheckSquare className="w-3.5 h-3.5" />
+              {selectionMode ? "Selecting" : "Select"}
+            </button>
+          )}
+
           <span className="text-xs text-slate-400 tabular-nums ml-auto">
             <span className="font-semibold text-slate-700">{filtered.length}</span>
             {" / "}
             {companies.length} companies
           </span>
+
+          {/* Import data button */}
+          <button
+            onClick={() => setImportWizardOpen(true)}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md border border-slate-200 text-slate-500 hover:text-slate-700 hover:border-slate-300 transition-all"
+          >
+            <Upload className="w-3.5 h-3.5" />
+            Import data
+          </button>
         </div>
 
         {/* Scrollable content */}
@@ -170,12 +242,24 @@ export default function ExplorerPage() {
               <ChartsSkeleton />
             )
           ) : view === "table" ? (
-            <CompanyTable companies={filtered} />
+            <CompanyTable
+              companies={filtered}
+              onAnnotationSave={handleAnnotationSave}
+              onCompaniesDeleted={handleCompaniesDeleted}
+              onLinkedInUpdate={handleLinkedInUpdate}
+              selectionMode={selectionMode}
+            />
           ) : (
             <ChartsView companies={filtered} />
           )}
         </div>
       </div>
+
+      <FileUploadWizard
+        open={importWizardOpen}
+        onClose={() => setImportWizardOpen(false)}
+        onImportComplete={handleImportComplete}
+      />
     </div>
   );
 }

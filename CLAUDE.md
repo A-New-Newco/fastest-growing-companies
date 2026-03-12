@@ -58,3 +58,67 @@ Configure `RUN_YEAR`, `RUN_RESET`, `RUN_INPUT` at the top of `agent_enricher.py`
 
 ### Enriched CSV added columns
 `CFO_NOME, CFO_RUOLO, CFO_LINKEDIN, FONTE, CONFIDENZA, DATA_RICERCA`
+
+---
+
+## Dashboard (`dashboard/`)
+
+A Next.js 14 App Router dashboard for exploring and managing company data. See `dashboard/docs/` for full documentation.
+
+```bash
+cd dashboard
+npm install          # Install dependencies
+npm run dev          # Start dev server (localhost:3000)
+npm run build        # Production build
+npx tsc --noEmit     # Type check
+```
+
+---
+
+## Documentation protocol
+
+**At the end of every session that implements a feature or makes significant changes, update `dashboard/docs/` accordingly.**
+
+### Mandatory feature-document workflow
+
+**When the user asks for a new feature, always create its feature document immediately (before or together with implementation).**
+
+- Create `dashboard/docs/features/<FEATURE_NAME>.md` the first time that feature is requested.
+- Treat that file as the single source of truth for the feature.
+- On every later change/refactor/fix related to that feature, update the same file in the same session.
+- Do not close the task without aligning docs and code.
+
+### Folder structure
+
+```
+dashboard/docs/
+  PRD.md                    # Product requirements (top-level spec)
+  PROGRESS.md               # Step-by-step build log (mark tasks done)
+  features/
+    CAMPAIGNS.md            # Campaigns feature — schema, flows, roadmap
+    <FEATURE_NAME>.md       # One file per major feature
+  architecture/
+    DATABASE.md             # Tables, views, RLS policies overview
+    API.md                  # All API routes with method, purpose, auth
+    COMPONENTS.md           # Key components and their responsibilities
+```
+
+### Rules
+
+1. **New feature request from user** → **always** create `dashboard/docs/features/<FEATURE_NAME>.md` (if missing) and keep it updated across all subsequent related changes, covering:
+   - Context and purpose
+   - Data model (tables, columns, constraints)
+   - File structure (new files + modified files)
+   - Main flows (step-by-step)
+   - Notable behaviors and edge cases
+   - Future roadmap items
+
+2. **Existing feature changed** → update the relevant file in `dashboard/docs/features/`
+
+3. **New API route added** → update or create `dashboard/docs/architecture/API.md`
+
+4. **New DB table/migration** → update or create `dashboard/docs/architecture/DATABASE.md`
+
+5. **`PROGRESS.md`** → mark completed steps with `[x]`, add new steps as they are planned/implemented
+
+6. **Never duplicate** information across files — link between docs with relative paths instead

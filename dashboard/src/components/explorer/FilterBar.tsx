@@ -69,6 +69,7 @@ export default function FilterBar({
     filters.cfoFoundOnly ||
     filters.linkedinFilter !== "all" ||
     filters.hasRealCfoFilter !== "all" ||
+    filters.hasContactFilter !== "all" ||
     filters.minRevenue > 0 ||
     filters.maxRevenue > 0;
 
@@ -81,7 +82,7 @@ export default function FilterBar({
   }
 
   function reset() {
-    onChange({ ...DEFAULT_FILTER_STATE });
+    onChange({ ...DEFAULT_FILTER_STATE, country: filters.country });
   }
 
   return (
@@ -217,6 +218,24 @@ export default function FilterBar({
           ))}
         </div>
 
+        {/* Has Contact */}
+        <div className="flex items-center gap-1">
+          <span className="text-xs text-slate-400 mr-1">Has Contact</span>
+          {CFO_PRESENCE_OPTIONS.map(({ value, label }) => (
+            <button
+              key={value}
+              onClick={() => onChange({ ...filters, hasContactFilter: value })}
+              className={`px-2.5 py-1 text-xs rounded-md border transition-all ${
+                filters.hasContactFilter === value
+                  ? "bg-violet-600 text-white border-violet-600"
+                  : "bg-white text-slate-600 border-slate-200 hover:border-violet-400"
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+
       </div>
 
       {/* Active filter summary chips */}
@@ -270,6 +289,13 @@ export default function FilterBar({
               label="Real CFO"
               value={filters.hasRealCfoFilter === "has" ? "present" : "absent"}
               onRemove={() => onChange({ ...filters, hasRealCfoFilter: "all" })}
+            />
+          )}
+          {filters.hasContactFilter !== "all" && (
+            <FilterChip
+              label="Has Contact"
+              value={filters.hasContactFilter === "has" ? "present" : "absent"}
+              onRemove={() => onChange({ ...filters, hasContactFilter: "all" })}
             />
           )}
           {(filters.minRevenue > 0 || filters.maxRevenue > 0) && (

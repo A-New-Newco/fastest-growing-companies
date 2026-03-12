@@ -145,7 +145,7 @@ export default function ChartFilterBar({
   }
 
   function clearAll() {
-    onChange({ ...DEFAULT_FILTER_STATE });
+    onChange({ ...DEFAULT_FILTER_STATE, country: filters.country });
   }
 
   return (

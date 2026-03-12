@@ -12,6 +12,7 @@ import {
   LabelList,
 } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { getCountryLabel, normalizeCountryCode } from "@/lib/constants";
 import type { Company } from "@/types";
 
 interface Props {
@@ -68,6 +69,14 @@ function CustomTooltip({
 }
 
 export default function CfoPresenceByRegione({ companies }: Props) {
+  const countries = useMemo(
+    () => [...new Set(companies.map((c) => normalizeCountryCode(c.country)))],
+    [companies]
+  );
+
+  const countryScope =
+    countries.length === 1 ? getCountryLabel(countries[0]) : "selected countries";
+
   const data = useMemo<BarDatum[]>(() => {
     const map = new Map<string, { hasCfo: number; noCfo: number }>();
     for (const c of companies) {
@@ -92,8 +101,8 @@ export default function CfoPresenceByRegione({ companies }: Props) {
           CFO Presence by Region
         </CardTitle>
         <p className="text-xs text-slate-500 mt-0.5">
-          Companies with a real CFO/Finance Manager by Italian region.
-          Sorted by total company count.
+          Companies with a real CFO/Finance Manager by region in {countryScope}.
+          {" "}Sorted by total company count.
         </p>
       </CardHeader>
       <CardContent>

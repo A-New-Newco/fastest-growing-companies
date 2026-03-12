@@ -7,8 +7,10 @@
 ## How to Resume
 
 1. Read `docs/PRD.md` for the full spec
-2. Check which steps are done below
-3. Continue from the first `[ ]` or `[~]` step
+2. Read `docs/architecture/` for current DB schema and API routes
+3. Read `docs/features/` for feature-specific docs
+4. Check which steps are done below
+5. Continue from the first `[ ]` or `[~]` step
 
 ---
 
@@ -26,6 +28,14 @@
 - [x] Step 8: Charts base — TopSectorsBar, RoleDistributionPie (with "Other" modal), ConfidenceBar
 - [x] Step 9: GrowthRevenueScatter + RegionMap (react-simple-maps + italy-regions.json)
 - [x] Step 10: Build verification — `npm run build` passes 0 errors (Recharts v3 type fixes applied)
+- [x] Step 11: Supabase auth + multi-team — profiles, teams, team_memberships, join_requests, middleware, /login, /join-team, /pending-approval, /admin/requests
+- [x] Step 12: Team-scoped annotations — migration 002, `annotations` table con `team_id`, API `/api/annotations`, AnnotationModal
+- [x] Step 13: Campagne LinkedIn outreach — migration 003, tabelle `campaigns` + `campaign_contacts`, 8 API routes, 10 componenti, pagine `/campaigns` e `/campaigns/[id]`, row selection nell'Explorer → vedere `docs/features/CAMPAIGNS.md`
+- [x] Step 14: Docs restructure — `docs/` organizzato in `features/` e `architecture/`, regole di aggiornamento in `CLAUDE.md`
+- [x] Step 15: Data import from file — migration 004, tabelle `import_batches` + `field_mappings` + `imported_companies`, view `all_companies`, API `/api/imports/*`, wizard `FileUploadWizard` con LLM mapping (Groq), bottone "Import data" nell'Explorer → vedere `docs/features/IMPORTS.md`
+- [x] Step 16: Campaigns client hardening — validazione `res.ok` + shape checks sulle fetch `/api/campaigns*`, messaggi d'errore espliciti, fix crash `campaigns.filter is not a function`
+- [x] Step 17: Campaigns schema root-fix — aggiunta migration `006_campaign_outreach_columns.sql` per garantire le colonne outreach (`connection_note_template`, `quota_policy`, `pause_reason`, `integration_mode`) in tutti gli ambienti
+- [x] Step 18: Plugin outreach schema root-fix — aggiunta migration `007_plugin_outreach_backfill.sql` per riallineare anche claim metadata su `campaign_contacts` (`claimed_by`, `claim_expires_at`, `last_attempt_at`, `last_error_code`) e oggetti plugin correlati
 
 ---
 
@@ -48,3 +58,11 @@
 | 2026-03-07 | Recharts over Tremor | More controllable, native scatter plot, lighter bundle |
 | 2026-03-07 | TanStack Table v8 | Declarative sort/filter, shadcn Table as render layer |
 | 2026-03-07 | "Real CFO" = CFO/DAF or Finance Manager + medium/high confidence | 92.4% "contact found" is misleading; only ~28% are true finance officers |
+| 2026-03-11 | Campaign contacts stored separately from companies | Permette tracking per-campagna, deduplicazione, e future integrazioni con il plugin |
+| 2026-03-11 | Optimistic updates per status contatto | Evita latenza percepita; rollback su errore |
+| 2026-03-11 | `companies_full` view per join dei dati azienda nei contacts | Evita dipendenza dalla struttura interna della tabella companies |
+| 2026-03-11 | `imported_companies` separata da `companies` | Dati esterni (DE, FR, ecc.) hanno schema diverso; `all_companies` view li unifica per l'Explorer |
+| 2026-03-11 | LLM mapping via Groq (fetch diretto, no SDK) | `llama-3.3-70b-versatile` con `response_format: json_object`; fallback manuale se API non disponibile |
+| 2026-03-11 | Guardie runtime su payload API campagne | Evita crash UI quando endpoint risponde con `{ error: ... }` su 401/403/500 |
+| 2026-03-11 | Migration 006 per colonne outreach campagne | Risolve alla fonte gli errori schema `column ... does not exist` riallineando il DB |
+| 2026-03-11 | Migration 007 plugin-outreach backfill | Mitiga ambienti con possibile salto di `005_plugin_outreach.sql` (versione duplicata) e riallinea lo schema claim/plugin |

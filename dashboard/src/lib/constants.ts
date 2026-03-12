@@ -1,4 +1,4 @@
-import type { RuoloCategory, Confidenza } from "@/types";
+import type { RuoloCategory, Confidenza, CampaignStatus, ContactStatus } from "@/types";
 
 // ── CFO Role Category metadata ─────────────────────────────────────────────────
 export const ROLE_CATEGORY_META: Record<
@@ -8,17 +8,17 @@ export const ROLE_CATEGORY_META: Record<
   "CFO / DAF": {
     label: "CFO / DAF",
     color: "#2563eb", // blue-600
-    description: "Chief Financial Officer, Direttore Finanziario",
+    description: "Chief Financial Officer, Finance Director",
   },
   "Finance Manager": {
     label: "Finance Manager",
     color: "#0891b2", // cyan-600
-    description: "Responsabile Amministrativo, Controller, Accountant",
+    description: "Finance Manager, Controller, Accountant",
   },
   "CEO / AD": {
     label: "CEO / AD",
     color: "#7c3aed", // violet-600
-    description: "CEO, Amministratore Delegato, Managing Director",
+    description: "Chief Executive Officer, Managing Director",
   },
   "Mixed Role": {
     label: "Mixed Role",
@@ -28,22 +28,22 @@ export const ROLE_CATEGORY_META: Record<
   "Founder / Owner": {
     label: "Founder / Owner",
     color: "#ea580c", // orange-600
-    description: "Founder, Fondatore, Titolare, Owner",
+    description: "Founder, Owner, Proprietor",
   },
   Presidente: {
-    label: "Presidente",
+    label: "President",
     color: "#d97706", // amber-600
-    description: "Presidente, President, Chairman",
+    description: "President, Chairman",
   },
   "General Manager": {
     label: "General Manager",
     color: "#059669", // emerald-600
-    description: "Direttore Generale, Managing Partner",
+    description: "General Manager, Managing Partner",
   },
   Amministratore: {
-    label: "Amministratore",
+    label: "Administrator",
     color: "#64748b", // slate-500
-    description: "Amministratore Unico, Amministratore",
+    description: "Administrator, Sole Director",
   },
   Other: {
     label: "Other",
@@ -70,43 +70,118 @@ export const CONFIDENCE_META: Record<
 
 // ── Chart colors for sectors (30 sectors → grouped palette) ──────────────────
 export const SECTOR_COLORS: Record<string, string> = {
-  "IT e software": "#2563eb",
-  "Costruzione e ingegneria": "#7c3aed",
-  "Macchinari e attrezzature": "#0891b2",
-  "Energia e servizi pubblici": "#059669",
+  "IT and Software": "#2563eb",
+  "Construction and Engineering": "#7c3aed",
+  "Machinery and Equipment": "#0891b2",
+  "Energy and Utilities": "#059669",
   "E-commerce": "#ea580c",
-  "Servizi professionali, scientifici e tecnici": "#d97706",
-  "Pubblicità e marketing": "#db2777",
-  "Cibo e bevande": "#65a30d",
-  "Produzione industriale": "#9333ea",
-  "Consulenza manageriale": "#0369a1",
-  "Ospitalità e viaggi": "#b45309",
-  "Logistica e trasporto": "#1d4ed8",
-  "Servizi sanitari": "#16a34a",
-  "Commercio all'ingrosso": "#7e22ce",
-  "Smaltimento rifiuti & riciclo": "#15803d",
-  "Fintech, servizi finanziari e assicurazioni": "#1e40af",
+  "Professional, Scientific and Technical Services": "#d97706",
+  "Advertising and Marketing": "#db2777",
+  "Food and Beverages": "#65a30d",
+  "Industrial Manufacturing": "#9333ea",
+  "Management Consulting": "#0369a1",
+  "Hospitality and Travel": "#b45309",
+  "Logistics and Transportation": "#1d4ed8",
+  "Health and Social Services": "#16a34a",
+  "Wholesale Trade": "#7e22ce",
+  "Waste Management & Recycling": "#15803d",
+  "Fintech, Financial Services and Insurance": "#1e40af",
   "MICE (Meetings, Incentives, Conferences, Exhibitions)": "#9f1239",
-  "Abbigliamento e moda": "#ec4899",
-  Formazione: "#f59e0b",
-  "Prodotti farmaceutici, biotecnologie e scienze della vita": "#10b981",
-  "Media e telecomunicazioni": "#6366f1",
-  "Servizi per l'impiego": "#78716c",
-  "Tempo libero e divertimento": "#f97316",
-  "Vendita al dettaglio": "#ef4444",
-  Immobiliare: "#8b5cf6",
-  "Servizi ambientali": "#22c55e",
-  "Sicurezza e investigazione": "#64748b",
+  "Apparel and Fashion": "#ec4899",
+  "Education and Training": "#f59e0b",
+  "Pharmaceuticals, Biotechnology and Life Sciences": "#10b981",
+  "Media and Telecommunications": "#6366f1",
+  "Employment Services": "#78716c",
+  "Leisure and Entertainment": "#f97316",
+  "Retail": "#ef4444",
+  "Real Estate": "#8b5cf6",
+  "Environmental Services": "#22c55e",
+  "Security and Investigations": "#64748b",
   Sport: "#06b6d4",
   Automotive: "#84cc16",
-  Altro: "#a8a29e",
+  "Aerospace and Defense": "#4f46e5",
+  "Agriculture, Forestry and Fishing": "#65a30d",
+  Furniture: "#f97316",
+  "Chemical Products": "#06b6d4",
+  Other: "#a8a29e",
 };
 
 // Default color for unknown sectors
 export const DEFAULT_SECTOR_COLOR = "#94a3b8";
 
+// ── Country metadata ──────────────────────────────────────────────────────────
+export const DEFAULT_COUNTRY = "IT";
+export const ALL_COUNTRIES_VALUE = "all";
+
+const COUNTRY_LABELS: Record<string, string> = {
+  IT: "Italy",
+  DE: "Germany",
+  FR: "France",
+  ES: "Spain",
+  PT: "Portugal",
+  UK: "United Kingdom",
+  GB: "United Kingdom",
+  US: "United States",
+  NL: "Netherlands",
+  BE: "Belgium",
+  CH: "Switzerland",
+  AT: "Austria",
+};
+
+export function normalizeCountryCode(value: string | null | undefined): string {
+  const normalized = value?.trim().toUpperCase();
+  return normalized && normalized.length > 0 ? normalized : DEFAULT_COUNTRY;
+}
+
+export function getCountryLabel(code: string): string {
+  if (code === ALL_COUNTRIES_VALUE) return "All countries";
+  const normalized = normalizeCountryCode(code);
+  return COUNTRY_LABELS[normalized] ?? normalized;
+}
+
+// ── Import: target field registry ────────────────────────────────────────────
+/** All internal fields the LLM can map source fields to */
+export const IMPORT_TARGET_FIELDS: Record<string, { label: string; required?: boolean }> = {
+  name:            { label: "Company Name",      required: true },
+  website:         { label: "Website" },
+  growth_rate:     { label: "Growth Rate (%)" },
+  sector:          { label: "Sector / Industry" },
+  region:          { label: "Region" },
+  city:            { label: "City" },
+  national_rank:   { label: "National Rank" },
+  source_key:      { label: "Source Key (unique ID)" },
+  revenue_a:       { label: "Revenue Start (K€)" },
+  revenue_b:       { label: "Revenue End (K€)" },
+  year:            { label: "Year" },
+  description:     { label: "Description" },
+  foundation_year: { label: "Foundation Year" },
+  employees_start: { label: "Employees Start" },
+  employees_end:   { label: "Employees End" },
+  is_listed:       { label: "Publicly Listed" },
+  extra_data:      { label: "Extra Data (unmapped)" },
+};
+
+/** Countries available in the import wizard (ISO 3166-1 alpha-2) */
+export const SUPPORTED_COUNTRIES: Array<{ code: string; label: string }> = [
+  { code: "IT", label: "Italy" },
+  { code: "DE", label: "Germany" },
+  { code: "FR", label: "France" },
+  { code: "NL", label: "Netherlands" },
+  { code: "ES", label: "Spain" },
+  { code: "BE", label: "Belgium" },
+  { code: "AT", label: "Austria" },
+  { code: "CH", label: "Switzerland" },
+  { code: "GB", label: "United Kingdom" },
+  { code: "US", label: "United States" },
+  { code: "PL", label: "Poland" },
+  { code: "SE", label: "Sweden" },
+  { code: "DK", label: "Denmark" },
+  { code: "NO", label: "Norway" },
+];
+
 // ── Filter defaults ────────────────────────────────────────────────────────────
 export const DEFAULT_FILTER_STATE = {
+  country: DEFAULT_COUNTRY,
   search: "",
   settori: [] as string[],
   regioni: [] as string[],
@@ -116,6 +191,7 @@ export const DEFAULT_FILTER_STATE = {
   cfoFoundOnly: false,
   linkedinFilter: "all" as const,
   hasRealCfoFilter: "all" as const,
+  hasContactFilter: "all" as const,
   minRevenue: 0,
   maxRevenue: 0,
 };
@@ -123,3 +199,29 @@ export const DEFAULT_FILTER_STATE = {
 // ── Categories considered "real CFO" for HAS_REAL_CFO logic ──────────────────
 export const REAL_CFO_CATEGORIES: RuoloCategory[] = ["CFO / DAF", "Finance Manager"];
 export const REAL_CFO_CONFIDENCES: Confidenza[] = ["high", "medium"];
+
+// ── Campaign status metadata ───────────────────────────────────────────────────
+export const CAMPAIGN_STATUS_META: Record<
+  CampaignStatus,
+  { label: string; color: string; bg: string }
+> = {
+  draft:     { label: "Draft",     color: "#475569", bg: "#f1f5f9" },
+  active:    { label: "Active",    color: "#166534", bg: "#dcfce7" },
+  paused:    { label: "Paused",    color: "#92400e", bg: "#fef3c7" },
+  completed: { label: "Completed", color: "#3730a3", bg: "#e0e7ff" },
+  archived:  { label: "Archived",  color: "#64748b", bg: "#f8fafc" },
+};
+
+// ── Contact status metadata ────────────────────────────────────────────────────
+export const CONTACT_STATUS_META: Record<
+  ContactStatus,
+  { label: string; color: string; bg: string }
+> = {
+  pending:           { label: "Pending",           color: "#475569", bg: "#f1f5f9" },
+  contacted:         { label: "Contacted",          color: "#1d4ed8", bg: "#dbeafe" },
+  replied:           { label: "Replied",            color: "#92400e", bg: "#fef3c7" },
+  meeting_scheduled: { label: "Meeting Scheduled",  color: "#6d28d9", bg: "#ede9fe" },
+  converted:         { label: "Converted",          color: "#166534", bg: "#dcfce7" },
+  not_interested:    { label: "Not Interested",     color: "#991b1b", bg: "#fee2e2" },
+  no_reply:          { label: "No Reply",           color: "#334155", bg: "#e2e8f0" },
+};
