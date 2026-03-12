@@ -157,6 +157,7 @@ function mapRow(row: CompanyFullRow): Company {
     confidenza,
     cfoFound,
     hasRealCfo,
+    contactId: row.contact_id,
     dataOrigin: row.data_origin === "imported" ? "imported" : "curated",
     annotation,
   };
@@ -264,6 +265,9 @@ export function filterCompanies(
 
     if (filters.linkedinFilter === "has" && !c.cfoLinkedin) return false;
     if (filters.linkedinFilter === "no" && c.cfoLinkedin) return false;
+
+    if (filters.hasContactFilter === "has" && !c.cfoNome) return false;
+    if (filters.hasContactFilter === "no" && c.cfoNome) return false;
 
     if (filters.minRevenue > 0 && c.ricavi2024 < filters.minRevenue * 1_000)
       return false;

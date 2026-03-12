@@ -59,7 +59,7 @@ export default function JoinTeamForm() {
   }
 
   return (
-    <div className="flex min-h-[calc(100vh-3.5rem)] items-center justify-center p-6">
+    <div className="flex min-h-full items-center justify-center p-6">
       <div className="w-full max-w-md">
         <div className="mb-6">
           <h1 className="text-xl font-semibold text-slate-900">Request access</h1>

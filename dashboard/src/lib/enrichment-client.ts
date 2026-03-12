@@ -107,6 +107,12 @@ export async function fetchResults(): Promise<CompanyResult[]> {
   return res.json();
 }
 
+export async function fetchHistory(datasetId: string): Promise<CompanyResult[]> {
+  const res = await fetch(`${API_BASE}/history?dataset_id=${encodeURIComponent(datasetId)}`);
+  if (!res.ok) throw new Error(`Failed to fetch history: ${res.status}`);
+  return res.json();
+}
+
 export async function startRun(req: StartRequest): Promise<{ status: string; total: number }> {
   const res = await fetch(`${API_BASE}/start`, {
     method: "POST",

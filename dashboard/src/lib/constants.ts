@@ -191,6 +191,7 @@ export const DEFAULT_FILTER_STATE = {
   cfoFoundOnly: false,
   linkedinFilter: "all" as const,
   hasRealCfoFilter: "all" as const,
+  hasContactFilter: "all" as const,
   minRevenue: 0,
   maxRevenue: 0,
 };

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   Area,
   AreaChart,
@@ -32,6 +32,7 @@ import {
   type ProgressEvent,
   connectToEnrichmentStream,
   fetchDatasets,
+  fetchHistory,
   fetchResults,
   fetchStatus,
   reprocessCompanies,
@@ -140,8 +141,9 @@ export default function CfoMonitorPage() {
   // Runtime state
   const [status, setStatus] = useState<EnrichmentStatus | null>(null);
   const [progress, setProgress] = useState<ProgressEvent | null>(null);
-  const [results, setResults] = useState<CompanyResult[]>([]);
-  const [tokenHistory, setTokenHistory] = useState<{ n: number; tokens: number }[]>([]);
+  const [liveResults, setLiveResults] = useState<CompanyResult[]>([]);
+  const [historyResults, setHistoryResults] = useState<CompanyResult[]>([]);
+  const [activeTab, setActiveTab] = useState<"live" | "history">("history");
   const [serverOnline, setServerOnline] = useState<boolean | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
@@ -170,6 +172,10 @@ export default function CfoMonitorPage() {
   const handleDatasetChange = (val: string) => {
     setSelectedDataset(val);
     lsSet("cfo-monitor:dataset", val);
+    setLiveResults([]);
+    setHistoryResults([]);
+    setSelected(new Set());
+    loadHistory(val);
   };
   const handleConcurrencyChange = ([v]: number[]) => {
     setConcurrency(v);
@@ -177,10 +183,26 @@ export default function CfoMonitorPage() {
   };
 
   // ------------------------------------------------------------------
-  // Boot: load datasets + current status + existing results
+  // Load full history from persisted file (survives server restarts)
+  // ------------------------------------------------------------------
+  const applyHistory = useCallback((rs: CompanyResult[]) => {
+    const sorted = rs.slice().sort((a, b) => a.rank - b.rank).reverse();
+    setHistoryResults(sorted);
+  }, []);
+
+  const loadHistory = useCallback(async (datasetId: string) => {
+    try {
+      const hist = await fetchHistory(datasetId);
+      if (hist.length > 0) applyHistory(hist);
+    } catch {
+      // History not available (server offline or no file yet) — silent
+    }
+  }, [applyHistory]);
+
+  // ------------------------------------------------------------------
+  // Boot: load datasets + current status + history
   // ------------------------------------------------------------------
   useEffect(() => {
-    // Restore persisted config (client-only, safe after hydration)
     const savedDs = lsGet("cfo-monitor:dataset");
     const savedConc = lsGet("cfo-monitor:concurrency");
     if (savedDs) setSelectedDataset(savedDs);
@@ -189,34 +211,28 @@ export default function CfoMonitorPage() {
     fetchDatasets()
       .then((ds) => {
         setDatasets(ds);
-        // Pre-select first dataset if nothing is saved yet
+        const activeDs = lsGet("cfo-monitor:dataset") ?? (ds.length > 0 ? ds[0].id : "");
         if (!lsGet("cfo-monitor:dataset") && ds.length > 0) {
           setSelectedDataset(ds[0].id);
           lsSet("cfo-monitor:dataset", ds[0].id);
         }
         setServerOnline(true);
+        if (activeDs) loadHistory(activeDs);
       })
       .catch(() => setServerOnline(false));
 
     fetchStatus()
       .then((s) => {
         setStatus(s);
+        // If the server still has live results in memory, restore them
         if (s.completed > 0) {
-          // Restore results from in-memory server state
           fetchResults()
             .then((rs) => {
-              setResults(rs.slice().reverse()); // newest first
-              // Rebuild token history
-              let runningTok = 0;
-              const history: { n: number; tokens: number }[] = [];
-              [...rs].forEach((r, i) => {
-                const tok = (r.input_tokens ?? 0) + (r.output_tokens ?? 0);
-                if (tok > 0) {
-                  runningTok += tok;
-                  history.push({ n: i + 1, tokens: runningTok });
-                }
-              });
-              setTokenHistory(history);
+              if (rs.length > 0) {
+                const sorted = rs.slice().sort((a, b) => a.rank - b.rank).reverse();
+                setLiveResults(sorted);
+                setActiveTab("live");
+              }
             })
             .catch(() => {});
         }
@@ -249,22 +265,17 @@ export default function CfoMonitorPage() {
         );
       },
       onCompany: (data: CompanyResult) => {
-        setResults((prev) => {
-          // For reprocess events: update existing row in-place
-          if (data.is_reprocess) {
-            return prev.map((r) => (r.rank === data.rank ? { ...r, cfo_linkedin: data.cfo_linkedin } : r));
+        setLiveResults((prev) => {
+          const existingIdx = prev.findIndex((r) => r.rank === data.rank);
+          if (existingIdx !== -1) {
+            const next = [...prev];
+            next[existingIdx] = data.is_reprocess
+              ? { ...prev[existingIdx], cfo_linkedin: data.cfo_linkedin }
+              : data;
+            return next;
           }
           return [data, ...prev];
         });
-        if (!data.is_reprocess) {
-          const tok = (data.input_tokens ?? 0) + (data.output_tokens ?? 0);
-          if (tok > 0) {
-            setTokenHistory((prev) => {
-              const running = (prev[prev.length - 1]?.tokens ?? 0) + tok;
-              return [...prev, { n: prev.length + 1, tokens: running }];
-            });
-          }
-        }
       },
       onDone: (data: DoneEvent) => {
         setStatus((prev) =>
@@ -287,9 +298,10 @@ export default function CfoMonitorPage() {
   const handleStart = async () => {
     setErrorMsg(null);
     setImportMsg(null);
-    setResults([]);
-    setTokenHistory([]);
     setSelected(new Set());
+    setLiveResults([]);
+    if (doReset) setHistoryResults([]);
+    setActiveTab("live");
     try {
       await startRun({
         dataset_id: selectedDataset || undefined,
@@ -312,6 +324,14 @@ export default function CfoMonitorPage() {
   };
 
   // ------------------------------------------------------------------
+  // Tab switch (clears selection)
+  // ------------------------------------------------------------------
+  const handleTabChange = (tab: "live" | "history") => {
+    setActiveTab(tab);
+    setSelected(new Set());
+  };
+
+  // ------------------------------------------------------------------
   // Selection helpers
   // ------------------------------------------------------------------
   const toggleSelect = (rank: number) => {
@@ -322,11 +342,11 @@ export default function CfoMonitorPage() {
     });
   };
 
-  const toggleSelectAll = () => {
-    if (selected.size === results.length) {
+  const toggleSelectAll = (displayedResults: CompanyResult[]) => {
+    if (selected.size === displayedResults.length) {
       setSelected(new Set());
     } else {
-      setSelected(new Set(results.map((r) => r.rank)));
+      setSelected(new Set(displayedResults.map((r) => r.rank)));
     }
   };
 
@@ -362,11 +382,10 @@ export default function CfoMonitorPage() {
   };
 
   // ------------------------------------------------------------------
-  // Re-process LinkedIn
+  // Re-process LinkedIn (live tab only)
   // ------------------------------------------------------------------
-  // Bulk reprocess (selected rows without LinkedIn)
-  const handleReprocessBulk = async () => {
-    const targets = results.filter(
+  const handleReprocessBulk = async (displayedResults: CompanyResult[]) => {
+    const targets = displayedResults.filter(
       (r) => selected.has(r.rank) && r.cfo_nome && !r.cfo_linkedin
     );
     if (!targets.length) return;
@@ -387,7 +406,6 @@ export default function CfoMonitorPage() {
     }
   };
 
-  // Per-row reprocess (single company)
   const handleReprocessOne = async (r: CompanyResult) => {
     if (!r.cfo_nome || reprocessingRanks.has(r.rank)) return;
     setReprocessingRanks((prev) => new Set([...prev, r.rank]));
@@ -402,7 +420,7 @@ export default function CfoMonitorPage() {
   };
 
   // ------------------------------------------------------------------
-  // LinkedIn fast search (single row — no DB save, update in-memory only)
+  // LinkedIn fast search (live tab only — no DB save)
   // ------------------------------------------------------------------
   const handleLiSearchOne = async (r: CompanyResult) => {
     if (!r.cfo_nome || liSearchingRanks.has(r.rank)) return;
@@ -411,15 +429,11 @@ export default function CfoMonitorPage() {
       const res = await fetch("/api/linkedin-search", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          companyName: r.azienda,
-          contactName: r.cfo_nome,
-          // No companyId — skip DB save; the user will import results separately
-        }),
+        body: JSON.stringify({ companyName: r.azienda, contactName: r.cfo_nome }),
       });
       const data = await res.json();
       if (res.ok && data.found) {
-        setResults((prev) =>
+        setLiveResults((prev) =>
           prev.map((row) => row.rank === r.rank ? { ...row, cfo_linkedin: data.linkedinUrl } : row)
         );
         setLiRowResult((prev) => ({ ...prev, [r.rank]: "found" }));
@@ -447,33 +461,46 @@ export default function CfoMonitorPage() {
 
   const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
   const foundPct = completed > 0 ? Math.round((found / completed) * 100) : 0;
-  const avgTokens =
-    completed > 0 && results.length > 0
-      ? Math.round(
-          results.reduce((sum, r) => sum + (r.input_tokens ?? 0) + (r.output_tokens ?? 0), 0) /
-            results.length
-        )
-      : null;
+  const liveTotalTokens = liveResults.reduce((s, r) => s + (r.input_tokens ?? 0) + (r.output_tokens ?? 0), 0);
+  const avgTokens = liveResults.length > 0 ? Math.round(liveTotalTokens / liveResults.length) : null;
   const eta =
     isRunning && completed > 0 && elapsed > 0
       ? Math.round(((total - completed) * elapsed) / completed)
       : null;
 
-  // Toolbar selection state
-  const selectedResults = results.filter((r) => selected.has(r.rank));
-  const canReprocess = selectedResults.some((r) => r.cfo_nome && !r.cfo_linkedin);
-  const canImport = selectedResults.length > 0 && !!status?.dataset_id;
+  // Results shown in table (changes with active tab)
+  const displayedResults = activeTab === "live" ? liveResults : historyResults;
+
+  // Token history computed from displayed results (for the chart)
+  const tokenHistory = useMemo(() => {
+    const sorted = [...displayedResults].sort((a, b) => a.rank - b.rank);
+    let running = 0;
+    const hist: { n: number; tokens: number }[] = [];
+    sorted.forEach((r, i) => {
+      const tok = (r.input_tokens ?? 0) + (r.output_tokens ?? 0);
+      if (tok > 0) {
+        running += tok;
+        hist.push({ n: i + 1, tokens: running });
+      }
+    });
+    return hist;
+  }, [displayedResults]);
+
+  // Toolbar state (live tab only)
+  const selectedResults = displayedResults.filter((r) => selected.has(r.rank));
+  const canReprocess = activeTab === "live" && selectedResults.some((r) => r.cfo_nome && !r.cfo_linkedin);
+  const canImport = activeTab === "live" && selectedResults.length > 0 && !!status?.dataset_id;
   const liSearchCandidates = selectedResults.filter((r) => r.cfo_nome && !r.cfo_linkedin);
-  const canLiSearch = liSearchCandidates.length > 0;
-  const allSelected = results.length > 0 && selected.size === results.length;
-  const someSelected = selected.size > 0 && selected.size < results.length;
+  const canLiSearch = activeTab === "live" && liSearchCandidates.length > 0;
+  const allSelected = displayedResults.length > 0 && selected.size === displayedResults.length;
+  const someSelected = selected.size > 0 && selected.size < displayedResults.length;
 
   // Confidence pie data
   const pieData = [
-    { name: "High", value: results.filter((r) => r.confidenza === "high").length, key: "high" },
-    { name: "Medium", value: results.filter((r) => r.confidenza === "medium").length, key: "medium" },
-    { name: "Low", value: results.filter((r) => r.confidenza === "low").length, key: "low" },
-    { name: "Not found", value: results.filter((r) => !r.cfo_nome).length, key: "not_found" },
+    { name: "High", value: displayedResults.filter((r) => r.confidenza === "high").length, key: "high" },
+    { name: "Medium", value: displayedResults.filter((r) => r.confidenza === "medium").length, key: "medium" },
+    { name: "Low", value: displayedResults.filter((r) => r.confidenza === "low").length, key: "low" },
+    { name: "Not found", value: displayedResults.filter((r) => !r.cfo_nome).length, key: "not_found" },
   ].filter((d) => d.value > 0);
 
   // ------------------------------------------------------------------
@@ -626,7 +653,7 @@ export default function CfoMonitorPage() {
           />
           <KpiCard
             label="Total Tokens"
-            value={results.reduce((s, r) => s + (r.input_tokens ?? 0) + (r.output_tokens ?? 0), 0).toLocaleString()}
+            value={liveTotalTokens.toLocaleString()}
             sub={avgTokens != null ? `${avgTokens} tok/company avg` : undefined}
           />
           <KpiCard
@@ -640,23 +667,39 @@ export default function CfoMonitorPage() {
       {/* ------------------------------------------------------------------ */}
       {/* Results table + charts                                                */}
       {/* ------------------------------------------------------------------ */}
-      {results.length > 0 && (
+      {(liveResults.length > 0 || historyResults.length > 0) && (
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
 
-          {/* Live table */}
+          {/* Table */}
           <div className="xl:col-span-2">
             <Card className="border-slate-200 bg-white">
-              <CardHeader className="pb-0">
-                <div className="flex items-center justify-between gap-3 flex-wrap">
-                  <CardTitle className="text-sm font-semibold text-slate-700 flex items-center gap-2">
-                    Live Results
-                    <Badge variant="secondary" className="text-[10px] tabular-nums">
-                      {results.length}
-                    </Badge>
-                  </CardTitle>
+              {/* Tab bar */}
+              <div className="flex items-center justify-between border-b border-slate-200 px-4">
+                <div className="flex">
+                  {(["history", "live"] as const).map((tab) => (
+                    <button
+                      key={tab}
+                      onClick={() => handleTabChange(tab)}
+                      className={`py-3 px-3 text-xs font-medium border-b-2 transition-colors capitalize flex items-center gap-1.5 ${
+                        activeTab === tab
+                          ? "border-indigo-500 text-indigo-700"
+                          : "border-transparent text-slate-500 hover:text-slate-700"
+                      }`}
+                    >
+                      {tab === "live" && isRunning && (
+                        <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                      )}
+                      {tab === "history" ? "History" : "Live"}
+                      <span className="tabular-nums opacity-60">
+                        {tab === "history" ? historyResults.length : liveResults.length}
+                      </span>
+                    </button>
+                  ))}
+                </div>
 
-                  {/* Toolbar */}
-                  <div className="flex items-center gap-2 flex-wrap pb-1">
+                {/* Toolbar — live tab only */}
+                {activeTab === "live" && (
+                  <div className="flex items-center gap-2 flex-wrap py-2">
                     {selected.size > 0 && (
                       <>
                         {canLiSearch && (
@@ -675,7 +718,7 @@ export default function CfoMonitorPage() {
                             variant="outline"
                             className="h-7 text-xs border-slate-200 text-slate-600"
                             disabled={reprocessingBulk}
-                            onClick={handleReprocessBulk}
+                            onClick={() => handleReprocessBulk(displayedResults)}
                           >
                             {reprocessingBulk
                               ? "Re-running…"
@@ -695,38 +738,41 @@ export default function CfoMonitorPage() {
                         )}
                       </>
                     )}
-                    {status?.dataset_id && (
+                    {status?.dataset_id && liveResults.length > 0 && (
                       <Button
                         size="sm"
                         className="h-7 text-xs bg-indigo-600 hover:bg-indigo-500 text-white"
                         disabled={importing}
-                        onClick={() => handleImport(results)}
+                        onClick={() => handleImport(liveResults)}
                       >
                         {importing ? "Importing…" : "Import All"}
                       </Button>
                     )}
                   </div>
-                </div>
-
-                {importMsg && (
-                  <p className={`text-xs mt-1.5 ${importMsg.includes("failed") || importMsg.includes("Failed") ? "text-red-600" : "text-emerald-600"}`}>
-                    {importMsg}
-                  </p>
                 )}
-              </CardHeader>
-              <CardContent className="p-0 mt-3">
+              </div>
+
+              {importMsg && activeTab === "live" && (
+                <p className={`text-xs px-4 pt-2 ${importMsg.includes("failed") || importMsg.includes("Failed") ? "text-red-600" : "text-emerald-600"}`}>
+                  {importMsg}
+                </p>
+              )}
+
+              <CardContent className="p-0 mt-0">
                 <div className="overflow-auto max-h-[520px]">
                   <table className="w-full text-xs">
                     <thead className="sticky top-0 bg-white border-b border-slate-200 z-10">
                       <tr className="text-slate-500 text-left">
                         <th className="px-3 py-2.5 w-8">
+                          {activeTab === "live" && (
                           <input
                             type="checkbox"
                             className="rounded border-slate-300 accent-indigo-600"
                             checked={allSelected}
                             ref={(el) => { if (el) el.indeterminate = someSelected; }}
-                            onChange={toggleSelectAll}
+                            onChange={() => toggleSelectAll(displayedResults)}
                           />
+                          )}
                         </th>
                         <th className="px-3 py-2.5 font-medium w-10">#</th>
                         <th className="px-3 py-2.5 font-medium">Company</th>
@@ -740,7 +786,7 @@ export default function CfoMonitorPage() {
                       </tr>
                     </thead>
                     <tbody>
-                      {results.map((r) => (
+                      {displayedResults.map((r) => (
                         <tr
                           key={r.rank}
                           className={`border-b border-slate-100 transition-colors ${
@@ -954,7 +1000,7 @@ export default function CfoMonitorPage() {
           onClose={() => setLiSearchModalOpen(false)}
           onLinkedInUpdate={(rankStr, linkedinUrl) => {
             const rank = Number(rankStr);
-            setResults((prev) =>
+            setLiveResults((prev: CompanyResult[]) =>
               prev.map((row) => row.rank === rank ? { ...row, cfo_linkedin: linkedinUrl } : row)
             );
           }}

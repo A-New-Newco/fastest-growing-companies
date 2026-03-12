@@ -25,9 +25,13 @@ interface CompanyRow {
   selected: boolean;
 }
 
+const WORKER_OPTIONS = [1, 2, 3, 4, 5, 6, 7, 8] as const;
+const DEFAULT_WORKERS = 3;
+
 interface State {
   step: 1 | 2;
   name: string;
+  numWorkers: number;
   searchQuery: string;
   results: CompanyRow[];
   selected: CompanyRow[];
@@ -38,6 +42,7 @@ interface State {
 
 type Action =
   | { type: "SET_NAME"; value: string }
+  | { type: "SET_WORKERS"; value: number }
   | { type: "SET_STEP"; step: 1 | 2 }
   | { type: "SET_SEARCH"; value: string }
   | { type: "SET_RESULTS"; results: CompanyRow[] }
@@ -51,6 +56,7 @@ type Action =
 function reducer(state: State, action: Action): State {
   switch (action.type) {
     case "SET_NAME": return { ...state, name: action.value };
+    case "SET_WORKERS": return { ...state, numWorkers: action.value };
     case "SET_STEP": return { ...state, step: action.step };
     case "SET_SEARCH": return { ...state, searchQuery: action.value };
     case "SET_RESULTS": return { ...state, results: action.results, loadingSearch: false };
@@ -74,6 +80,7 @@ function reducer(state: State, action: Action): State {
 const initialState: State = {
   step: 1,
   name: "",
+  numWorkers: DEFAULT_WORKERS,
   searchQuery: "",
   results: [],
   selected: [],
@@ -155,6 +162,11 @@ export default function CreateSessionModal({ open, onClose, onCreated }: Props) 
             companyWebsite: c.sitoWeb,
             companyCountry: c.country,
           })),
+          modelConfig: {
+            models: ["compound-beta", "llama-3.3-70b-versatile", "llama-3.1-8b-instant"],
+            current_model_index: 0,
+            numWorkers: state.numWorkers,
+          },
         }),
       });
       if (!res.ok) {
@@ -189,7 +201,7 @@ export default function CreateSessionModal({ open, onClose, onCreated }: Props) 
           </DialogTitle>
         </DialogHeader>
 
-        {/* Step 1: name */}
+        {/* Step 1: name + workers */}
         {state.step === 1 && (
           <div className="space-y-4 py-2">
             <div className="space-y-1.5">
@@ -204,6 +216,37 @@ export default function CreateSessionModal({ open, onClose, onCreated }: Props) 
                 autoFocus
               />
             </div>
+
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-medium text-slate-600 uppercase tracking-wider">
+                  Parallel Workers
+                </label>
+                <span className="text-xs text-slate-400">
+                  {state.numWorkers === 1 ? "sequential" : state.numWorkers <= 3 ? "safe" : state.numWorkers <= 5 ? "moderate" : "aggressive"}
+                </span>
+              </div>
+              <div className="flex gap-1">
+                {WORKER_OPTIONS.map((n) => (
+                  <button
+                    key={n}
+                    type="button"
+                    onClick={() => dispatch({ type: "SET_WORKERS", value: n })}
+                    className={`flex-1 rounded py-1.5 text-xs font-medium transition-colors ${
+                      state.numWorkers === n
+                        ? "bg-indigo-600 text-white"
+                        : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                    }`}
+                  >
+                    {n}
+                  </button>
+                ))}
+              </div>
+              <p className="text-xs text-slate-400">
+                compound-beta is limited to 30 req/min — keep ≤ 5 to avoid rate limits
+              </p>
+            </div>
+
             <p className="text-xs text-slate-500">
               You&apos;ll select companies in the next step.
             </p>

@@ -39,6 +39,7 @@ export interface Company {
   confidenza: Confidenza;
   cfoFound: boolean; // true if any contact found
   hasRealCfo: boolean; // true if CFO/DAF or Finance Manager + medium/high confidence
+  contactId: string | null; // campaign contact id, non-null if added to a campaign
   dataOrigin: "curated" | "imported";
   annotation?: Annotation;
 }
@@ -67,6 +68,7 @@ export interface FilterState {
   cfoFoundOnly: boolean;
   linkedinFilter: CfoPresenceFilter;
   hasRealCfoFilter: CfoPresenceFilter;
+  hasContactFilter: CfoPresenceFilter;
   minRevenue: number; // €M (0 = no filter)
   maxRevenue: number; // €M (0 = no filter)
 }

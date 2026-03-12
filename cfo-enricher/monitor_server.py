@@ -110,6 +110,51 @@ async def _event_generator(request: Request) -> Any:
 # ---------------------------------------------------------------------------
 
 
+# ---------------------------------------------------------------------------
+# Monitor event persistence — full event data (tokens, cost, elapsed, …)
+# ---------------------------------------------------------------------------
+
+MONITOR_EVENTS_FILE = "monitor_events.jsonl"
+
+
+def _save_monitor_event(output_dir: str, event: dict[str, Any]) -> None:
+    """Append a company event (with full metadata) to monitor_events.jsonl."""
+    try:
+        path = Path(output_dir) / MONITOR_EVENTS_FILE
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with path.open("a", encoding="utf-8") as f:
+            f.write(json.dumps(event, ensure_ascii=False) + "\n")
+    except Exception as exc:
+        print(f"[monitor] Failed to save monitor event: {exc}", flush=True)
+
+
+def _load_monitor_events(output_dir: str) -> list[dict[str, Any]]:
+    """Load all persisted monitor events from monitor_events.jsonl."""
+    path = Path(output_dir) / MONITOR_EVENTS_FILE
+    if not path.exists():
+        return []
+    events: list[dict[str, Any]] = []
+    # Last occurrence wins (handles reprocess overwrites)
+    seen: dict[int, int] = {}  # rank → index in events
+    with path.open("r", encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                evt = json.loads(line)
+                rank = evt.get("rank")
+                if rank is not None:
+                    if rank in seen:
+                        events[seen[rank]] = evt  # overwrite
+                    else:
+                        seen[rank] = len(events)
+                        events.append(evt)
+            except Exception:
+                pass
+    return events
+
+
 def _on_company_done(outcome: CompanyOutcome, completed: int, total: int) -> None:
     state = rs.state
 
@@ -134,6 +179,10 @@ def _on_company_done(outcome: CompanyOutcome, completed: int, total: int) -> Non
         "elapsed_s": round(outcome.elapsed_s, 2),
         "had_rate_limit": outcome.had_rate_limit,
     }
+
+    # Persist full event data so history survives restarts
+    if state.output_dir:
+        _save_monitor_event(state.output_dir, company_event)
 
     state.completed = completed
     if result.cfo_nome:
@@ -229,6 +278,12 @@ async def start_enrichment(req: StartRequest) -> dict:
     if not input_path.exists():
         raise HTTPException(status_code=400, detail=f"Input file not found: {input_path}")
 
+    # If resetting, also clear the persisted monitor events
+    if req.reset:
+        monitor_file = output_dir / MONITOR_EVENTS_FILE
+        if monitor_file.exists():
+            monitor_file.unlink()
+
     # Reset state
     rs.state.reset()
     rs.state.status = "running"
@@ -276,6 +331,26 @@ async def stream_events(request: Request) -> EventSourceResponse:
 @app.get("/api/enrichment/results")
 def get_results() -> list[dict]:
     return rs.state.results
+
+
+@app.get("/api/enrichment/history")
+def get_history(dataset_id: str | None = None) -> list[dict]:
+    """Return all persisted monitor events for a dataset (survives restarts)."""
+    output_dir: str | None = None
+
+    if dataset_id:
+        preset = next((d for d in DATASETS if d["id"] == dataset_id), None)
+        if preset:
+            output_dir = preset["output_dir"]
+
+    # Fall back to current run's output dir
+    if not output_dir:
+        output_dir = rs.state.output_dir
+
+    if not output_dir:
+        return []
+
+    return _load_monitor_events(output_dir)
 
 
 # ---------------------------------------------------------------------------
@@ -340,7 +415,7 @@ async def _reprocess_task(companies: list[ReprocessCompany]) -> None:
                 ),
             )
 
-        # Push updated company event via SSE
+        # Build updated event
         updated: dict[str, Any] = {
             "rank": company.rank,
             "azienda": company.azienda,
@@ -360,6 +435,11 @@ async def _reprocess_task(companies: list[ReprocessCompany]) -> None:
             "had_rate_limit": False,
             "is_reprocess": True,
         }
+
+        # Persist updated LinkedIn in monitor history
+        if state.output_dir:
+            _save_monitor_event(state.output_dir, updated)
+
         state.event_queue.put_nowait({"type": "company", "data": updated})
 
 

@@ -1,29 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { createAdminSupabaseClient } from "@/lib/supabase/admin";
-
-const GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions";
-const GROQ_MODEL = "compound-beta-mini";
-
-const LINKEDIN_PROFILE_RE =
-  /https?:\/\/(www\.)?linkedin\.com\/in\/([a-zA-Z0-9\-_%]+)\/?/i;
-
-// Legal suffixes to strip from company names before searching
-const LEGAL_SUFFIX_RE =
-  /[\s,]+(?:s\.?r\.?l\.?|s\.?p\.?a\.?|s\.?a\.?s\.?|s\.?n\.?c\.?|s\.?a\.?p\.?a\.?|s\.?r\.?l\.?s\.?|s\.?a\.?|s\.?l\.?|gmbh|ag|kg|gbr|ohg|ug|b\.?v\.?|n\.?v\.?|ltd\.?|llc\.?|inc\.?|corp\.?|plc\.?)\.?$/i;
-
-function stripLegalSuffix(name: string): string {
-  return name.replace(LEGAL_SUFFIX_RE, "").trim();
-}
-
-function extractLinkedInUrl(text: string): string | null {
-  const match = text.match(LINKEDIN_PROFILE_RE);
-  if (!match) return null;
-  // Reject company pages that might have slipped through
-  if (text.includes("/company/")) return null;
-  const slug = match[2].replace(/\/$/, "");
-  return `https://www.linkedin.com/in/${slug}`;
-}
+import { findLinkedIn } from "@/lib/linkedin-finder";
 
 export async function POST(req: NextRequest) {
   const supabase = createServerSupabaseClient();
@@ -55,41 +33,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "GROQ_API_KEY not configured" }, { status: 500 });
   }
 
-  const cleanCompanyName = stripLegalSuffix(companyName);
-  const query = `${cleanCompanyName} ${contactName} site:linkedin.com`;
-
-  // Call Groq compound-beta-mini — it automatically uses web search
-  const groqRes = await fetch(GROQ_API_URL, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${apiKey}`,
-    },
-    body: JSON.stringify({
-      model: GROQ_MODEL,
-      temperature: 0,
-      max_tokens: 256,
-      messages: [
-        {
-          role: "user",
-          content: `Find the LinkedIn personal profile URL of ${contactName} who works at ${cleanCompanyName}. Use this search query: "${query}". Return ONLY the LinkedIn profile URL in the format https://www.linkedin.com/in/username, or the word "null" if not found. Do not include any explanation.`,
-        },
-      ],
-    }),
-  });
-
-  if (!groqRes.ok) {
-    const err = await groqRes.text();
-    return NextResponse.json(
-      { error: `Groq API error ${groqRes.status}: ${err}` },
-      { status: 502 }
-    );
-  }
-
-  const groqJson = await groqRes.json();
-  const rawText: string = groqJson.choices?.[0]?.message?.content ?? "";
-
-  const linkedinUrl = extractLinkedInUrl(rawText);
+  const linkedinUrl = await findLinkedIn(companyName, contactName, apiKey);
 
   // Save to DB if found and companyId provided
   if (linkedinUrl && companyId) {
@@ -124,6 +68,5 @@ export async function POST(req: NextRequest) {
   return NextResponse.json({
     linkedinUrl,
     found: !!linkedinUrl,
-    query,
   });
 }

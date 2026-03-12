@@ -22,10 +22,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={inter.variable}>
-      <body className="font-sans antialiased bg-slate-50 text-slate-900 min-h-screen">
+      <body className="font-sans antialiased text-slate-900">
         <ClientProviders>
-          <Navbar />
-          <main>{children}</main>
+          <div className="flex h-screen overflow-hidden">
+            <Navbar />
+            <main className="flex-1 overflow-auto bg-slate-50">{children}</main>
+          </div>
         </ClientProviders>
       </body>
     </html>

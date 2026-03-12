@@ -153,7 +153,7 @@ export default function ExplorerPage() {
   );
 
   return (
-    <div className="flex h-[calc(100vh-3.5rem)]">
+    <div className="flex h-full">
       {/* ── Left sidebar ──────────────────────────────────────────────────── */}
       <aside className="w-[250px] xl:w-[270px] flex-shrink-0 border-r border-slate-200 bg-white overflow-y-auto">
         {loading ? (

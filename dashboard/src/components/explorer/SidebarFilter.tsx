@@ -143,6 +143,13 @@ function ActiveChips({
       onRemove: () => onChange({ ...filters, hasRealCfoFilter: "all" }),
     });
 
+  if (filters.hasContactFilter !== "all")
+    otherChips.push({
+      key: "contact",
+      label: `Contact: ${filters.hasContactFilter}`,
+      onRemove: () => onChange({ ...filters, hasContactFilter: "all" }),
+    });
+
   if (filters.minGrowth > 0 || filters.maxGrowth < 600)
     otherChips.push({
       key: "growth",
@@ -197,6 +204,7 @@ export default function SidebarFilter({
     filters.cfoFoundOnly ||
     filters.linkedinFilter !== "all" ||
     filters.hasRealCfoFilter !== "all" ||
+    filters.hasContactFilter !== "all" ||
     filters.minRevenue > 0 ||
     filters.maxRevenue > 0 ||
     filters.minGrowth > 0 ||
@@ -385,6 +393,26 @@ export default function SidebarFilter({
               className={`${toggleBase} ${
                 filters.hasRealCfoFilter === value
                   ? "bg-emerald-600 text-white"
+                  : toggleInactive
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Has Contact */}
+      <div>
+        <SectionLabel>Has Contact</SectionLabel>
+        <div className={toggleRow}>
+          {CFO_PRESENCE_OPTIONS.map(({ value, label }) => (
+            <button
+              key={value}
+              onClick={() => onChange({ ...filters, hasContactFilter: value })}
+              className={`${toggleBase} ${
+                filters.hasContactFilter === value
+                  ? "bg-violet-600 text-white"
                   : toggleInactive
               }`}
             >

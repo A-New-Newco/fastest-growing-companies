@@ -47,7 +47,7 @@ export default function SignupPage() {
 
   if (emailSent) {
     return (
-      <div className="flex min-h-[calc(100vh-3.5rem)] items-center justify-center p-6">
+      <div className="flex min-h-full items-center justify-center p-6">
         <div className="w-full max-w-sm bg-white rounded-xl border border-slate-200 shadow-sm p-8 text-center space-y-4">
           <div className="text-4xl">📬</div>
           <h1 className="text-lg font-semibold text-slate-900">Check your email</h1>
@@ -62,7 +62,7 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="flex min-h-[calc(100vh-3.5rem)] items-center justify-center p-6">
+    <div className="flex min-h-full items-center justify-center p-6">
       <div className="w-full max-w-sm">
         <div className="mb-6">
           <h1 className="text-xl font-semibold text-slate-900">Sign up</h1>

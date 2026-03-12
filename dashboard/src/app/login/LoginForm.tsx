@@ -39,7 +39,7 @@ export default function LoginForm() {
   }
 
   return (
-    <div className="flex min-h-[calc(100vh-3.5rem)] items-center justify-center p-6">
+    <div className="flex min-h-full items-center justify-center p-6">
       <div className="w-full max-w-sm">
         <div className="mb-6">
           <h1 className="text-xl font-semibold text-slate-900">Sign in</h1>
