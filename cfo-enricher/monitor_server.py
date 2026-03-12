@@ -213,6 +213,7 @@ async def start_enrichment(req: StartRequest) -> dict:
         raise HTTPException(status_code=409, detail="A run is already in progress")
 
     # Resolve input/output from preset or overrides
+    preset: dict | None = None
     if req.dataset_id:
         preset = next((d for d in DATASETS if d["id"] == req.dataset_id), None)
         if not preset:
@@ -234,8 +235,8 @@ async def start_enrichment(req: StartRequest) -> dict:
     rs.state.input_path = str(input_path)
     rs.state.output_dir = str(output_dir)
     rs.state.dataset_id = req.dataset_id or ""
-    rs.state.country_code = preset["country_code"] if req.dataset_id and preset else "IT"
-    rs.state.year = preset["year"] if req.dataset_id and preset else 2026
+    rs.state.country_code = preset["country_code"] if preset else "IT"
+    rs.state.year = preset["year"] if preset else 2026
     rs.state.start_time = time.monotonic()
 
     # Count total companies (quick peek)

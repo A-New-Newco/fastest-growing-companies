@@ -31,10 +31,26 @@ import {
   type ProgressEvent,
   connectToEnrichmentStream,
   fetchDatasets,
+  fetchResults,
   fetchStatus,
+  reprocessCompanies,
   startRun,
   stopRun,
 } from "@/lib/enrichment-client";
+
+// ---------------------------------------------------------------------------
+// localStorage helpers (SSR-safe)
+// ---------------------------------------------------------------------------
+
+function lsGet(key: string): string | null {
+  if (typeof window === "undefined") return null;
+  return localStorage.getItem(key);
+}
+
+function lsSet(key: string, val: string) {
+  if (typeof window === "undefined") return;
+  localStorage.setItem(key, val);
+}
 
 // ---------------------------------------------------------------------------
 // Confidence badge
@@ -113,30 +129,61 @@ const PIE_COLORS: Record<string, string> = {
 // ---------------------------------------------------------------------------
 
 export default function CfoMonitorPage() {
-  // Config
+  // Config — persisted in localStorage
   const [datasets, setDatasets] = useState<Dataset[]>([]);
   const [selectedDataset, setSelectedDataset] = useState<string>("");
-  const [concurrency, setConcurrency] = useState(8);
+  const [concurrency, setConcurrency] = useState<number>(8);
   const [doReset, setDoReset] = useState(false);
 
-  // State
+  // Runtime state
   const [status, setStatus] = useState<EnrichmentStatus | null>(null);
   const [progress, setProgress] = useState<ProgressEvent | null>(null);
   const [results, setResults] = useState<CompanyResult[]>([]);
-  const [costHistory, setCostHistory] = useState<{ n: number; cost: number }[]>([]);
+  const [tokenHistory, setTokenHistory] = useState<{ n: number; tokens: number }[]>([]);
   const [serverOnline, setServerOnline] = useState<boolean | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  // Selection
+  const [selected, setSelected] = useState<Set<number>>(new Set());
+
+  // Action states
+  const [importing, setImporting] = useState(false);
+  const [importMsg, setImportMsg] = useState<string | null>(null);
+  const [reprocessingRanks, setReprocessingRanks] = useState<Set<number>>(new Set());
+  const reprocessingBulk = reprocessingRanks.size > 0;
 
   const esRef = useRef<EventSource | null>(null);
 
   // ------------------------------------------------------------------
-  // Boot: load datasets + current status
+  // Persist config changes
+  // ------------------------------------------------------------------
+  const handleDatasetChange = (val: string) => {
+    setSelectedDataset(val);
+    lsSet("cfo-monitor:dataset", val);
+  };
+  const handleConcurrencyChange = ([v]: number[]) => {
+    setConcurrency(v);
+    lsSet("cfo-monitor:concurrency", String(v));
+  };
+
+  // ------------------------------------------------------------------
+  // Boot: load datasets + current status + existing results
   // ------------------------------------------------------------------
   useEffect(() => {
+    // Restore persisted config (client-only, safe after hydration)
+    const savedDs = lsGet("cfo-monitor:dataset");
+    const savedConc = lsGet("cfo-monitor:concurrency");
+    if (savedDs) setSelectedDataset(savedDs);
+    if (savedConc) setConcurrency(Number(savedConc) || 8);
+
     fetchDatasets()
       .then((ds) => {
         setDatasets(ds);
-        if (ds.length > 0) setSelectedDataset(ds[0].id);
+        // Pre-select first dataset if nothing is saved yet
+        if (!lsGet("cfo-monitor:dataset") && ds.length > 0) {
+          setSelectedDataset(ds[0].id);
+          lsSet("cfo-monitor:dataset", ds[0].id);
+        }
         setServerOnline(true);
       })
       .catch(() => setServerOnline(false));
@@ -144,6 +191,25 @@ export default function CfoMonitorPage() {
     fetchStatus()
       .then((s) => {
         setStatus(s);
+        if (s.completed > 0) {
+          // Restore results from in-memory server state
+          fetchResults()
+            .then((rs) => {
+              setResults(rs.slice().reverse()); // newest first
+              // Rebuild token history
+              let runningTok = 0;
+              const history: { n: number; tokens: number }[] = [];
+              [...rs].forEach((r, i) => {
+                const tok = (r.input_tokens ?? 0) + (r.output_tokens ?? 0);
+                if (tok > 0) {
+                  runningTok += tok;
+                  history.push({ n: i + 1, tokens: runningTok });
+                }
+              });
+              setTokenHistory(history);
+            })
+            .catch(() => {});
+        }
         if (s.status === "running") attachStream();
       })
       .catch(() => {});
@@ -151,7 +217,7 @@ export default function CfoMonitorPage() {
   }, []);
 
   // ------------------------------------------------------------------
-  // SSE
+  // SSE — direct connection to bypass Next.js proxy buffering
   // ------------------------------------------------------------------
   const attachStream = useCallback(() => {
     esRef.current?.close();
@@ -173,14 +239,21 @@ export default function CfoMonitorPage() {
         );
       },
       onCompany: (data: CompanyResult) => {
-        setResults((prev) => [data, ...prev]);
-        if (data.cost_usd != null) {
-          setCostHistory((prev) => {
-            const running = parseFloat(
-              ((prev[prev.length - 1]?.cost ?? 0) + data.cost_usd!).toFixed(6)
-            );
-            return [...prev, { n: prev.length + 1, cost: running }];
-          });
+        setResults((prev) => {
+          // For reprocess events: update existing row in-place
+          if (data.is_reprocess) {
+            return prev.map((r) => (r.rank === data.rank ? { ...r, cfo_linkedin: data.cfo_linkedin } : r));
+          }
+          return [data, ...prev];
+        });
+        if (!data.is_reprocess) {
+          const tok = (data.input_tokens ?? 0) + (data.output_tokens ?? 0);
+          if (tok > 0) {
+            setTokenHistory((prev) => {
+              const running = (prev[prev.length - 1]?.tokens ?? 0) + tok;
+              return [...prev, { n: prev.length + 1, tokens: running }];
+            });
+          }
         }
       },
       onDone: (data: DoneEvent) => {
@@ -203,8 +276,10 @@ export default function CfoMonitorPage() {
   // ------------------------------------------------------------------
   const handleStart = async () => {
     setErrorMsg(null);
+    setImportMsg(null);
     setResults([]);
-    setCostHistory([]);
+    setTokenHistory([]);
+    setSelected(new Set());
     try {
       await startRun({
         dataset_id: selectedDataset || undefined,
@@ -227,6 +302,96 @@ export default function CfoMonitorPage() {
   };
 
   // ------------------------------------------------------------------
+  // Selection helpers
+  // ------------------------------------------------------------------
+  const toggleSelect = (rank: number) => {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      next.has(rank) ? next.delete(rank) : next.add(rank);
+      return next;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    if (selected.size === results.length) {
+      setSelected(new Set());
+    } else {
+      setSelected(new Set(results.map((r) => r.rank)));
+    }
+  };
+
+  // ------------------------------------------------------------------
+  // Import to DB
+  // ------------------------------------------------------------------
+  const handleImport = async (targets: CompanyResult[]) => {
+    if (!targets.length || !status) return;
+    setImporting(true);
+    setImportMsg(null);
+    try {
+      const res = await fetch("/api/cfo-monitor/import", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          dataset_id: status.dataset_id,
+          country_code: status.country_code,
+          year: status.year,
+          companies: targets,
+        }),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error((err as { error?: string }).error ?? `Import failed: ${res.status}`);
+      }
+      const data = await res.json() as { updated: number };
+      setImportMsg(`Updated ${data.updated} companies in DB`);
+    } catch (e: unknown) {
+      setImportMsg(e instanceof Error ? e.message : "Import failed");
+    } finally {
+      setImporting(false);
+    }
+  };
+
+  // ------------------------------------------------------------------
+  // Re-process LinkedIn
+  // ------------------------------------------------------------------
+  // Bulk reprocess (selected rows without LinkedIn)
+  const handleReprocessBulk = async () => {
+    const targets = results.filter(
+      (r) => selected.has(r.rank) && r.cfo_nome && !r.cfo_linkedin
+    );
+    if (!targets.length) return;
+    const ranks = new Set(targets.map((r) => r.rank));
+    setReprocessingRanks((prev) => new Set([...prev, ...ranks]));
+    setErrorMsg(null);
+    try {
+      await reprocessCompanies(targets);
+      attachStream();
+    } catch (e: unknown) {
+      setErrorMsg(e instanceof Error ? e.message : "Reprocess failed");
+    } finally {
+      setReprocessingRanks((prev) => {
+        const next = new Set(prev);
+        ranks.forEach((r) => next.delete(r));
+        return next;
+      });
+    }
+  };
+
+  // Per-row reprocess (single company)
+  const handleReprocessOne = async (r: CompanyResult) => {
+    if (!r.cfo_nome || reprocessingRanks.has(r.rank)) return;
+    setReprocessingRanks((prev) => new Set([...prev, r.rank]));
+    setErrorMsg(null);
+    try {
+      await reprocessCompanies([r]);
+      attachStream();
+    } catch (e: unknown) {
+      setErrorMsg(e instanceof Error ? e.message : "Reprocess failed");
+      setReprocessingRanks((prev) => { const next = new Set(prev); next.delete(r.rank); return next; });
+    }
+  };
+
+  // ------------------------------------------------------------------
   // Derived values
   // ------------------------------------------------------------------
   const isRunning = status?.status === "running";
@@ -234,16 +399,28 @@ export default function CfoMonitorPage() {
   const total = status?.total ?? 0;
   const found = progress?.found ?? status?.found ?? 0;
   const notFound = progress?.not_found ?? status?.not_found ?? 0;
-  const totalCost = progress?.total_cost_usd ?? status?.total_cost_usd ?? 0;
   const elapsed = progress?.elapsed_s ?? status?.elapsed_s ?? 0;
 
   const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
   const foundPct = completed > 0 ? Math.round((found / completed) * 100) : 0;
-  const avgCost = completed > 0 ? `$${(totalCost / completed).toFixed(4)}` : "—";
+  const avgTokens =
+    completed > 0 && results.length > 0
+      ? Math.round(
+          results.reduce((sum, r) => sum + (r.input_tokens ?? 0) + (r.output_tokens ?? 0), 0) /
+            results.length
+        )
+      : null;
   const eta =
     isRunning && completed > 0 && elapsed > 0
       ? Math.round(((total - completed) * elapsed) / completed)
       : null;
+
+  // Toolbar selection state
+  const selectedResults = results.filter((r) => selected.has(r.rank));
+  const canReprocess = selectedResults.some((r) => r.cfo_nome && !r.cfo_linkedin);
+  const canImport = selectedResults.length > 0 && !!status?.dataset_id;
+  const allSelected = results.length > 0 && selected.size === results.length;
+  const someSelected = selected.size > 0 && selected.size < results.length;
 
   // Confidence pie data
   const pieData = [
@@ -295,7 +472,11 @@ export default function CfoMonitorPage() {
             {/* Dataset selector */}
             <div className="flex-1 min-w-[200px]">
               <label className="block text-xs font-medium text-slate-500 mb-1.5">Dataset</label>
-              <Select value={selectedDataset} onValueChange={setSelectedDataset} disabled={isRunning}>
+              <Select
+                value={selectedDataset}
+                onValueChange={handleDatasetChange}
+                disabled={isRunning}
+              >
                 <SelectTrigger className="h-9 border-slate-200 bg-white text-slate-800 text-sm">
                   <SelectValue placeholder="Select dataset…" />
                 </SelectTrigger>
@@ -320,7 +501,7 @@ export default function CfoMonitorPage() {
                 max={16}
                 step={1}
                 value={[concurrency]}
-                onValueChange={([v]) => setConcurrency(v)}
+                onValueChange={handleConcurrencyChange}
                 disabled={isRunning}
               />
             </div>
@@ -398,9 +579,9 @@ export default function CfoMonitorPage() {
             accent
           />
           <KpiCard
-            label="Total Cost"
-            value={`$${totalCost.toFixed(4)}`}
-            sub={`${avgCost}/company avg`}
+            label="Total Tokens"
+            value={results.reduce((s, r) => s + (r.input_tokens ?? 0) + (r.output_tokens ?? 0), 0).toLocaleString()}
+            sub={avgTokens != null ? `${avgTokens} tok/company avg` : undefined}
           />
           <KpiCard
             label="Elapsed"
@@ -419,41 +600,112 @@ export default function CfoMonitorPage() {
           {/* Live table */}
           <div className="xl:col-span-2">
             <Card className="border-slate-200 bg-white">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-semibold text-slate-700 flex items-center gap-2">
-                  Live Results
-                  <Badge variant="secondary" className="text-[10px] tabular-nums">
-                    {results.length}
-                  </Badge>
-                </CardTitle>
+              <CardHeader className="pb-0">
+                <div className="flex items-center justify-between gap-3 flex-wrap">
+                  <CardTitle className="text-sm font-semibold text-slate-700 flex items-center gap-2">
+                    Live Results
+                    <Badge variant="secondary" className="text-[10px] tabular-nums">
+                      {results.length}
+                    </Badge>
+                  </CardTitle>
+
+                  {/* Toolbar */}
+                  <div className="flex items-center gap-2 flex-wrap pb-1">
+                    {selected.size > 0 && (
+                      <>
+                        {canReprocess && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="h-7 text-xs border-slate-200 text-slate-600"
+                            disabled={reprocessingBulk}
+                            onClick={handleReprocessBulk}
+                          >
+                            {reprocessingBulk
+                              ? "Searching…"
+                              : `Re-run LinkedIn (${selectedResults.filter((r) => r.cfo_nome && !r.cfo_linkedin).length})`}
+                          </Button>
+                        )}
+                        {canImport && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="h-7 text-xs border-indigo-200 text-indigo-600 hover:bg-indigo-50"
+                            disabled={importing}
+                            onClick={() => handleImport(selectedResults)}
+                          >
+                            {importing ? "Importing…" : `Import Selected (${selected.size})`}
+                          </Button>
+                        )}
+                      </>
+                    )}
+                    {status?.dataset_id && (
+                      <Button
+                        size="sm"
+                        className="h-7 text-xs bg-indigo-600 hover:bg-indigo-500 text-white"
+                        disabled={importing}
+                        onClick={() => handleImport(results)}
+                      >
+                        {importing ? "Importing…" : "Import All"}
+                      </Button>
+                    )}
+                  </div>
+                </div>
+
+                {importMsg && (
+                  <p className={`text-xs mt-1.5 ${importMsg.includes("failed") || importMsg.includes("Failed") ? "text-red-600" : "text-emerald-600"}`}>
+                    {importMsg}
+                  </p>
+                )}
               </CardHeader>
-              <CardContent className="p-0">
+              <CardContent className="p-0 mt-3">
                 <div className="overflow-auto max-h-[520px]">
                   <table className="w-full text-xs">
                     <thead className="sticky top-0 bg-white border-b border-slate-200 z-10">
                       <tr className="text-slate-500 text-left">
-                        <th className="px-4 py-2.5 font-medium w-12">#</th>
-                        <th className="px-4 py-2.5 font-medium">Company</th>
-                        <th className="px-4 py-2.5 font-medium">CFO</th>
-                        <th className="px-4 py-2.5 font-medium hidden md:table-cell">Role</th>
-                        <th className="px-4 py-2.5 font-medium">Conf.</th>
-                        <th className="px-4 py-2.5 font-medium text-right hidden sm:table-cell">Cost</th>
-                        <th className="px-4 py-2.5 font-medium text-right hidden sm:table-cell">Tokens</th>
-                        <th className="px-4 py-2.5 font-medium text-right hidden lg:table-cell">Turns</th>
-                        <th className="px-4 py-2.5 font-medium text-right hidden lg:table-cell">Time</th>
+                        <th className="px-3 py-2.5 w-8">
+                          <input
+                            type="checkbox"
+                            className="rounded border-slate-300 accent-indigo-600"
+                            checked={allSelected}
+                            ref={(el) => { if (el) el.indeterminate = someSelected; }}
+                            onChange={toggleSelectAll}
+                          />
+                        </th>
+                        <th className="px-3 py-2.5 font-medium w-10">#</th>
+                        <th className="px-3 py-2.5 font-medium">Company</th>
+                        <th className="px-3 py-2.5 font-medium">CFO</th>
+                        <th className="px-3 py-2.5 font-medium hidden md:table-cell">Role</th>
+                        <th className="px-3 py-2.5 font-medium">Conf.</th>
+                        <th className="px-3 py-2.5 font-medium text-right hidden sm:table-cell">Tokens</th>
+                        <th className="px-3 py-2.5 font-medium text-right hidden lg:table-cell">Turns</th>
+                        <th className="px-3 py-2.5 font-medium text-right hidden lg:table-cell">Time</th>
+                        <th className="px-3 py-2.5 font-medium text-right w-16">Act.</th>
                       </tr>
                     </thead>
                     <tbody>
                       {results.map((r) => (
                         <tr
                           key={r.rank}
-                          className="border-b border-slate-100 hover:bg-slate-50 transition-colors"
+                          className={`border-b border-slate-100 transition-colors ${
+                            selected.has(r.rank)
+                              ? "bg-indigo-50/60"
+                              : "hover:bg-slate-50"
+                          }`}
                         >
-                          <td className="px-4 py-2 text-slate-400">{r.rank}</td>
-                          <td className="px-4 py-2 max-w-[160px]">
+                          <td className="px-3 py-2">
+                            <input
+                              type="checkbox"
+                              className="rounded border-slate-300 accent-indigo-600"
+                              checked={selected.has(r.rank)}
+                              onChange={() => toggleSelect(r.rank)}
+                            />
+                          </td>
+                          <td className="px-3 py-2 text-slate-400">{r.rank}</td>
+                          <td className="px-3 py-2 max-w-[140px]">
                             <span className="block truncate font-medium text-slate-800">{r.azienda}</span>
                           </td>
-                          <td className="px-4 py-2 max-w-[140px]">
+                          <td className="px-3 py-2 max-w-[130px]">
                             {r.cfo_nome ? (
                               r.cfo_linkedin ? (
                                 <a
@@ -470,26 +722,40 @@ export default function CfoMonitorPage() {
                             ) : (
                               <span className="text-slate-300 italic">not found</span>
                             )}
+                            {(r.cfo_email || r.cfo_telefono) && (
+                              <span className="block truncate text-[10px] text-slate-400 mt-0.5">
+                                {[r.cfo_email, r.cfo_telefono].filter(Boolean).join(" · ")}
+                              </span>
+                            )}
                           </td>
-                          <td className="px-4 py-2 hidden md:table-cell max-w-[160px]">
+                          <td className="px-3 py-2 hidden md:table-cell max-w-[150px]">
                             <span className="block truncate text-slate-500">{r.cfo_ruolo ?? "—"}</span>
                           </td>
-                          <td className="px-4 py-2">
+                          <td className="px-3 py-2">
                             <ConfBadge value={r.confidenza} />
                           </td>
-                          <td className="px-4 py-2 text-right text-slate-500 hidden sm:table-cell tabular-nums">
-                            {r.cost_usd != null ? `$${r.cost_usd.toFixed(4)}` : "—"}
-                          </td>
-                          <td className="px-4 py-2 text-right text-slate-500 hidden sm:table-cell tabular-nums">
+                          <td className="px-3 py-2 text-right text-slate-500 hidden sm:table-cell tabular-nums">
                             {r.input_tokens != null && r.output_tokens != null
-                              ? `${r.input_tokens}+${r.output_tokens}`
+                              ? (r.input_tokens + r.output_tokens).toLocaleString()
                               : "—"}
                           </td>
-                          <td className="px-4 py-2 text-right text-slate-500 hidden lg:table-cell tabular-nums">
+                          <td className="px-3 py-2 text-right text-slate-500 hidden lg:table-cell tabular-nums">
                             {r.tool_calls || "—"}
                           </td>
-                          <td className="px-4 py-2 text-right text-slate-500 hidden lg:table-cell tabular-nums">
+                          <td className="px-3 py-2 text-right text-slate-500 hidden lg:table-cell tabular-nums">
                             {r.elapsed_s.toFixed(1)}s
+                          </td>
+                          <td className="px-3 py-2 text-right">
+                            {r.cfo_nome && !r.cfo_linkedin && (
+                              <button
+                                onClick={() => handleReprocessOne(r)}
+                                disabled={reprocessingRanks.has(r.rank)}
+                                title="Find LinkedIn profile"
+                                className="rounded px-1.5 py-0.5 text-[10px] font-medium border border-slate-200 text-slate-500 hover:border-indigo-300 hover:text-indigo-600 disabled:opacity-40 transition-colors"
+                              >
+                                {reprocessingRanks.has(r.rank) ? "…" : "LI"}
+                              </button>
+                            )}
                           </td>
                         </tr>
                       ))}
@@ -550,57 +816,41 @@ export default function CfoMonitorPage() {
               </CardContent>
             </Card>
 
-            {/* Cumulative cost chart */}
-            {costHistory.length > 1 && (
+            {/* Cumulative token chart */}
+            {tokenHistory.length > 1 && (
               <Card className="border-slate-200 bg-white">
                 <CardHeader className="pb-1">
                   <CardTitle className="text-sm font-semibold text-slate-700">
-                    Cumulative Cost{" "}
-                    <span className="text-indigo-600 tabular-nums">${totalCost.toFixed(4)}</span>
+                    Cumulative Tokens{" "}
+                    <span className="text-indigo-600 tabular-nums">
+                      {(tokenHistory[tokenHistory.length - 1]?.tokens ?? 0).toLocaleString()}
+                    </span>
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="pb-4">
                   <ResponsiveContainer width="100%" height={140}>
                     <AreaChart
-                      data={costHistory}
-                      margin={{ top: 4, right: 8, left: -24, bottom: 0 }}
+                      data={tokenHistory}
+                      margin={{ top: 4, right: 8, left: -16, bottom: 0 }}
                     >
                       <defs>
-                        <linearGradient id="costGrad" x1="0" y1="0" x2="0" y2="1">
+                        <linearGradient id="tokGrad" x1="0" y1="0" x2="0" y2="1">
                           <stop offset="5%" stopColor="#6366f1" stopOpacity={0.15} />
                           <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
                         </linearGradient>
                       </defs>
-                      <XAxis
-                        dataKey="n"
-                        tick={{ fontSize: 10, fill: "#94a3b8" }}
-                        tickLine={false}
-                        axisLine={false}
-                      />
+                      <XAxis dataKey="n" tick={{ fontSize: 10, fill: "#94a3b8" }} tickLine={false} axisLine={false} />
                       <YAxis
                         tick={{ fontSize: 10, fill: "#94a3b8" }}
                         tickLine={false}
                         axisLine={false}
-                        tickFormatter={(v: number) => `$${v.toFixed(2)}`}
+                        tickFormatter={(v: number) => v >= 1000 ? `${Math.round(v / 1000)}k` : String(v)}
                       />
                       <Tooltip
-                        contentStyle={{
-                          background: "#ffffff",
-                          border: "1px solid #e2e8f0",
-                          borderRadius: 8,
-                          fontSize: 11,
-                          color: "#0f172a",
-                        }}
-                        formatter={(v) => [`$${Number(v).toFixed(4)}`, "Total cost"]}
+                        contentStyle={{ background: "#ffffff", border: "1px solid #e2e8f0", borderRadius: 8, fontSize: 11, color: "#0f172a" }}
+                        formatter={(v) => [Number(v).toLocaleString(), "Total tokens"]}
                       />
-                      <Area
-                        type="monotone"
-                        dataKey="cost"
-                        stroke="#6366f1"
-                        strokeWidth={2}
-                        fill="url(#costGrad)"
-                        dot={false}
-                      />
+                      <Area type="monotone" dataKey="tokens" stroke="#6366f1" strokeWidth={2} fill="url(#tokGrad)" dot={false} />
                     </AreaChart>
                   </ResponsiveContainer>
                 </CardContent>
