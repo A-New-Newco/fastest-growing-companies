@@ -176,7 +176,76 @@ const KNOWN_COLUMNS = new Set([
   "name", "website", "growth_rate", "sector", "region", "city",
   "national_rank", "source_key", "revenue_a", "revenue_b", "year",
   "description", "foundation_year", "employees_start", "employees_end", "is_listed",
+  // CFO enrichment columns
+  "cfo_nome", "cfo_ruolo", "cfo_linkedin", "cfo_confidenza", "cfo_ruolo_category",
 ]);
+
+// ── CFO role categorisation (mirrors clean_data.py:normalize_role) ───────────
+
+const _CFO_PAT =
+  /\bcfo\b|chief financial|direttore finanziario|direttrice.*finanza|direttore.*finanza|financial director|financial officer|financial manager|head of finance|head of treasury|augmented cfo|country cfo|group cfo|founder and cfo|finance.*control.*director|director of administration.*finance|direttore amministrativo e finanziario|direttrice amministrazione.*finanza|chief strategy.*financial|finanzvorstand|leiter\s+finanzen|kaufm.*nnischer\s+direktor|finance director/i;
+
+const _CEO_PAT =
+  /\bceo\b|chief executive officer|amministratore delegato|managing director(?!\s+of\s+sales)|executive managing director|\bchairman\b|co-ceo\b|\bco ceo\b|gesch[äa]ftsf[üu]hrer/i;
+
+const _FOUNDER_PAT =
+  /\bfounder\b|\bco-founder\b|\bco founder\b|\bfondatore\b|\bco-fondatore\b|\bcofondatore\b|\bsocio fondatore\b|\bco-titolare e fondatore\b|\bgr[üu]nder\b|\bmitgr[üu]nder\b/i;
+
+const _PRESIDENTE_PAT = /\bpresidente\b|\bpresident\b/i;
+
+const _FINANCE_MGR_PAT =
+  /responsabile.*(amministr|finanz|contabil|controllo|bilancio|gestione|ufficio)|referente.*amministrativ|resp\.?\s*amministrativ|head of admin|head of hr.*finance|finance.*hr|finance.*legal|finance.*admin|finance.*accounting|finance.*control(?!.*director)|finance.*business|finance.*managing|finance manager|finance and accounting|finance,.*accounting|administrative.*accounting|administration.*(director|manager|specialist)|\badmin\b|admin.*accountant|accounting.*controlling|\baccounting\b|senior accountant|senior.*accountant|senior financial controller|senior management accountant|business controller|\bcontroller\b|\bcontrollo\b|\bcontabile\b|impiegata.*contabil|addetto.*contabilit|specialista amministrativo|amministrazione.*finanza|amministrazione.*controllo|\bafc\b|agency director.*controller|industrial planning.*control|procurement.*cost control|treasury.*cash|supply chain.*finance|direttore amministrativo|direttore operativo e amministrativo|amministrazione e rendicontazione|\bfinance\b|finance controller|agenzia.*controller|^\s*amministrazione\s*$|hr.*amministrazione|amministrazione\s*e\s*rendicontazione|kaufm.*nnischer\s+leiter|leiter\s+verwaltung|head of administration|leiter\s+buchhaltung|finanzbuchhaltung/i;
+
+const _GM_PAT =
+  /\bdirettore generale\b|\bdirezione generale\b|\bgeneral manager\b|\bmanaging partner\b|\blegale rappresentante.*direttore generale\b/i;
+
+const _ADMIN_PAT = /\bamministratore unico\b|\bamministratore\b|\bamministratrice\b/i;
+
+const _OWNER_PAT =
+  /\btitolare\b|\bowner\b|\bproprietario\b|\bimprenditore\b|\blegale rappresentante\b|\bprocuratore\b|\bsocio di maggioranza\b|\bsocio titolare\b|\binhaber\b/i;
+
+/**
+ * Compute CFO role category from raw role string and fonte.
+ * Mirrors clean_data.py:normalize_role() — supports both Italian and German titles.
+ */
+export function computeRuoloCategory(
+  rawRole: string | null | undefined,
+  fonte: string | null | undefined
+): string {
+  if (!rawRole || rawRole.trim() === "") return "Not Found";
+  if (fonte === "not_found") return "Not Found";
+
+  // Strip leading "First Last - " name prefix
+  const cleaned = rawRole.replace(
+    /^(?:[A-ZÀÈÉÌÒÙÜ][a-zàèéìòùü']+\s){2,4}[-–]\s/u,
+    ""
+  );
+
+  const hasCfo = _CFO_PAT.test(cleaned);
+  const hasCeo = _CEO_PAT.test(cleaned);
+  const hasFounder = _FOUNDER_PAT.test(cleaned);
+  const hasPresidente = _PRESIDENTE_PAT.test(cleaned);
+  const hasGm = _GM_PAT.test(cleaned);
+  const hasAdmin = _ADMIN_PAT.test(cleaned);
+  const hasFinanceMgr = _FINANCE_MGR_PAT.test(cleaned);
+  const hasOwner = _OWNER_PAT.test(cleaned);
+
+  // Mixed Role: two or more major C-level categories
+  const majorCount = [hasCfo, hasCeo, hasFounder, hasPresidente].filter(Boolean).length;
+  if (majorCount >= 2) return "Mixed Role";
+
+  if (hasCfo) return "CFO / DAF";
+  if (hasCeo) return "CEO / AD";
+  if (hasFinanceMgr && !hasGm && !hasPresidente) return "Finance Manager";
+  if (hasFounder) return "Founder / Owner";
+  if (hasPresidente) return "Presidente";
+  if (hasGm) return "General Manager";
+  if (hasAdmin) return "Amministratore";
+  if (hasFinanceMgr) return "Finance Manager";
+  if (hasOwner) return "Founder / Owner";
+
+  return "Other";
+}
 
 /**
  * Apply the confirmed field mapping to a single flat record,

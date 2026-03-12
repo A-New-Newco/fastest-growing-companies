@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import {
   useReactTable,
   getCoreRowModel,
@@ -49,6 +49,12 @@ import {
 import type { Annotation, Company } from "@/types";
 import { formatRevenue, formatGrowth } from "@/lib/data";
 import { ROLE_CATEGORY_META, CONFIDENCE_META } from "@/lib/constants";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import AnnotationModal from "./AnnotationModal";
 import AddToCampaignModal from "@/components/campaigns/AddToCampaignModal";
 import AddToEnrichmentModal from "@/components/enrichment/AddToEnrichmentModal";
@@ -61,6 +67,7 @@ interface CompanyTableProps {
   onAnnotationSave?: (companyId: string, annotation: Omit<Annotation, "companyId">) => void;
   onCompaniesDeleted?: (companyIds: string[]) => void;
   onLinkedInUpdate?: (companyId: string, linkedinUrl: string) => void;
+  onCompanyClick?: (company: Company) => void;
   // Selection mode (optional — campaigns feature)
   selectionMode?: boolean;
 }
@@ -109,8 +116,11 @@ export default function CompanyTable({
   onAnnotationSave,
   onCompaniesDeleted,
   onLinkedInUpdate,
+  onCompanyClick,
   selectionMode = false,
 }: CompanyTableProps) {
+  const onCompanyClickRef = useRef(onCompanyClick);
+  onCompanyClickRef.current = onCompanyClick;
   const [sorting, setSorting] = useState<SortingState>([]);
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 25 });
   const [editingCompany, setEditingCompany] = useState<Company | null>(null);
@@ -321,9 +331,12 @@ export default function CompanyTable({
           return (
             <div className="flex flex-col gap-0.5">
               <div className="flex items-center gap-1.5 group">
-                <span className="font-medium text-slate-900 text-sm">
+                <button
+                  onClick={() => onCompanyClickRef.current?.(row)}
+                  className="font-medium text-slate-900 text-sm text-left hover:text-indigo-600 transition-colors duration-150 cursor-pointer"
+                >
                   {info.getValue()}
-                </span>
+                </button>
                 {row.sitoWeb && row.sitoWeb !== "n/a" && (
                   <a
                     href={row.sitoWeb}
@@ -413,18 +426,29 @@ export default function CompanyTable({
         cell: (info) => {
           const cat = info.getValue();
           const meta = ROLE_CATEGORY_META[cat];
+          const rawRole = info.row.original.cfoRuolo;
           if (cat === "Not Found")
             return <span className="text-slate-300 text-xs">—</span>;
-          return (
+          const chip = (
             <span
               className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium whitespace-nowrap"
               style={{
                 backgroundColor: meta.color + "1a",
                 color: meta.color,
+                cursor: rawRole ? "help" : "default",
               }}
             >
               {meta.label}
             </span>
+          );
+          if (!rawRole) return chip;
+          return (
+            <TooltipProvider delayDuration={200}>
+              <Tooltip>
+                <TooltipTrigger asChild>{chip}</TooltipTrigger>
+                <TooltipContent>{rawRole}</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           );
         },
       }),

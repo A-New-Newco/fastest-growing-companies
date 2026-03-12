@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { createAdminSupabaseClient } from "@/lib/supabase/admin";
 import { parseAllRecords, detectFormat } from "@/lib/file-parser";
-import { applyMapping } from "@/lib/groq-mapper";
+import { applyMapping, computeRuoloCategory } from "@/lib/groq-mapper";
 
 interface Params {
   params: { batchId: string };
@@ -111,7 +111,17 @@ export async function POST(req: NextRequest, { params }: Params) {
 
   for (let i = 0; i < allRecords.length; i += BATCH_SIZE) {
     const chunk = allRecords.slice(i, i + BATCH_SIZE);
-    const rows = chunk.map((record) => applyMapping(record, mapping, defaults));
+    const rows = chunk.map((record) => {
+      const row = applyMapping(record, mapping, defaults);
+      // Auto-compute cfo_ruolo_category if cfo_ruolo is present but category is missing
+      if (row.cfo_ruolo && !row.cfo_ruolo_category) {
+        row.cfo_ruolo_category = computeRuoloCategory(
+          row.cfo_ruolo as string,
+          row.fonte as string | null
+        );
+      }
+      return row;
+    });
 
     const { data: upserted, error: upsertError } = await admin
       .from("imported_companies")

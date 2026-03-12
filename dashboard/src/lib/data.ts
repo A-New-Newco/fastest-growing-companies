@@ -35,6 +35,8 @@ interface CompanyFullRow {
   cfo_ruolo: string | null;
   cfo_ruolo_category: string | null;
   cfo_linkedin: string | null;
+  cfo_email: string | null;
+  cfo_phone: string | null;
   confidenza: string | null;
   enrichment_source: string | null;
   contact_left: boolean | null;
@@ -154,6 +156,8 @@ function mapRow(row: CompanyFullRow): Company {
     cfoRuolo: row.cfo_ruolo,
     cfoRuoloCategory: ruoloCategory,
     cfoLinkedin: row.cfo_linkedin,
+    cfoEmail: row.cfo_email ?? null,
+    cfoTelefono: row.cfo_phone ?? null,
     confidenza,
     cfoFound,
     hasRealCfo,

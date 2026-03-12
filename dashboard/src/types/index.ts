@@ -36,6 +36,8 @@ export interface Company {
   cfoRuolo: string | null; // original raw value
   cfoRuoloCategory: RuoloCategory;
   cfoLinkedin: string | null;
+  cfoEmail: string | null;
+  cfoTelefono: string | null;
   confidenza: Confidenza;
   cfoFound: boolean; // true if any contact found
   hasRealCfo: boolean; // true if CFO/DAF or Finance Manager + medium/high confidence

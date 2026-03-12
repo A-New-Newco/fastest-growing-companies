@@ -14,6 +14,7 @@ import { TableIcon, BarChart2, CheckSquare, Upload } from "lucide-react";
 import FileUploadWizard from "@/components/imports/FileUploadWizard";
 import SidebarFilter from "@/components/explorer/SidebarFilter";
 import CompanyTable from "@/components/explorer/CompanyTable";
+import CompanyDetailModal from "@/components/explorer/CompanyDetailModal";
 import CfoPresenceBySettore from "@/components/charts/CfoPresenceBySettore";
 import CfoPresenceByRegione from "@/components/charts/CfoPresenceByRegione";
 import GrowthByCfoPresence from "@/components/charts/GrowthByCfoPresence";
@@ -92,6 +93,7 @@ export default function ExplorerPage() {
   const [view, setView] = useState<View>("table");
   const [selectionMode, setSelectionMode] = useState(false);
   const [importWizardOpen, setImportWizardOpen] = useState(false);
+  const [selectedCompany, setSelectedCompany] = useState<Company | null>(null);
   const { filters, setFilters } = useFilters();
 
   function handleImportComplete(importedCount: number) {
@@ -124,12 +126,12 @@ export default function ExplorerPage() {
     companyId: string,
     annotation: Omit<Annotation, "companyId">
   ) {
+    const updated = { companyId, ...annotation };
     setCompanies((prev) =>
-      prev.map((c) =>
-        c.id === companyId
-          ? { ...c, annotation: { companyId, ...annotation } }
-          : c
-      )
+      prev.map((c) => (c.id === companyId ? { ...c, annotation: updated } : c))
+    );
+    setSelectedCompany((prev) =>
+      prev?.id === companyId ? { ...prev, annotation: updated } : prev
     );
   }
 
@@ -247,6 +249,7 @@ export default function ExplorerPage() {
               onAnnotationSave={handleAnnotationSave}
               onCompaniesDeleted={handleCompaniesDeleted}
               onLinkedInUpdate={handleLinkedInUpdate}
+              onCompanyClick={setSelectedCompany}
               selectionMode={selectionMode}
             />
           ) : (
@@ -259,6 +262,12 @@ export default function ExplorerPage() {
         open={importWizardOpen}
         onClose={() => setImportWizardOpen(false)}
         onImportComplete={handleImportComplete}
+      />
+
+      <CompanyDetailModal
+        company={selectedCompany}
+        onClose={() => setSelectedCompany(null)}
+        onAnnotationSave={handleAnnotationSave}
       />
     </div>
   );

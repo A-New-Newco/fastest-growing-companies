@@ -6,6 +6,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { Company } from "@/types";
 import { formatRevenue, formatGrowth } from "@/lib/data";
 import { ROLE_CATEGORY_META } from "@/lib/constants";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface Top10TableProps {
   companies: Company[];
@@ -102,15 +108,34 @@ export default function Top10Table({ companies }: Top10TableProps) {
                     </td>
                     <td className="px-3 py-3 pr-5 hidden xl:table-cell">
                       {c.cfoRuoloCategory !== "Not Found" ? (
-                        <span
-                          className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium"
-                          style={{
-                            backgroundColor: roleMeta.color + "1a",
-                            color: roleMeta.color,
-                          }}
-                        >
-                          {roleMeta.label}
-                        </span>
+                        c.cfoRuolo ? (
+                          <TooltipProvider delayDuration={200}>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <span
+                                  className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium cursor-help"
+                                  style={{
+                                    backgroundColor: roleMeta.color + "1a",
+                                    color: roleMeta.color,
+                                  }}
+                                >
+                                  {roleMeta.label}
+                                </span>
+                              </TooltipTrigger>
+                              <TooltipContent>{c.cfoRuolo}</TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        ) : (
+                          <span
+                            className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium"
+                            style={{
+                              backgroundColor: roleMeta.color + "1a",
+                              color: roleMeta.color,
+                            }}
+                          >
+                            {roleMeta.label}
+                          </span>
+                        )
                       ) : (
                         <span className="text-slate-300 text-xs">—</span>
                       )}

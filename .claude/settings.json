@@ -57,7 +57,15 @@
       "Bash(curl -s \"http://localhost:3001/api/enrichment/history?dataset_id=de_2026\")",
       "Bash(curl -sv \"http://localhost:3001/api/enrichment/history?dataset_id=de_2026\")",
       "Bash(curl -s -o /dev/null -w \"%{http_code}\" \"http://localhost:3001/api/enrichment/history?dataset_id=de_2026\")",
-      "Bash(curl -s -o /dev/null -w \"%{http_code}\" \"http://localhost:3000/api/enrichment/history?dataset_id=de_2026\")"
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" \"http://localhost:3000/api/enrichment/history?dataset_id=de_2026\")",
+      "Bash(grep -n \"create.*materialized.*view\\\\|create view\" /Users/francescofiore/Coding/Reef/fastest-growing-companies/dashboard/supabase/migrations/*.sql)",
+      "Bash(find /Users/francescofiore/Coding/Reef/fastest-growing-companies -path *output* -name *.csv -o -path *enriched* -name *.csv)",
+      "mcp__supabase__apply_migration",
+      "Bash(npx tsx:*)",
+      "WebFetch(domain:www.ft.com)",
+      "WebFetch(domain:rankings.statista.com)",
+      "WebFetch(domain:datapao.com)",
+      "Bash(ls /Users/francescofiore/Coding/Reef/fastest-growing-companies/*.py)"
     ],
     "additionalDirectories": [
       "/Users/francescofiore/Coding/Reef/fastest-growing-companies/dashboard/src/app/campaigns",
