@@ -1,0 +1,24 @@
+[project]
+name = "linkedin-enricher"
+version = "0.1.0"
+description = "LinkedIn profile enricher for known contacts — powered by Claude agent SDK"
+requires-python = ">=3.14"
+dependencies = [
+  "claude-agent-sdk>=0.1.0",
+  "fastapi>=0.115.0",
+  "uvicorn>=0.34.0",
+  "sse-starlette>=2.0.0",
+]
+
+[dependency-groups]
+dev = [
+  "ruff>=0.9.0",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py314"
+
+[tool.ruff.lint]
+# E402: module-level imports not at top of file — intentional, config vars come first
+ignore = ["E402"]

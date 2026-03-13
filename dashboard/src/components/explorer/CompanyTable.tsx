@@ -59,6 +59,8 @@ import AnnotationModal from "./AnnotationModal";
 import AddToCampaignModal from "@/components/campaigns/AddToCampaignModal";
 import AddToEnrichmentModal from "@/components/enrichment/AddToEnrichmentModal";
 import LinkedInSearchModal from "@/components/linkedin/LinkedInSearchModal";
+import { useRouter } from "next/navigation";
+import { startLinkedinRun } from "@/lib/linkedin-enrichment-client";
 
 const columnHelper = createColumnHelper<Company>();
 
@@ -131,6 +133,8 @@ export default function CompanyTable({
   const [linkedInSearchingId, setLinkedInSearchingId] = useState<string | null>(null);
   const [linkedInRowResult, setLinkedInRowResult] = useState<Record<string, "found" | "not_found">>({});
   const [deletingSelected, setDeletingSelected] = useState(false);
+  const [sendingToAgent, setSendingToAgent] = useState(false);
+  const router = useRouter();
 
   // Reset selection when companies change (e.g. filter applied)
   useEffect(() => {
@@ -153,6 +157,31 @@ export default function CompanyTable({
   );
   const selectedCuratedCount = selectedIds.length - selectedImportedIds.length;
   const allSelected = companies.length > 0 && selectedIds.length === companies.length;
+
+  async function handleSendToLinkedinAgent() {
+    const targets = selectedCompanies.filter((c) => c.cfoNome && !c.cfoLinkedin);
+    if (targets.length === 0) return;
+    setSendingToAgent(true);
+    try {
+      await startLinkedinRun({
+        contacts: targets.map((c) => ({
+          id: c.id,
+          nome: c.cfoNome!,
+          ruolo: c.cfoRuolo ?? undefined,
+          azienda: c.azienda,
+          sito_web: c.sitoWeb ?? undefined,
+          data_origin: c.dataOrigin ?? "curated",
+        })),
+        max_concurrency: 8,
+        reset: false,
+      });
+      router.push("/linkedin-monitor");
+    } catch (e: unknown) {
+      alert(e instanceof Error ? e.message : "Failed to send to LinkedIn agent");
+    } finally {
+      setSendingToAgent(false);
+    }
+  }
 
   async function handleDeleteSelectedCompanies() {
     if (selectedImportedIds.length === 0) {
@@ -763,6 +792,17 @@ export default function CompanyTable({
           >
             <Linkedin className="w-3.5 h-3.5" />
             Find LinkedIn
+          </button>
+          <button
+            onClick={handleSendToLinkedinAgent}
+            disabled={deletingSelected || sendingToAgent || selectedCompanies.filter((c) => c.cfoNome && !c.cfoLinkedin).length === 0}
+            className="flex items-center gap-1.5 bg-violet-600 hover:bg-violet-500
+                       disabled:opacity-60 disabled:cursor-not-allowed
+                       text-white text-xs font-medium px-3 py-1.5 rounded-full transition-colors"
+            title="Send to LinkedIn Agent (Claude) for batch search"
+          >
+            <Search className="w-3.5 h-3.5" />
+            {sendingToAgent ? "Sending…" : "LI Agent"}
           </button>
           <button
             onClick={handleDeleteSelectedCompanies}
