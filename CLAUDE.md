@@ -59,6 +59,26 @@ Configure `RUN_YEAR`, `RUN_RESET`, `RUN_INPUT` at the top of `agent_enricher.py`
 ### Enriched CSV added columns
 `CFO_NOME, CFO_RUOLO, CFO_LINKEDIN, FONTE, CONFIDENZA, DATA_RICERCA`
 
+## LinkedIn Enricher
+
+```bash
+cd linkedin-enricher
+uv sync                               # Install dependencies
+claude auth login                     # Authenticate (Pro plan, one-time)
+./start.sh                            # Start monitor server (port 8766)
+uv run python agent_enricher.py       # Standalone mode (set RUN_INPUT)
+```
+
+### Architecture
+- `agent_enricher.py` — Claude agent (Haiku 4.5) with `WebSearch` + `WebFetch` finds LinkedIn profiles for known contacts.
+- `monitor_server.py` — FastAPI + SSE monitor on port 8766 (same pattern as cfo-enricher).
+- `run_state.py` — singleton run state.
+- Input: JSON via `POST /api/linkedin/start` or CSV (standalone mode).
+- Output: `linkedin_progress.jsonl` checkpoint + `enriched.csv`.
+
+### Enriched CSV added columns
+`LINKEDIN_URL, CONFIDENZA, FONTE, DATA_RICERCA`
+
 ---
 
 ## Dashboard (`dashboard/`)

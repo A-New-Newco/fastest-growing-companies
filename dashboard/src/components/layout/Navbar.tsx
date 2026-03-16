@@ -10,6 +10,7 @@ import {
   Send,
   Sparkles,
   Activity,
+  Linkedin,
   Users,
   PanelLeftClose,
   PanelLeftOpen,
@@ -80,6 +81,7 @@ const NAV_LINKS = [
   { href: "/campaigns", label: "Campaigns", icon: Send },
   { href: "/enrichment", label: "Enrichment", icon: Sparkles },
   { href: "/cfo-monitor", label: "CFO Monitor", icon: Activity },
+  { href: "/linkedin-monitor", label: "LI Monitor", icon: Linkedin },
 ];
 
 const ADMIN_LINKS = [

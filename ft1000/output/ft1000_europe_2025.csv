@@ -1,0 +1,1001 @@
+RANK,COMPANY,CAGR_PCT,HEADQUARTERS,CATEGORY,REVENUE_2023_EUR,REVENUE_2020_EUR,EMPLOYEES_2023,EMPLOYEES_2020,FOUNDING_YEAR
+1,Menlo Electric,830.8,Poland,Energy & Utilities,150670601,186848,149,8,2020
+2,Allica,652,United Kingdom of Great Britain and Northern Ireland,"Fintech, Financial Services & Insurance",100125351,228102,502,142,2019
+3,Almedia,473.6,Germany,Advertising & Marketing,29440571,155991,24,1,2020
+4,Olla Home Solution,442.7,Italy,Construction & Engineering,89632718,560677,12,1,2020
+5,Raya,409.3,Italy,Wholesale,146456719,1108961,2,2,2020
+6,Alpha General Contractor,349.2,Italy,Construction & Engineering,59657294,658258,114,3,2019
+7,dieseo,348.1,Germany,Ecommerce,10806130,120129,29,5,2020
+8,Kempower,343.5,Finland,Electrical Manufacturing,283600000,3252000,737,38,2017
+9,Cykero,341.8,Germany,Waste management & recycling,12500000,145000,12,1,2020
+10,Viridis Group,334.1,Italy,Construction & Engineering,18515952,226304,40,10,2015
+11,Zilch,327.2,United Kingdom of Great Britain and Northern Ireland,"Fintech, Financial Services & Insurance",65900278,819020,239,34,2018
+12,Chip,325.1,United Kingdom of Great Britain and Northern Ireland,"Fintech, Financial Services & Insurance",17419664,219673,114,58,2016
+13,A1 Solar,313.2,Hungary,Energy & Utilities,10251970,153609,20,1,2019
+14,Pixii,306.6,Norway,Energy & Utilities,62756986,1008278,124,33,2018
+15,Kleidi,300.9,France,Construction & Engineering,16825366,261118,9,3,2019
+16,Raylyst Solar,293.7,Czechia,Wholesale,90825137,1401112,27,2,2018
+17,Venticento,290.9,Italy,Advertising & Marketing,6414664,107390,14,10,2020
+18,SourceWhale,279.7,United Kingdom of Great Britain and Northern Ireland,IT & Software,7751011,137180,70,4,2019
+19,Jackson Remediation,279.4,United Kingdom of Great Britain and Northern Ireland,Construction & Engineering,8828227,156575,7,4,2019
+20,Envidev Consulting,279.3,Italy,"Professional, Scientific & Technical Services",9549646,175000,1,1,2020
+21,Pecci,275.9,Italy,Construction & Engineering,85330451,1606566,76,16,2011
+22,RideTandem,267.5,United Kingdom of Great Britain and Northern Ireland,Logistics & Transportation,7169616,139983,40,6,2019
+23,BFY Group,266.2,United Kingdom of Great Britain and Northern Ireland,Management consulting,9547957,188274,38,11,2004
+24,Just Russel,257.9,Belgium,Ecommerce,8908507,194373,29,2,2020
+25,Pace,257.6,United Kingdom of Great Britain and Northern Ireland,Management consulting,9975736,211269,46,3,2020
+26,Switcho,252.1,Italy,"Fintech, Financial Services & Insurance",6009454,137683,77,9,2019
+27,WithU,245.8,United Kingdom of Great Britain and Northern Ireland,Leisure & Entertainment,6361628,148992,67,6,2019
+28,Jeff,237.5,Latvia,"Fintech, Financial Services & Insurance",6641553,155982,30,7,2020
+29,BizAway,237.1,Italy,Hospitality & Travel,72218580,1885630,237,47,2015
+30,Pier Currà Architettura,236.9,Italy,"Professional, Scientific & Technical Services",4933717,128983,26,13,2017
+31,Aria,234.6,France,"Fintech, Financial Services & Insurance",6132960,163651,32,5,2018
+32,Kid-A,227.7,United Kingdom of Great Britain and Northern Ireland,Media & Telecommunications,5409255,148961,14,3,2019
+33,Pathos Communications,222,United Kingdom of Great Britain and Northern Ireland,Advertising & Marketing,6570081,190577,50,1,2019
+34,SC Media House,221.1,Germany,Advertising & Marketing,4092383,123568,15,2,2020
+35,Eva Consulting,220,Italy,Management consulting,4108345,125426,23,6,2017
+36,Simmer Eats,219.5,United Kingdom of Great Britain and Northern Ireland,Food & Beverages,5074861,150720,15,1,2018
+37,Fairfamily Group,219.4,Germany,Management consulting,7837037,240473,43,5,2019
+38,Elgin White Limited,217.6,United Kingdom of Great Britain and Northern Ireland,Management consulting,11713639,354368,8,2,2006
+39,Energie de Loire (EDL),217,France,Energy & Utilities,38023995,1193962,64,5,2018
+40,Strelec Gruppe,216.9,Germany,Electrical Manufacturing,11891367,373711,13,1,2018
+41,Spotlag,215.6,France,"Professional, Scientific & Technical Services",3919567,124633,25,3,2019
+42,KCS C&C,214.3,United Kingdom of Great Britain and Northern Ireland,Food & Beverages,27889623,870030,21,5,2020
+43,Oxford Summer Courses,212.8,United Kingdom of Great Britain and Northern Ireland,Education & Social Services,13245082,419294,25,29,2012
+44,NLIST,208.2,"Netherlands, Kingdom of the",Employment Services,10209062,348810,10,2,2018
+45,Daintta,207.5,United Kingdom of Great Britain and Northern Ireland,IT & Software,6940088,231265,41,4,2019
+46,Target Travel,206.9,Italy,Hospitality & Travel,12113678,419271,21,13,1985
+47,Konversational,206.8,Ireland,IT & Software,4584257,158805,37,6,2020
+48,Wallester,206.5,Estonia,"Fintech, Financial Services & Insurance",9140000,317380,126,3,2016
+49,Imprendiroma,204.5,Italy,Construction & Engineering,113724639,4028192,42,14,2008
+50,PureXtracts,204.4,United Kingdom of Great Britain and Northern Ireland,Ecommerce,2995433,102912,5,2,2005
+51,Vagabondo Viaggi,203.9,Italy,Hospitality & Travel,4695705,167304,13,6,2010
+52,Veesion,203.4,France,IT & Software,5616692,201134,100,9,2018
+53,Busforfun.com,201.7,Italy,Leisure & Entertainment,6723302,244891,30,6,2015
+54,Sinergies,201.4,Italy,Energy & Utilities,14114960,515625,4,1,2013
+55,Internet Up,200.5,Germany,Ecommerce,13347927,491667,26,2,2020
+56,Tecnogreen,199.5,Italy,Energy & Utilities,3429282,127616,14,1,2020
+57,Ticketsms,199.4,Italy,IT & Software,6802484,253341,26,7,2017
+58,Glow25,199,Germany,Ecommerce,82786067,3098406,85,12,2017
+59,Townhouse Group Limited,198.1,United Kingdom of Great Britain and Northern Ireland,Health Care & Life Sciences,7637556,279210,453,36,2020
+60,Walr,197.9,United Kingdom of Great Britain and Northern Ireland,"Professional, Scientific & Technical Services",13056503,478246,40,2,2020
+61,Nameless Festival,197.5,Italy,Leisure & Entertainment,6267275,238139,7,1,2015
+62,Padel Horizon & Wave in Paris,196.9,France,Leisure & Entertainment,3039491,116175,26,12,2014
+63,Candidate Flow,195.2,Germany,Advertising & Marketing,10288107,400114,26,6,2020
+64,Creation,192.3,United Kingdom of Great Britain and Northern Ireland,Advertising & Marketing,13428814,520783,49,2,2017
+65,Energetica Store,191.8,Italy,Energy & Utilities,3484508,140222,2,1,2009
+66,Capitole Energie,191.7,France,Management consulting,18748685,755170,21,5,2017
+67,Woltair,191.2,Czechia,Energy & Utilities,51579064,1965099,320,38,2018
+68,CAMS Servizi Edili,190.5,Italy,Construction & Engineering,34667108,1413575,49,6,2018
+69,Epicode,189.2,Italy,Education & Social Services,4983000,206000,15,1,2020
+70,Winkler Personalservice,188.1,Germany,Employment Services,11500000,481000,300,20,2020
+71,DAC.digital,186.7,Poland,IT & Software,7791742,314711,109,26,2016
+72,BSport,185.5,France,IT & Software,4053089,174166,70,12,2018
+73,Solidstudio,184.9,Poland,IT & Software,3339139,137410,43,6,2017
+74,Kaizzen,184.6,France,IT & Software,3956223,171609,19,2,2019
+75,Parama,184,Italy,Ecommerce,5496380,239848,9,5,2020
+76,Aqualy,183.5,Italy,Food & Beverages,6208641,272399,15,5,2019
+77,Ancient + Brave,183.4,United Kingdom of Great Britain and Northern Ireland,Health Care & Life Sciences,11762224,500574,29,3,2018
+78,Lifeaz,181.9,France,Wholesale,4448058,198640,33,19,2015
+79,Euro Impianti 20,180.5,Italy,Construction & Engineering,7257089,328903,93,11,2020
+80,Koll Facility Management & Projektabwicklung,179.7,Germany,Construction & Engineering,7914834,361866,4,2,2011
+81,Kicket.com,179,Poland,Leisure & Entertainment,4469652,195749,10,8,2015
+82,Finanza.tech,177.6,Italy,"Fintech, Financial Services & Insurance",9986549,466612,39,17,2012
+83,Skinport,177.1,Germany,IT & Software,19498648,916668,11,1,2018
+84,WeDiscover,176.7,United Kingdom of Great Britain and Northern Ireland,Advertising & Marketing,2551307,116660,25,3,2020
+85,Inpulse,175.9,France,"Professional, Scientific & Technical Services",2100979,100076,35,6,2018
+86,Solar Energy Mitte,175.2,Germany,Energy & Utilities,13111248,628778,25,8,2011
+87,Coccia Costruzioni,172.2,Italy,Construction & Engineering,111628943,5535649,60,15,2008
+88,Foredil,169.8,Italy,Construction & Engineering,67135748,3418950,21,22,2014
+89,MCS Formulas,168.1,"Netherlands, Kingdom of the",Food & Beverages,2025431,105120,5,1,2019
+90,Veremark,165,United Kingdom of Great Britain and Northern Ireland,"Professional, Scientific & Technical Services",4259894,221815,122,13,2018
+91,Energy Solutions,164.4,Italy,Energy & Utilities,39524930,2138536,21,3,2017
+92,O.C. Hairsystems,163.5,Germany,"Professional, Scientific & Technical Services",7866985,430088,75,5,2019
+93,BeInfluence Europe,160.1,Belgium,Advertising & Marketing,3870700,220000,28,6,2019
+94,Time Vision,159,Italy,Education & Social Services,2216148,127616,40,6,2019
+95,Appostrophe,157.5,Sweden,IT & Software,9983050,647768,10,2,2016
+96,Yoto,157.4,United Kingdom of Great Britain and Northern Ireland,IT & Software,58814859,3339096,113,28,2015
+97,RG Finance,156.8,Germany,Management consulting,3023161,178538,18,6,2019
+98,PromoXL,155.9,"Netherlands, Kingdom of the",Advertising & Marketing,1872111,111751,5,2,2020
+99,Jobtech,155.6,Italy,Employment Services,1801040,107805,44,14,2019
+100,Vanbat,155,Italy,Waste Management & recycling,10818963,652534,6,2,2017
+101,Mac Recruit Group,155,United Kingdom of Great Britain and Northern Ireland,Employment Services,4809501,281083,10,6,2018
+102,La Belle Equipe,154.9,France,Employment Services,5395658,325852,17,6,2018
+103,Snowit,154.3,Italy,Leisure & Entertainment,14090000,856800,42,13,2016
+104,Newark Engineering,154.2,Italy,Construction & Engineering,19390899,1180547,13,2,2009
+105,X-Win,153.8,Italy,Energy & Utilities,34644195,2119511,10,6,2013
+106,Work4You,151.9,France,"Professional, Scientific & Technical Services",20087760,1257163,51,0,2018
+107,Wild Cosmetics,151.7,United Kingdom of Great Britain and Northern Ireland,Ecommerce,52835133,3210580,71,10,2020
+108,Radical Storage,151.7,Italy,Hospitality & Travel,4471293,280477,15,15,2016
+109,Enerix Westerwald-Bonn,150.4,Germany,Electrical Manufacturing,31018181,1975010,176,21,2020
+110,Moneybox,148.3,United Kingdom of Great Britain and Northern Ireland,"Fintech, Financial Services & Insurance",89097799,5637405,333,171,2015
+111,Revù clinic,145,Lithuania,Health Care & Life Sciences,5371651,365091,83,17,2013
+112,Titanbay,143.6,United Kingdom of Great Britain and Northern Ireland,"Fintech, Financial Services & Insurance",1884678,126261,50,15,2019
+113,Flease,142.4,France,"Professional, Scientific & Technical Services",5355589,376203,20,4,2018
+114,Tecnologie Edili,141.9,Italy,Construction & Engineering,4616358,326027,18,3,2008
+115,181travel,141.3,Italy,Hospitality & Travel,1928434,137285,14,4,2015
+116,DCF Verlag,141.2,Germany,Media & Telecommunications,4386932,312487,19,5,2019
+117,Gamian Consulting,140.9,Italy,Management consulting,3672689,262660,14,4,2007
+118,Hydrogen-Refueling-Solutions (HRS),140,France,Metals & Mining,30082007,2175916,122,29,2004
+119,Archingest,139.5,Italy,Construction & Engineering,48327521,3517395,16,6,2005
+120,Zappyrent,139.4,Italy,IT & Software,1810000,132000,34,9,2019
+121,RoomPriceGenie,139.3,Switzerland,IT & Software,3748017,234897,69,24,2019
+122,FinStart,139,France,Management consulting,8663629,634223,15,3,2020
+123,REGION10 GROUP,138.6,Germany,"Professional, Scientific & Technical Services",1619755,119203,14,2,2017
+124,Binalyze,137,Estonia,IT & Software,1502182,112828,80,9,2018
+125,Apricus Solar,136.8,Germany,Energy & Utilities,16585387,1248682,32,8,2014
+126,Löwenanteil,135.9,Germany,Ecommerce,21001640,1599803,25,4,2017
+127,Cashback XL,135.8,"Netherlands, Kingdom of the",Advertising & Marketing,18620276,1421000,35,16,2013
+128,Go4Sea,135.6,Italy,Hospitality & Travel,7344479,561297,17,12,2013
+129,Route220,134.4,Italy,IT & Software,5571000,432300,22,12,2014
+130,IoT Venture,133.6,Germany,IT & Software,16200000,1270415,48,23,2016
+131,Moonwards,133.1,Germany,Ecommerce,3008396,237611,3,2,2018
+132,XAAS,132.9,Germany,IT & Software,8792000,696307,17,8,2011
+133,Rite NRG,132.4,Poland,IT & Software,3373428,255580,72,11,2017
+134,SO FAST SO GOOD,132.4,France,Food & Beverages,6729600,535969,72,39,2015
+135,Gaia,132.4,United Kingdom of Great Britain and Northern Ireland,IT & Software,3176272,245167,30,5,2017
+136,Inex One,132.3,Sweden,"Professional, Scientific & Technical Services",5455536,481967,17,14,2018
+137,Mawave Marketing,132.2,Germany,Advertising & Marketing,6527360,521170,98,16,2018
+138,Proxify,131.7,Sweden,"Professional, Scientific & Technical Services",36563657,3255570,145,15,2018
+139,The Pantheon Iconic Rome Hotel,131.7,Italy,Hospitality & Travel,16885118,1357663,66,63,2016
+140,Novibet,131.7,Malta,Leisure & Entertainment,173890506,13988595,884,338,2016
+141,My American Shop,131.4,Belgium,Ecommerce,10897046,879158,23,1,2020
+142,Acteam Enr,131,France,Energy & Utilities,26316627,2133691,33,6,2012
+143,Russo Casa,131,Italy,Construction & Engineering,1652058,134011,5,1,2018
+144,Mia Burton,130.6,Italy,Ecommerce,7453310,607522,24,26,2019
+145,Seals Group,130.5,Germany,"Professional, Scientific & Technical Services",3949568,322425,35,3,2020
+146,NextCom,130.2,Greece,IT & Software,16339328,1338643,48,11,2000
+147,Bears with Benefits,128.5,Germany,Pharmaceuticals & Cosmetics,31044809,2602468,45,6,2018
+148,INNOVO,127.7,United Kingdom of Great Britain and Northern Ireland,Energy & Utilities,6785233,556423,2,2,2016
+149,AMPECO,127.4,Bulgaria,IT & Software,3684881,313422,92,11,2018
+150,Wafflemeister,127.4,United Kingdom of Great Britain and Northern Ireland,Food & Beverages,12157090,1002014,18,20,2017
+151,PhotoAid,127.1,Poland,IT & Software,8914001,723673,12,5,2012
+152,alerabat.com,126.8,Poland,Advertising & Marketing,19829328,1616164,39,32,2015
+153,GreenFeedCycles,126.4,Italy,Wholesale,14407072,1241858,4,1,2019
+154,Labs2Life SrL,126.3,Italy,Construction & Engineering,1560000,134654,4,3,2020
+155,54,126.1,United Kingdom of Great Britain and Northern Ireland,Advertising & Marketing,179932498,15084275,90,25,2015
+156,Sensoneo,125.5,Slovakia,Waste Management & recycling,8531937,743826,108,29,2017
+157,Love Finance,124.8,United Kingdom of Great Britain and Northern Ireland,"Fintech, Financial Services & Insurance",5477483,467083,43,7,2012
+158,Silverstream Technologies,124.6,United Kingdom of Great Britain and Northern Ireland,"Professional, Scientific & Technical Services",59316301,5236687,135,27,2012
+159,AssiBro - Broker di Assicurazioni,123.6,Italy,"Fintech, Financial Services & Insurance",1501250,134269,17,4,2019
+160,Xceed,123.3,Italy,Leisure & Entertainment,3462645,310790,25,12,2014
+161,Chāmpo,123,United Kingdom of Great Britain and Northern Ireland,Retail,16212325,1416792,8,2,2019
+162,VencoTec Solar,122.6,Germany,Energy & Utilities,5510092,499349,35,1,2009
+163,Globalis Viagens e Eventos Corporativos,122.3,Portugal,Hospitality & Travel,23198154,2113061,22,19,2015
+164,Wingstop UK,121.9,United Kingdom of Great Britain and Northern Ireland,Hospitality & Travel,97379237,8628104,2000,800,2017
+165,Erasmus Learning Academy,121.3,Italy,Education & Social Services,1757450,162114,5,3,2020
+166,LemonSistemi,120.7,Italy,Construction & Engineering,13882480,1290564,57,10,2009
+167,KONTAX,120.2,Germany,Management consulting,10585000,992000,120,15,2019
+168,Adrenalead,120.1,France,Advertising & Marketing,4800000,450000,18,6,2018
+169,Refinery 89,120.1,"Netherlands, Kingdom of the",Advertising & Marketing,22065000,2069000,44,5,2018
+170,Greenvest ESCo,119.8,Italy,Energy & Utilities,41400000,3900000,65,65,2011
+171,Devot,119.7,Croatia,IT & Software,6695052,631490,36,10,2016
+172,IT Squad,119.2,Poland,IT & Software,3319919,300080,100,10,2020
+173,Ison Travel,119.1,United Kingdom of Great Britain and Northern Ireland,Hospitality & Travel,46277890,4264134,78,13,2013
+174,ClearBank,118.9,United Kingdom of Great Britain and Northern Ireland,"Fintech, Financial Services & Insurance",128432588,11866294,587,257,2015
+175,Eb Facility,118.4,Italy,Manufacturing,4649752,446431,33,15,2020
+176,Time Vision,117.1,Italy,Education & Social Services,7025621,686652,53,64,2012
+177,Extracadabra,116.5,France,Employment Services,17491101,1723049,66,28,2015
+178,IKEHU Energy,115.9,"Netherlands, Kingdom of the",Energy & Utilities,30075687,2986783,18,4,2017
+179,Friulia,115.3,Italy,"Fintech, Financial Services & Insurance",135547727,13582535,26,28,1967
+180,KB CARS,115.2,Germany,Automotive,18975929,1903552,2,2,2009
+181,Salabam Solutions,115.2,Italy,Hospitality & Travel,21065206,2113275,19,8,2015
+182,Vers-Kompass,115.1,Germany,"Fintech, Financial Services & Insurance",3087000,310143,35,10,2020
+183,Cambridge Spark,114.9,United Kingdom of Great Britain and Northern Ireland,Education & Social Services,15699432,1532552,125,17,2016
+184,Ingag,114.8,Italy,Construction & Engineering,2875668,290050,4,3,2015
+185,Smart Future,114.6,Italy,"Professional, Scientific & Technical Services",7011316,709028,10,5,2012
+186,Birdie,114.2,United Kingdom of Great Britain and Northern Ireland,Health Care & Life Sciences,8295350,817903,167,65,2017
+187,THE NEWCO,113.5,Italy,IT & Software,4632021,476172,25,5,2018
+188,Knoops,113.4,United Kingdom of Great Britain and Northern Ireland,Food & Beverages,10723106,1069549,244,38,2019
+189,Undress Code,113.3,Poland,Apparel & Fashion,2126004,208336,10,4,2015
+190,Aircash,113.1,Croatia,"Fintech, Financial Services & Insurance",35286000,3643811,91,9,2015
+191,BidBerry,112.5,Italy,Advertising & Marketing,13329227,1388986,7,1,2018
+192,Link Group,112.2,Poland,IT & Software,38124012,3795097,565,142,2016
+193,Schüttflix,112.2,Germany,Construction & Engineering,126123395,13206175,199,40,2018
+194,Opyn,112,Italy,"Fintech, Financial Services & Insurance",39735066,4168221,87,19,2012
+195,Ruffato Mario,111.8,Italy,Construction & Engineering,74084707,7796760,32,30,1985
+196,The Alliance,111.7,United Kingdom of Great Britain and Northern Ireland,Media & Telecommunications,14947715,1526241,104,8,2019
+197,Iceye,111.7,Finland,Aerospace & Defence,89652000,9450000,575,235,2014
+198,JSE,111.5,Germany,IT & Software,1857262,196242,12,2,2009
+199,Travel Compositor,111.2,Spain,IT & Software,28540342,3028235,68,41,2014
+200,AscentCore,111,Romania,IT & Software,9150530,973790,127,21,2017
+201,GB Audio,110.9,Italy,"Professional, Scientific & Technical Services",2410224,257091,21,21,2016
+202,Pilgrim,110.8,France,Construction & Engineering,24334484,2596557,12,2,2019
+203,Gift & Go,110.7,United Kingdom of Great Britain and Northern Ireland,IT & Software,37816767,3917464,15,6,2017
+204,Emerald Technology,110.1,United Kingdom of Great Britain and Northern Ireland,Employment Services,18257495,1906145,34,35,2000
+205,Pectech,110.1,Italy,Wholesale,2188177,235964,2,1,2019
+206,Wealthon,109.7,Poland,"Fintech, Financial Services & Insurance",2211385,228145,69,9,2018
+207,SKY-NRG,109.7,Italy,Energy & Utilities,59381437,6439935,56,35,2007
+208,Sabor A España,109.5,Spain,Retail,15509297,1687612,305,45,2009
+209,The People Branding Company,109.4,Germany,Advertising & Marketing,2402711,261577,22,3,2020
+210,Finish Pack,109.4,Germany,Apparel & Fashion,8152371,887793,140,30,2017
+211,LAB Productions,108.3,France,Mechanical & Plant Engineering,5620120,622108,10,5,2018
+212,Dama Electric,107.9,Italy,Construction & Engineering,10408328,1158718,50,18,2017
+213,DATAPAO,107.3,Hungary,IT & Software,3258592,386718,34,6,2016
+214,Matera,107,France,Real Estate,12368519,1393905,155,94,2017
+215,LGG Advisors,106.9,Portugal,"Professional, Scientific & Technical Services",2007824,226856,45,10,2008
+216,Manelli Impresa,106.5,Italy,Construction & Engineering,234092359,26580798,832,258,2008
+217,HeizOel24 - interaid,106,Germany,IT & Software,36123603,4134227,15,12,2005
+218,Draivi,105.8,Finland,"Fintech, Financial Services & Insurance",17125832,1964068,19,10,2012
+219,Energy Boost Energie,105.2,Italy,Energy & Utilities,11245209,1300971,15,13,2011
+220,Sciuker Frames,105.1,Italy,Construction & Engineering,164927000,19105000,613,129,1996
+221,Emme Costruzioni Generali,104.3,Italy,Construction & Engineering,1668573,195704,13,3,2018
+222,iplicit,104.3,United Kingdom of Great Britain and Northern Ireland,IT & Software,3718400,422623,87,37,2010
+223,Grantify,103.8,United Kingdom of Great Britain and Northern Ireland,IT & Software,9620622,1100995,70,20,2019
+224,BcodeAutomation,103.7,Italy,IT & Software,2685781,317879,14,5,2017
+225,ITHQ,103.4,United Kingdom of Great Britain and Northern Ireland,IT & Software,4822740,555121,15,6,2008
+226,Moasure,102.9,United Kingdom of Great Britain and Northern Ireland,Electrical Manufacturing,14026619,1626437,31,4,2014
+227,Histaminikus,102.3,Germany,Ecommerce,1855510,224068,23,5,2019
+228,Zahnheld,102.1,Germany,Ecommerce,7264575,880319,12,8,2017
+229,Wehype,101.8,Sweden,Advertising & Marketing,18648168,2269913,45,16,2016
+230,AVENTOS Group,100.6,Germany,Real Estate,6190243,767193,21,7,2019
+231,waskostetmeinauto.com,100.5,Germany,Automotive,3453566,428575,2,1,2016
+232,Stoov,100.1,"Netherlands, Kingdom of the",Ecommerce,43288406,5406593,44,4,2014
+233,Fratelli Ettore & Carlo Barattelli,100,Italy,Construction & Engineering,44619270,5579496,31,16,2004
+234,Enfuse Group,99.5,United Kingdom of Great Britain and Northern Ireland,Management consulting,8340314,1017673,34,5,2016
+235,Procept,99.5,France,Mechanical & Plant Engineering,7218483,909304,15,6,2016
+236,Talentlotsen,99.4,Germany,Employment Services,4492987,566341,35,12,2017
+237,reanmo,99.4,Germany,IT & Software,2299515,290198,29,6,2019
+238,Educ-Up,99.3,France,Education & Social Services,3725314,470232,159,19,2016
+239,Stillnetwork,99,France,IT & Software,26194991,3325596,7,3,2011
+240,GeoGuessr,98.8,Sweden,Leisure & Entertainment,21180007,2987446,48,4,2013
+241,Brenner Energie,98.8,Germany,Energy & Utilities,9425372,1200192,35,7,2019
+242,Cosmico,98.8,Italy,IT & Software,3684398,469190,19,1,2020
+243,Robin Radar Systems,98.7,"Netherlands, Kingdom of the",Aerospace & Defence,43055000,5489000,115,54,2010
+244,Vizst Technology,98.6,United Kingdom of Great Britain and Northern Ireland,IT & Software,11620875,1436494,46,21,2010
+245,Beentouch,98.3,Italy,IT & Software,2528693,324277,16,3,2017
+246,CloudRock,98,United Kingdom of Great Britain and Northern Ireland,Management consulting,26573920.429576937,3317330.9279423854,30,80,2017
+247,barely digital,98,Germany,IT & Software,26606000,3429000,18,3,2018
+248,Volonline,97.8,Italy,Hospitality & Travel,52726572,6814560,37,47,2012
+249,Discover Car Hire,97.8,Latvia,Hospitality & Travel,68036999,8794988,165,57,2013
+250,Funkey,97.5,Belgium,Leisure & Entertainment,3773949,489558,18,6,2017
+251,ehotel,97.3,Germany,IT & Software,99779149,12988170,41,33,2000
+252,Heart Apartments,97,Italy,Hospitality & Travel,6738769,880801,13,8,2015
+253,Surfshark,96.7,Lithuania,IT & Software,108028919,14187070,370,112,2018
+254,My Property Host,96.5,United Kingdom of Great Britain and Northern Ireland,Hospitality & Travel,6140630,783669,45,7,2014
+255,Klippa,96.3,"Netherlands, Kingdom of the",IT & Software,6155041,813340,65,40,2015
+256,Open Communication Partners,96.2,United Kingdom of Great Britain and Northern Ireland,Advertising & Marketing,58341498,7485462,109,26,2017
+257,Nitro Games,96.2,Finland,IT & Software,8841600,1171300,48,36,2007
+258,Aprila Bank,96.1,Norway,"Fintech, Financial Services & Insurance",14723156,1951458,36,31,2017
+259,Greenergy,95.6,Italy,Construction & Engineering,13071588,1746676,34,14,2006
+260,Iocoli porte e finestre,95.5,Italy,Manufacturing,12375112,1656870,48,8,2008
+261,Enermea,95.5,Italy,Construction & Engineering,3683321,493191,14,12,2007
+262,Elevate,95.2,France,IT & Software,11726306,1577824,100,12,2017
+263,Juvigo,95.1,Germany,Hospitality & Travel,2446410,329271,38,20,2015
+264,Les Associés,95.1,France,Management consulting,6106224,822092,4,0,2020
+265,BPO Group,95.1,United Kingdom of Great Britain and Northern Ireland,Hospitality & Travel,23154220,3021157,14,4,1970
+266,Babylone consulting,94.9,France,Management consulting,2327358,314326,3,2,2020
+267,Foorban,94.8,Italy,Food & Beverages,5113232,692172,64,24,2015
+268,OBS Italia,94.7,Italy,Construction & Engineering,10459398,1417923,8,8,2015
+269,Langhammer,94.7,Germany,Automotive,3473976,470972,19,8,2018
+270,inte-QT,94.3,Spain,Media & Telecommunications,1533423,209000,16,8,2018
+271,Pirotecnica Sarro,94.2,Italy,Retail,2491869,340347,2,2,2017
+272,Ciglieri,94.1,Italy,"Professional, Scientific & Technical Services",1515147,207178,32,3,2014
+273,Voltaïca,94,France,Energy & Utilities,21620129,2959487,38,5,2008
+274,LumenWatt,93.7,Italy,Construction & Engineering,1650042,227023,4,3,2007
+275,BG Legno,93.7,Italy,Construction & Engineering,23952379,3298129,31,18,1993
+276,Gruppo Circi,93.4,Italy,Construction & Engineering,10786377,1491261,15,11,1981
+277,adspecialist,93,Germany,Advertising & Marketing,11569161,1608709,6,2,2019
+278,Plum,93,United Kingdom of Great Britain and Northern Ireland,"Fintech, Financial Services & Insurance",14638543,1973028,169,51,2016
+279,Italy Car Rent,92.5,Italy,Logistics & Transportation,51220301,7182181,159,52,2010
+280,Viaggigiovani.it,92.3,Italy,Hospitality & Travel,10419961,1465436,11,9,2008
+281,Sagitta SGR,92.2,Italy,"Fintech, Financial Services & Insurance",6312756,889225,22,8,2000
+282,Mews,92.1,"Netherlands, Kingdom of the",Hospitality & Travel,137649000,19421000,942,308,2012
+283,Virta Global,91.9,Finland,IT & Software,77886000,11029402,210,115,2013
+284,Revo Costruzioni,91.3,Italy,Construction & Engineering,14617623,2089302,21,7,2011
+285,Focaldata,90.9,United Kingdom of Great Britain and Northern Ireland,IT & Software,5527157,769857,32,14,2017
+286,Tecnica Group,90.9,Italy,Energy & Utilities,3952334,568528,24,11,2018
+287,M.T. Energy S.r.l. Impianti tecnologici,90.8,Italy,Manufacturing,26986015,3887899,207,137,2017
+288,Cruciat,90.7,Italy,Manufacturing,2103928,303152,9,8,2019
+289,We Exhibit,90.7,Italy,Leisure & Entertainment,6159303,888575,14,11,2015
+290,Bitvavo,90.7,"Netherlands, Kingdom of the","Fintech, Financial Services & Insurance",82225732,11864729,266,14,2018
+291,König Kanaltechnik,90.4,Germany,"Professional, Scientific & Technical Services",2027455,293586,19,4,2020
+292,Karl & Léon,89.9,France,Wholesale,16369613,2391019,17,2,2015
+293,Ecotek,89.8,Italy,Energy & Utilities,30931680,4526678,12,8,2006
+294,YKONE,89.1,France,Advertising & Marketing,76449721,11301291,170,77,2008
+295,Wenes Group,89.1,France,"Professional, Scientific & Technical Services",6934839,1025479,22,9,2007
+296,Formaggi Terre Sarde,88.8,Italy,Food & Beverages,9270122,1377396,7,2,2005
+297,Deutscher Bauservice,88.8,Germany,Construction & Engineering,9185000,1365000,135,65,2019
+298,Darwin Technologies,88.5,Italy,IT & Software,5970073,891271,15,11,2013
+299,Metric,88.5,United Kingdom of Great Britain and Northern Ireland,"Professional, Scientific & Technical Services",11432634,1653683,82,22,2020
+300,Teicos,88.4,Italy,Construction & Engineering,47890604,7163930,51,26,1995
+301,MANS Network,88.2,Spain,Ecommerce,3145066,471476,8,5,2019
+302,Lendi,88.1,Poland,"Fintech, Financial Services & Insurance",44601591,6379900,1837,70,2017
+303,Greentech,87.7,Italy,Construction & Engineering,1690000,255509,4,2,2013
+304,Sollis,87.7,Germany,Wholesale,79140070,11966602,15,6,2017
+305,ItalianGres,87.7,Italy,Construction & Engineering,3712937,561515,3,1,2019
+306,eXalt,87.6,France,Management consulting,74365000,11258315,904,191,2018
+307,Ricehouse,87.6,Italy,Construction & Engineering,2327129,352686,4,4,2016
+308,Appinio,87.5,Germany,IT & Software,22165966,3361245,204,13,2014
+309,Gecopra,87.4,Italy,IT & Software,18321427,2782729,36,24,1988
+310,EngUp Engineering,87.4,Italy,Construction & Engineering,1884642,286558,18,3,2019
+311,Axtom,87.3,France,Real Estate,208524000,31719348,217,76,2017
+312,Tahir Investments,87.3,Germany,Hospitality & Travel,4557685,693322,66,22,2017
+313,G&P Intech,87.2,Italy,Construction & Engineering,19726923,3007400,14,5,2009
+314,Globalfast,87,Germany,Logistics & Transportation,6450000,986700,9,9,2014
+315,EGT-Wirth,86.9,Germany,Construction & Engineering,6799664,1040938,29,12,2018
+316,Digitalisim,86.9,France,Media & Telecommunications,1559386,238976,18,2,2020
+317,Bonum,86.6,Italy,Wholesale,7406974,1140776,36,11,2000
+318,Scalizer,86.4,France,IT & Software,1526826,235671,20,1,2019
+319,IOVES,86.2,Italy,Apparel & Fashion,13308582,2061524,29,23,1950
+320,Casta Diva Group,85.7,Italy,Advertising & Marketing,111506678,17411446,116,79,2000
+321,The Longevity Suite,85.5,Italy,Health Care & Life Sciences,9237593,1446290,62,3,2019
+322,Cohabs,85.5,Belgium,Real Estate,9890000,1550264,58,15,2016
+323,NEWU,85.3,Italy,Advertising & Marketing,1957316,307552,8,2,2019
+324,Auxolar,85.3,Germany,Energy & Utilities,3360151,528297,18,11,2018
+325,G.R. Costruzioni,84.7,Italy,Construction & Engineering,4993239,792583,31,16,2018
+326,CCL Components,84.6,United Kingdom of Great Britain and Northern Ireland,Wholesale,162727759,25075847,60,24,1997
+327,Elettro A.M.,84.5,Italy,Manufacturing,7574789,1206408,18,14,2006
+328,GUSTO,84.3,France,Food & Beverages,23562599,3763676,49,16,2012
+329,Acri Ingenierie,84.2,France,Mechanical & Plant Engineering,4724104,755482,15,7,2012
+330,CR Payroll,84.2,Ireland,"Fintech, Financial Services & Insurance",3430698,548648,44,13,2018
+331,Words + Pixels,84.2,United Kingdom of Great Britain and Northern Ireland,Advertising & Marketing,2100366,325618,20,5,2020
+332,AMX Consulting,84.1,Germany,IT & Software,8832667,1416696,22,5,2017
+333,BSN Group,83.9,United Kingdom of Great Britain and Northern Ireland,Construction & Engineering,22765038,3544462,24,8,2018
+334,Energynat,83.8,Poland,Wholesale,85079093,13026151,28,21,2010
+335,Valumen,83.8,France,Employment Services,13645994,2196424,11,4,2015
+336,GT Classic Cars,83.7,France,Automotive,18716832,3020112,10,0,2012
+337,BAURIX,83.5,Germany,Ecommerce,3432146,555099,1,1,2018
+338,Requtech,83.4,Sweden,Media & Telecommunications,2924615,525583,12,2,2009
+339,Southenergy,83,Italy,Energy & Utilities,4658710,759652,19,9,2008
+340,Baroni Home,83,Italy,Ecommerce,9378339,1531358,1,1,2016
+341,Prodivi,82.6,Lithuania,IT & Software,1787007,293747,57,15,2017
+342,Ecologia Sannita,82.4,Italy,Waste Management & recycling,3030310,499585,15,4,2018
+343,Speri,82.3,Italy,Construction & Engineering,40615375,6704220,49,14,1974
+344,Consorzio Artea,82.2,Italy,Construction & Engineering,11136700,1840227,4,3,2003
+345,Sprintform,81.9,Hungary,IT & Software,1563141,259551,19,1,2019
+346,LeHibou,81.9,France,IT & Software,82975172,13782256,69,18,2017
+347,POM,81.6,Belgium,"Fintech, Financial Services & Insurance",3466441,578750,15,9,2014
+348,SCHMABO,81.5,Germany,Construction & Engineering,7350000,1230000,29,5,2010
+349,Aubert & Mathieu,81.4,France,Food & Beverages,1555717,260568,3,1,2018
+350,Crea Energia,81.4,Italy,Energy & Utilities,9302358,1559333,24,13,2010
+351,ANTARES ENERGIA,81.2,Italy,Energy & Utilities,18986626,3189708,12,7,2013
+352,Brocchetta,80.9,Italy,Food & Beverages,2242371,378558,14,11,2019
+353,Master Group,80.9,Italy,Media & Telecommunications,20970465,3540811,85,6,2015
+354,Soplaya,80.5,Italy,Food & Beverages,7502908,1274945,46,16,2017
+355,Tedee,80.3,Poland,IT & Software,3948415,640563,41,18,2018
+356,Insuvia,80.2,Lithuania,"Professional, Scientific & Technical Services",3487119,595534,45,29,2014
+357,Bumper,80.2,United Kingdom of Great Britain and Northern Ireland,"Fintech, Financial Services & Insurance",13993705,2317730,67,13,2013
+358,Golf Travel Group,80.1,United Kingdom of Great Britain and Northern Ireland,Hospitality & Travel,19038022,3158806,24,8,2015
+359,INIX Group Italia,79.9,Italy,IT & Software,3326317,570915,24,5,2018
+360,CrazyGames,79.9,Belgium,IT & Software,16880667,2897374,26,7,2014
+361,Kochan Gerüstbau,79.9,Germany,Construction & Engineering,7334000,1259000,27,21,2014
+362,Stravito,79.9,Sweden,IT & Software,8592678,1635104,80,40,2017
+363,Aton Green Storage,79.8,Italy,Mechanical & Plant Engineering,41855096,7197495,57,27,2014
+364,Alliance des Énergies,79.8,France,Energy & Utilities,15121568,2602872,35,10,2020
+365,Teamservice,79.6,Italy,IT & Software,11355909,1958961,35,20,1999
+366,Dynisma,79.4,United Kingdom of Great Britain and Northern Ireland,Automotive,13900504,2332201,48,8,2017
+367,Cormatex,79.3,Italy,Mechanical & Plant Engineering,18849660,3268576,29,23,1973
+368,4Energy,79.2,Italy,"Professional, Scientific & Technical Services",6439298,1118339,5,1,2014
+369,Kahoot!,79.1,Norway,IT & Software,152686380,23975900,463,184,2011
+370,U.G.A. Nutraceuticals,79,Italy,Pharmaceuticals & Cosmetics,33712985,5877966,16,10,2005
+371,Branchspace,78.9,United Kingdom of Great Britain and Northern Ireland,IT & Software,5896435,997436,68,15,2011
+372,Evondos Group,78.7,Finland,Health Care & Life Sciences,41390535,7251923,319,98,2020
+373,Dronivo,78.4,Germany,Electrical Manufacturing,4500000,793000,20,5,2017
+374,Jeton,78.3,United Kingdom of Great Britain and Northern Ireland,"Fintech, Financial Services & Insurance",33020189,5641929,55,6,2018
+375,KoRo,78.2,Germany,Food & Beverages,117262286,20708941,285,30,2014
+376,Percinque,78.2,Italy,Management consulting,4242768,749760,2,3,2012
+377,Energetic Efficiency,78.2,Italy,Construction & Engineering,7612672,1345893,22,12,2010
+378,SnackLab,78.1,Poland,Food & Beverages,1690542,284902,13,4,2020
+379,Airteam,77.9,Germany,IT & Software,1887000,335000,27,4,2018
+380,Studio Ekó,77.9,Italy,Construction & Engineering,8350471,1483625,20,8,2011
+381,Secret View,77.8,"Netherlands, Kingdom of the",Retail,2173757,386689,24,12,2015
+382,BuyAssociation,77.7,United Kingdom of Great Britain and Northern Ireland,Real Estate,4777466,825058,17,7,2017
+383,Seeders,77.6,"Netherlands, Kingdom of the",Advertising & Marketing,12837349,2292643,59,19,2012
+384,Atyos,77.5,France,IT & Software,2185081,390534,19,4,2018
+385,Sparklers Club,77.2,France,Retail,7031003,1262650,20,8,2015
+386,Power of your building,76.5,Italy,Construction & Engineering,4001301,727198,21,14,2007
+387,Cyclamen,76.3,France,Waste Management & recycling,18805137,3433204,49,20,2013
+388,Opencast,76.2,United Kingdom of Great Britain and Northern Ireland,IT & Software,57603055,10192635,431,117,2012
+389,MK Group,76.2,Germany,Construction & Engineering,9877274,1805905,88,17,2017
+390,Edileco,76,Italy,Construction & Engineering,32442558,5948503,118,50,2005
+391,Phyron,76,Sweden,IT & Software,3762953,764575,34,7,2019
+392,B.Conseil,75.9,France,Management consulting,5596584,1028601,49,7,2017
+393,Vanaways,75.9,United Kingdom of Great Britain and Northern Ireland,Automotive,126175358,22466579,58,11,2015
+394,PaperDigits,75.8,"Netherlands, Kingdom of the",Advertising & Marketing,1872332,344615,18,5,2019
+395,gravity9,75.7,United Kingdom of Great Britain and Northern Ireland,IT & Software,12346734,2205565,100,31,2017
+396,Obiz,75.5,France,Advertising & Marketing,83110752,15377128,107,34,2011
+397,Hochwald Automobile,75.3,Germany,Automotive,6500000,1206000,6,3,2012
+398,Solutions Composites,75.3,France,Mechanical & Plant Engineering,11634990,2161110,35,23,1998
+399,Blu Appalti,75.1,Italy,Construction & Engineering,9532033,1774971,35,13,2010
+400,Holie's,75,"Netherlands, Kingdom of the",Food & Beverages,7703766,1436859,8,3,2018
+401,Multevo,74.9,United Kingdom of Great Britain and Northern Ireland,Construction & Engineering,30967467,5608720,220,52,2010
+402,ACBC,74.7,Italy,Apparel & Fashion,12220978,2290239,14,11,2017
+403,Di Remigio Costruzioni,74.7,Italy,Construction & Engineering,3790450,710638,23,9,2006
+404,221e Srl,74.6,Italy,IT & Software,2000697,375661,15,9,2012
+405,VST Fire Solutions,74.4,"Netherlands, Kingdom of the",Construction & Engineering,23086738,4351152,5,4,2019
+406,Fluentbe,74.4,Poland,Education & Social Services,5157619,925206,434,111,2015
+407,Printeers,74.4,"Netherlands, Kingdom of the",Ecommerce,3096021,583991,15,3,2009
+408,DASH Water,74.3,United Kingdom of Great Britain and Northern Ireland,Food & Beverages,14056991,2570031,26,9,2017
+409,Grizzly New Marketing,74.3,Belgium,Advertising & Marketing,4236602,799755,47,19,2010
+410,BitQ,74.1,Italy,IT & Software,11691357,2215226,17,7,2006
+411,Edilenergia,74.1,Italy,Construction & Engineering,9801201,1858074,43,16,2018
+412,Indigo Independent Governance,74,United Kingdom of Great Britain and Northern Ireland,"Professional, Scientific & Technical Services",1525618,280475,10,4,2005
+413,PetroSol,73.7,Romania,IT & Software,1584629,302187,8,6,2014
+414,Seats.io,73.3,Belgium,IT & Software,3781043,725884,6,4,2014
+415,Feedgy,73.2,France,Energy & Utilities,14011626,2698799,38,14,2014
+416,OSMOSUN,73.1,France,Waste Management & recycling,3002794,578481,25,18,2014
+417,FLOK AG,73.1,Switzerland,Hospitality & Travel,3343851,553338,19,11,2016
+418,CreationDose,72.9,Italy,Advertising & Marketing,2077839,402155,43,14,2018
+419,Kolsquare,72.8,France,IT & Software,6313069,1224397,39,24,2010
+420,Domum-Bau,72.7,Germany,Construction & Engineering,8930388,1733051,12,8,2017
+421,Reos,72.7,Germany,Real Estate,5632739,1093801,84,26,2017
+422,Garaude,72.5,France,Wholesale,20772307,4047467,13,7,1995
+423,Ondato,72.4,Lithuania,"Fintech, Financial Services & Insurance",6638000,1295000,149,34,2014
+424,Isoterma,72.3,Italy,Construction & Engineering,28320067,5538171,37,19,2014
+425,Groupe Roy Énergie,71.9,France,Energy & Utilities,26071053,5136408,106,31,2016
+426,Green Creative,71.7,France,Manufacturing,6187627,1221854,17,13,2010
+427,Smart Eventi,71.3,Italy,Advertising & Marketing,4453086,885332,16,10,2010
+428,Greenovative,71.3,Germany,Energy & Utilities,96793000,19253000,83,19,2013
+429,Bluewave,71.3,"Netherlands, Kingdom of the",Advertising & Marketing,5821506,1159000,14,8,2018
+430,SP Group,71.2,Italy,Construction & Engineering,21741211,4331470,29,29,2017
+431,Continest,70.8,Hungary,Manufacturing,10669310,2263411,73,14,2019
+432,Mare20,70.8,Italy,Hospitality & Travel,4794843,962726,7,7,2017
+433,ProjektBauer,70.6,Switzerland,Advertising & Marketing,1553624,268758,8,3,2018
+434,Italiana Facility Management,70.6,Italy,Energy & Utilities,36465304,7349393,254,310,2018
+435,Ninesquared,70.3,Italy,Apparel & Fashion,1938949,392698,5,1,2017
+436,HNH Hospitality,70.2,Italy,Hospitality & Travel,105763529,21435005,625,306,2010
+437,Giganci Programowania,70.1,Poland,Education & Social Services,4686213,906400,34,10,2017
+438,Pinsami,70.1,Italy,Food & Beverages,24060321,4892052,127,50,2015
+439,Ebbot,70.1,Sweden,IT & Software,1642322,370085,26,7,2018
+440,Cianciolo Group,69.9,Italy,Manufacturing,15117225,3082429,55,42,2012
+441,Englputzeder,69.6,Austria,Ecommerce,27678600,5675000,26,5,2013
+442,andrea,69.5,Italy,Construction & Engineering,4848452,995754,10,3,2016
+443,SIKURO,68.7,Italy,IT & Software,1972552,411000,14,4,2017
+444,Happy Team,68.6,Poland,IT & Software,3959125,785390,68,20,2015
+445,Gesco,68.6,Italy,Energy & Utilities,27790642,5798153,51,30,2006
+446,Noah Maritime,68.4,Germany,Logistics & Transportation,2101236,440081,21,9,2019
+447,Elektro Knaak,68.3,Germany,Construction & Engineering,7971737,1671037,51,32,2017
+448,DanAds,68,Sweden,Advertising & Marketing,14621635,3416391,160,90,2013
+449,ChapsVision,67.9,France,IT & Software,107741000,22744000,542,220,2019
+450,INNPRO,67.7,Poland,Wholesale,153609030,30965405,280,69,2013
+451,Clear Junction,67.7,United Kingdom of Great Britain and Northern Ireland,"Fintech, Financial Services & Insurance",19946459,4232298,101,88,2016
+452,Landbay,67.4,United Kingdom of Great Britain and Northern Ireland,"Fintech, Financial Services & Insurance",43466930,8980492,148,90,2013
+453,Lakogep,67.2,Hungary,Construction & Engineering,111968081,25332560,44,23,2011
+454,Jungle,67.1,Italy,Advertising & Marketing,6244848,1339255,9,6,2009
+455,Fokus IT,67,France,IT & Software,7277088,1561696,54,18,2019
+456,Sparteo,66.9,France,Advertising & Marketing,21538342,4630019,74,34,2016
+457,eViso,66.9,Italy,IT & Software,225665906,48567777,54,33,2012
+458,Midsummer Energy,66.7,United Kingdom of Great Britain and Northern Ireland,Wholesale,118551389,24774129,91,24,2010
+459,Pure Gaming,66.7,France,Ecommerce,32366480,6984956,8,2,2009
+460,better decisions group,66.7,United Kingdom of Great Britain and Northern Ireland,IT & Software,2066372,432416,20,6,2013
+461,Skills,66.6,Italy,Education & Social Services,4593791,993530,34,11,2013
+462,B+S Bau und Sicherungsgesellschaft,66.5,Germany,Logistics & Transportation,50952760,11036559,284,115,2015
+463,Laudevco,66.4,France,Wholesale,13080307,2837609,27,8,2015
+464,Elettro D/E-Meraki,66.4,Italy,Energy & Utilities,4077232,884848,28,21,2003
+465,TapNation,66.1,France,Leisure & Entertainment,47242391,10303461,40,20,2019
+466,Suncity Group,66,Italy,Energy & Utilities,66278986,14490496,109,34,2012
+467,HD Insurance,65.7,Cyprus,"Fintech, Financial Services & Insurance",168692903,37072866,268,190,2011
+468,NúNú,65.6,Iceland,"Fintech, Financial Services & Insurance",2448139,519575,3,1,2020
+469,Italiana Energia,65.4,Italy,Energy & Utilities,6906546,1525614,25,20,2016
+470,Happily,65.4,Italy,"Professional, Scientific & Technical Services",1771696,391489,16,7,2017
+471,Yapily,65.3,United Kingdom of Great Britain and Northern Ireland,"Fintech, Financial Services & Insurance",5829365,1249354,117,40,2017
+472,Tappe Consulting,65.3,Germany,"Fintech, Financial Services & Insurance",1790829,396425,5,4,2015
+473,PPC,65.1,Germany,Media & Telecommunications,65959050,14645874,88,77,2000
+474,Storebox,65.1,Austria,Logistics & Transportation,11112684,2470961,71,45,2016
+475,Immerse Education,65.1,United Kingdom of Great Britain and Northern Ireland,Education & Social Services,11460226,2468896,44,22,2012
+476,C. Costruzioni Srl,65,Italy,Construction & Engineering,10009217,2226361,26,11,2012
+477,Barberino's,64.9,Italy,Retail,4230262,943767,68,27,2015
+478,Incipion,64.9,Germany,Construction & Engineering,11659218,2602015,36,24,2016
+479,Dialectica,64.6,United Kingdom of Great Britain and Northern Ireland,"Professional, Scientific & Technical Services",79265792,16044500,998,254,2015
+480,GI Costruzioni,64.6,Italy,Construction & Engineering,27230205,6111337,27,17,2010
+481,releva,64.5,Germany,Advertising & Marketing,3538359,794593,10,5,2015
+482,weLOG,64.4,Germany,Logistics & Transportation,8889000,2000000,190,60,2019
+483,VisMederi,64.3,Italy,Pharmaceuticals & Cosmetics,26540261,5984693,115,44,2009
+484,FAE Technology,64.2,Italy,Manufacturing,64819321,14651289,168,96,1990
+485,Sidly,64.1,Poland,Health Care & Life Sciences,2907505,626142,76,19,2014
+486,Insoore,64,Italy,"Fintech, Financial Services & Insurance",3688684,835901,67,35,2015
+487,Global Commissioning,63.9,United Kingdom of Great Britain and Northern Ireland,"Professional, Scientific & Technical Services",14508430,3190605,75,23,2019
+488,Rifò,63.9,Italy,Apparel & Fashion,2846136,646928,19,2,2018
+489,NRG MED,63.8,Italy,Energy & Utilities,15825434,3598495,71,30,2017
+490,Lemonway,63.8,France,"Fintech, Financial Services & Insurance",32877495,7486373,125,84,2007
+491,Lepaya,63.7,"Netherlands, Kingdom of the",IT & Software,21159285,4827461,244,187,2017
+492,Auto-Center Stolberg,63.5,Germany,Automotive,6451768,1476256,7,2,2015
+493,HF S.r.l. (Accaeffe Building Solutions),63.5,Italy,Construction & Engineering,7150798,1637232,19,8,2012
+494,Skladon,63.4,Czechia,Logistics & Transportation,8293000,1788555,112,45,2015
+495,Dreamix,63.4,Bulgaria,IT & Software,17966000,4121000,209,65,2006
+496,ULAM LABS,63.3,Poland,IT & Software,3285588,717555,62,25,2016
+497,Kecxwind,63.2,"Netherlands, Kingdom of the",Energy & Utilities,2783114,639804,22,6,2017
+498,Ares,63.2,France,Energy & Utilities,26097060,6009294,65,63,2009
+499,GT Company,63.1,France,Wholesale,43756205,10081901,42,14,2013
+500,Digital Factory Telecom (DFT),63,France,IT & Software,2645793,610879,9,3,2020
+501,TheOTCLab,63,"Netherlands, Kingdom of the",Pharmaceuticals & Cosmetics,5415339,1251304,7,2,2016
+502,Kanalexperten Reitz,62.5,Germany,Construction & Engineering,7909806,1844021,40,10,2016
+503,Mon courtier énergie,62.5,France,Energy & Utilities,21042000,4906609,184,102,2017
+504,Italianway,62.3,Italy,Hospitality & Travel,11944000,2792288,119,59,2014
+505,NurjanaTech,62.3,Italy,Aerospace & Defence,2923355,683507,21,18,2012
+506,Jungle,62.3,Italy,Advertising & Marketing,27188577,6359717,245,92,2018
+507,Hostinger,62.1,Lithuania,IT & Software,110164000,25860664,722,656,2012
+508,Alleop,62.1,Bulgaria,Ecommerce,4425482,1039300,21,9,2019
+509,Becker & Simon,62.1,Germany,Construction & Engineering,4950852,1163046,22,8,2016
+510,Orquest,62,Spain,IT & Software,4283813,1007353,66,16,2019
+511,Capital on Tap,62,United Kingdom of Great Britain and Northern Ireland,"Fintech, Financial Services & Insurance",360923331,82236931,560,145,2012
+512,Publink,62,Poland,IT & Software,2210023,494747,37,15,2012
+513,Sertec Engineering,61.9,Italy,Construction & Engineering,6161900,1451155,18,6,1968
+514,2Solar,61.9,"Netherlands, Kingdom of the",IT & Software,11540000,2720000,32,20,2013
+515,A&M Unternehmerberatung,61.9,Germany,Advertising & Marketing,6858000,1617000,45,20,2018
+516,Monsieur Guiz,61.8,France,IT & Software,7185008,1695707,50,15,2013
+517,Lammertz-Elektrotechnik,61.5,Germany,Electrical Manufacturing,10141568,2405500,58,25,2018
+518,Allea,61.5,France,Management consulting,2234818,530685,20,6,2016
+519,Nplus,61.3,Italy,Construction & Engineering,10868813,2588437,34,16,2013
+520,Hitisy,61.3,Germany,Wholesale,87782296,20907516,9,5,2017
+521,The Good Roll,61.3,"Netherlands, Kingdom of the",Health Care & Life Sciences,5111000,1219000,20,10,2017
+522,Project Group,61.2,Italy,Mechanical & Plant Engineering,18892805,4508990,43,36,1974
+523,IT Centric,61.2,Italy,IT & Software,15099345,3605595,41,18,2014
+524,iBanFirst,61,Belgium,"Fintech, Financial Services & Insurance",50329907,12062697,279,204,2013
+525,EPIL POINT Italia,60.8,Italy,Retail,6251630,1503258,114,27,2016
+526,Oroil Carburanti,60.6,Italy,Retail,8187763,1976752,9,3,2013
+527,BrightAnalytics,60.5,Belgium,IT & Software,10014048,2421992,72,21,2014
+528,MobieTrain,60.4,Belgium,IT & Software,2935012,710920,43,13,2015
+529,Green Solar,60.4,Italy,Energy & Utilities,8607795,2086507,25,16,2013
+530,Machina Capital,60.3,France,"Fintech, Financial Services & Insurance",6416808,1556997,9,7,2016
+531,eniosol,60.3,Germany,Energy & Utilities,9954000,2417000,11,2,2015
+532,Teamtailor,60.2,Sweden,IT & Software,33130744,8922745,276,138,2013
+533,Volmet,60.2,Czechia,Automotive,24981562,5717991,13,9,2009
+534,Hornetsecurity,60.2,Germany,IT & Software,61345003,14924479,418,189,2007
+535,Ouihelp,60.2,France,Health Care & Life Sciences,15151205,3686617,391,109,2016
+536,Tecnicar,59.9,Italy,Automotive,3391000,829209,11,10,2015
+537,New Digital Street,59.8,Poland,IT & Software,1679186,391428,30,9,2019
+538,Toosla,59.7,France,Automotive,11624440,2852519,28,6,2016
+539,Sprints & Sneakers,59.7,"Netherlands, Kingdom of the",Advertising & Marketing,3288215,807237,37,10,2017
+540,Fruugo,59.7,United Kingdom of Great Britain and Northern Ireland,IT & Software,91583358,21793185,186,60,2012
+541,DINO,59.5,Germany,Mechanical & Plant Engineering,2105073,518452,13,12,2019
+542,Entweder,59.5,"Netherlands, Kingdom of the",Real Estate,15353950,3782885,47,42,2018
+543,Andersen,59.5,Poland,IT & Software,48343000,11912000,10,7,2014
+544,Froda,59.3,Sweden,"Fintech, Financial Services & Insurance",36700520,10062960,77,28,2014
+545,Bunker Partner,59.2,Estonia,Energy & Utilities,410367292,101726265,19,6,2015
+546,Theon International,59.2,Cyprus,Aerospace & Defence,218722904,54219581,272,135,1997
+547,Vizion Network,59.2,United Kingdom of Great Britain and Northern Ireland,IT & Software,490322380,117817103,298,211,2008
+548,Le chocolat des Français,59.1,France,Food & Beverages,7356000,1825000,28,20,2014
+549,Ozturk Quebap,59.1,Spain,Food & Beverages,49275115,12232654,179,129,2015
+550,Neodigital Versicherung,59,Germany,"Fintech, Financial Services & Insurance",22630109,5632957,92,33,2017
+551,Blue Ocean Finance,58.8,Italy,Management consulting,2827000,706000,10,10,2018
+552,SFRE,58.8,Italy,"Professional, Scientific & Technical Services",12029863,3004536,20,5,2016
+553,B2Digit,58.4,France,IT & Software,7869113,1978128,70,19,2016
+554,LEDdiretto.it,58.4,Italy,Ecommerce,8855476,2228909,11,3,2015
+555,Pirene,58.2,Italy,Advertising & Marketing,6000092,1515970,120,40,1999
+556,Opteamis,57.9,France,IT & Software,54567290,13856500,65,25,2005
+557,JL&P,57.7,France,Energy & Utilities,7905944,2014144,21,10,2017
+558,T.O.M.,57.6,Germany,Construction & Engineering,11382709,2905379,63,13,2018
+559,edubily,57.6,Germany,Ecommerce,7379006,1884000,15,4,2015
+560,Régie Portage,57.6,France,Employment Services,29914485,7638731,292,177,2016
+561,Gentle North,57.6,Germany,Ecommerce,9189141,2349760,15,4,2017
+562,Odoo,57.5,Belgium,IT & Software,324214000,83044000,3388,1160,2002
+563,Alba,57.4,Italy,Energy & Utilities,12866265,3299334,44,30,2010
+564,BetterGov,57.3,United Kingdom of Great Britain and Northern Ireland,Management consulting,12560107,3123252,8,9,2016
+565,Unguess,57.3,Italy,IT & Software,5670000,1455435,80,23,2015
+566,LiveKid,57.3,Poland,IT & Software,2591826,633058,79,26,2017
+567,Sayano,57.3,Germany,Ecommerce,6350467,1630810,7,3,2017
+568,MUBI,57.3,United Kingdom of Great Britain and Northern Ireland,Media & Telecommunications,79087512,18356605,282,90,2007
+569,Kori Construction,57.2,United Kingdom of Great Britain and Northern Ireland,Construction & Engineering,62393747,15557056,45,19,2009
+570,INFISUD SRL,57.1,Italy,Construction & Engineering,41202270,10622318,42,20,1983
+571,euShipments.com,57,Bulgaria,Logistics & Transportation,14049790,3630684,72,37,2012
+572,NuBeTech,57,Italy,IT & Software,7040179,1819667,68,25,2018
+573,Chasing the sun,57,Italy,Energy & Utilities,8587154,2220145,90,30,2014
+574,OENERGY,56.9,Italy,Energy & Utilities,67827272,17558620,14,12,2010
+575,ITM Power,56.9,United Kingdom of Great Britain and Northern Ireland,Manufacturing,19041703,4776686,330,210,2000
+576,femtasy,56.8,Germany,Advertising & Marketing,4656841,1207832,35,10,2018
+577,Stampasi,56.8,Italy,Ecommerce,9802427,2543831,14,10,2017
+578,Solaris and more,56.8,Germany,Energy & Utilities,19510189,5065100,110,17,2011
+579,Frameo,56.7,Denmark,IT & Software,8684119,2259939,25,10,2015
+580,Proxym France,56.7,France,IT & Software,4689766,1219169,40,10,2014
+581,Omnium,56.6,Norway,IT & Software,1826775,513292,12,4,2017
+582,Findynamic,56.5,Italy,"Fintech, Financial Services & Insurance",3520266,919020,30,21,2016
+583,Vasco Electronics,56.5,Poland,IT & Software,23998005,5961519,196,87,2008
+584,Energy Bridge,56.3,"Netherlands, Kingdom of the",Energy & Utilities,3274000,858000,11,4,2019
+585,Soorce,56.1,Germany,Employment Services,59478568,15639618,320,50,2005
+586,GBS,56.1,Italy,Health Care & Life Sciences,9079265,2389241,46,24,2018
+587,PensionBee,56,United Kingdom of Great Britain and Northern Ireland,"Fintech, Financial Services & Insurance",27470848,7003572,198,149,2014
+588,AW Personal,56,Germany,Employment Services,8477000,2231000,190,81,2016
+589,Amexio Group,56,France,IT & Software,97086703,25570374,649,282,2006
+590,Gerritsen Group,56,"Netherlands, Kingdom of the",Logistics & Transportation,30273976,7974916,215,70,2000
+591,Kamase,56,France,Electrical Manufacturing,6865798,1809420,27,15,2010
+592,Navello,55.9,Italy,Construction & Engineering,8793863,2319104,37,31,1824
+593,Loop Horizon,55.8,United Kingdom of Great Britain and Northern Ireland,Advertising & Marketing,3652686,935225,30,7,2019
+594,Online-Phones 24,55.8,Germany,Ecommerce,30952000,8182993,18,12,2018
+595,Indexa Capital Group,55.8,Spain,"Fintech, Financial Services & Insurance",4843659,1281982,38,19,2014
+596,Italiana Trading Aerospace & Defense,55.7,Italy,Wholesale,3939341,1042878,7,2,2008
+597,Digital Impact,55.6,"Netherlands, Kingdom of the",IT & Software,3502234,930336,16,11,2011
+598,I.T.E.,55.5,Italy,Energy & Utilities,21778824,5788495,46,35,2012
+599,Generation Digital,55.5,United Kingdom of Great Britain and Northern Ireland,IT & Software,2811987,724291,6,3,2017
+600,P.B.L.,55.5,Italy,Manufacturing,20080615,5340707,75,15,2018
+601,Arnoux Autoprestige,55.5,France,Logistics & Transportation,5418323,1441856,59,27,2001
+602,Chefstore.nl,55.4,"Netherlands, Kingdom of the",Ecommerce,5363816,1430089,5,1,2017
+603,3bee,55.4,Italy,IT & Software,3343717,891583,35,12,2016
+604,Digex,55.4,"Netherlands, Kingdom of the",IT & Software,1627167,433910,16,5,2018
+605,Patatas Gomez,55.3,Spain,Food & Beverages,64281674,17148556,120,50,1963
+606,Bobs Gastronomie,55.1,Germany,Hospitality & Travel,17131614,4594193,451,210,2007
+607,Comfort Click,55,United Kingdom of Great Britain and Northern Ireland,Ecommerce,59667921,15526354,8,1,2005
+608,Fruggr,55,France,IT & Software,2524472,678211,52,8,2020
+609,Autoeasy,54.8,France,Automotive,5727902,1542824,6,4,2011
+610,COSMET GROUP,54.8,Italy,Construction & Engineering,25004735,6736688,95,55,1992
+611,Zugvogel Speditions,54.8,Austria,Logistics & Transportation,90619000,24426837,83,22,2015
+612,CVEP,54.8,Germany,Automotive,3742195,1009585,15,5,2016
+613,Falk Berberich Consulting,54.6,Germany,Management consulting,2059661,556999,12,4,2017
+614,Optimisation Habitat Energie,54.6,France,Construction & Engineering,3373515,913032,16,9,2013
+615,Valor Real Estate Partners,54.5,United Kingdom of Great Britain and Northern Ireland,Real Estate,17278894,4534586,49,23,2016
+616,Inbagno,54.4,Italy,Ecommerce,6192331,1682879,15,6,2017
+617,Mevisio,54.3,Sweden,IT & Software,2229189,672960,13,6,2017
+618,Zimmerei Nordmann,54.2,Germany,Construction & Engineering,7605094,2074577,17,10,2010
+619,MCR Conference,54.2,Italy,Education & Social Services,2340287,638678,14,11,2012
+620,Déco,54.1,Italy,Construction & Engineering,32085193,8767830,30,13,2010
+621,Imaginary Cloud,53.9,Portugal,IT & Software,4173323,1145120,68,32,2010
+622,Scuccato S.A.,53.7,Italy,Construction & Engineering,7892195,2172709,31,19,2012
+623,Heca,53.7,Italy,"Fintech, Financial Services & Insurance",3002914,826865,17,12,2009
+624,Prosapient,53.7,United Kingdom of Great Britain and Northern Ireland,"Professional, Scientific & Technical Services",32629625,8704184,244,68,2017
+625,Fair Collection,53.6,Norway,"Fintech, Financial Services & Insurance",4740892,1412314,35,6,2018
+626,L'ABCD,53.6,Italy,IT & Software,3463791,956752,7,5,2014
+627,Qurated Network,53.4,United Kingdom of Great Britain and Northern Ireland,"Professional, Scientific & Technical Services",7092323,1904980,21,9,2016
+628,EasyPark Group,53.3,Sweden,IT & Software,297660000,82569000,898,455,2002
+629,Tern Bicycles,53.2,Italy,Wholesale,13151349,3656198,2,1,2007
+630,Greyfood,53.2,Germany,Wholesale,31347786,8720997,13,6,2016
+631,Parser,53.2,United Kingdom of Great Britain and Northern Ireland,IT & Software,22981512,6196820,182,144,2017
+632,Imaco,53.1,Italy,Construction & Engineering,54541099,15202809,173,74,2006
+633,Netx64,53.1,Italy,IT & Software,2661375,742106,13,8,2006
+634,IBO International Brands Online,53,Germany,Ecommerce,5417688,1513302,18,7,2015
+635,Revolve Healthcare,52.9,Poland,IT & Software,1895564,504698,38,13,2017
+636,ESYEN,52.8,Italy,IT & Software,2296000,643371,38,25,2012
+637,Wellynx,52.8,Italy,Energy & Utilities,4227637,1185871,17,10,2011
+638,Schleeh & Wohlfahrt,52.7,Germany,Construction & Engineering,2624731,737878,18,2,2018
+639,Testbusters,52.6,Italy,Education & Social Services,8696024,2445471,31,9,2014
+640,Silverline Italia,52.6,Italy,Wholesale,6413015,1805617,6,0,2017
+641,Camping-Car Park,52.5,France,Hospitality & Travel,20188364,5696744,108,51,2011
+642,Robaws,52.4,Belgium,IT & Software,3280000,927000,25,13,2008
+643,Pricing Monkey,52.4,United Kingdom of Great Britain and Northern Ireland,"Fintech, Financial Services & Insurance",1892990,518421,9,6,2016
+644,SPI Finestre,52.3,Italy,Construction & Engineering,43232514,12227451,200,120,1985
+645,Tecalis,52.3,Spain,IT & Software,14369579,4064530,36,20,2008
+646,One Italy,52.3,Italy,Real Estate,8830000,2500000,6,1,2020
+647,Medinbox,52.3,France,IT & Software,5307874,1503406,32,3,2010
+648,Costa Edutainment,52.3,Italy,Leisure & Entertainment,75337775,21344742,212,185,1992
+649,Herold Ingenieurgesellschaft,52.2,Germany,Construction & Engineering,17243102,4885962,119,73,2008
+650,Cansativa Group,52.2,Germany,Chemicals,16470964,4671822,40,13,2017
+651,Westrafo,52.2,Italy,Energy & Utilities,77713993,22044106,131,70,2014
+652,Funnel,52.2,Sweden,Advertising & Marketing,37889535,11910667,321,156,2016
+653,Jenolite,52.1,United Kingdom of Great Britain and Northern Ireland,Retail,7126462,1962007,9,3,2013
+654,Masthaven,52,United Kingdom of Great Britain and Northern Ireland,"Fintech, Financial Services & Insurance",15146231,4177369,27,8,1999
+655,ITFS,51.8,Poland,IT & Software,38395102,10446846,600,230,2012
+656,AIHR,51.7,"Netherlands, Kingdom of the",Education & Social Services,12523161,3584468,77,28,2016
+657,Knights Pharmacy,51.7,United Kingdom of Great Britain and Northern Ireland,Health Care & Life Sciences,85966211,23855497,530,210,1984
+658,Lumosa,51.7,Germany,Electrical Manufacturing,15280446,4377955,33,15,2017
+659,Innovando,51.7,Italy,Waste Management & recycling,21400228,6135678,22,9,2014
+660,MTM Ruhrzinn,51.6,Germany,Waste Management & recycling,12422914,3562540,16,14,2014
+661,MissPompadour,51.6,Germany,Ecommerce,12498000,3589000,83,11,2019
+662,WebMakers Software House,51.5,Poland,IT & Software,1874721,512846,35,21,2010
+663,Sames Solar,51.5,Germany,Construction & Engineering,5786184,1664669,14,3,2009
+664,Skylabs,51.5,Italy,IT & Software,7659105,2203721,104,48,2015
+665,BeMSP,51.2,France,IT & Software,7565377,2188815,20,10,2014
+666,Linnify,51.1,Romania,IT & Software,2021131,585577,37,17,2016
+667,Business Changers,51.1,Italy,IT & Software,10285425,2981722,106,60,2012
+668,CottonBee,51.1,Poland,Ecommerce,3044195,840092,25,14,2011
+669,Beratung Wink,51,Germany,Energy & Utilities,5631132,1634461,21,20,1998
+670,Techspert,51,United Kingdom of Great Britain and Northern Ireland,"Professional, Scientific & Technical Services",4711778,1326371,67,44,2015
+671,Anthesis Group,50.8,United Kingdom of Great Britain and Northern Ireland,"Professional, Scientific & Technical Services",121683966,34363090,1237,422,2013
+672,MSS ELECTRONICS,50.5,Greece,IT & Software,5183515,1520586,19,15,2008
+673,Hero Interim Professionals,50.5,"Netherlands, Kingdom of the","Professional, Scientific & Technical Services",120055420,35240801,74,30,2007
+674,Temp.Akademie,50.4,Germany,Health Care & Life Sciences,1960564,575863,23,8,2015
+675,Thingsdata,50.4,"Netherlands, Kingdom of the",IT & Software,2194903,644793,10,3,2016
+676,Stufe A Pellet Italia,50.2,Italy,Manufacturing,12198182,3598049,40,25,2013
+677,Molenaar&Plasman Solutions,50.2,"Netherlands, Kingdom of the",Management consulting,1913885,564766,14,6,2009
+678,Gest Project General Contractor,50.2,Italy,Construction & Engineering,10938098,3228581,12,11,2002
+679,Mortier & Co,50,France,Management consulting,3430000,1017000,20,8,2016
+680,L'evoluzione del pulito,50,Italy,Health Care & Life Sciences,14768224,4379938,578,219,2016
+681,Clos & Monopole,49.9,France,Wholesale,3407727,1010915,12,3,2017
+682,Powering,49.9,Italy,Mechanical & Plant Engineering,73891996,21933936,40,42,2011
+683,Sun-Times,49.9,Italy,Advertising & Marketing,8959911,2660737,59,15,2006
+684,Superprof,49.6,France,Education & Social Services,37290252,11146268,160,40,2013
+685,Liota Bau,49.5,Germany,Construction & Engineering,6457154,1931342,28,19,2019
+686,Montis-Q,49.5,"Netherlands, Kingdom of the","Fintech, Financial Services & Insurance",3536054,1059263,14,5,2018
+687,Tecnoplast,49.4,Italy,Construction & Engineering,87514830,26237403,207,155,2003
+688,Justnails,49.4,Germany,Wholesale,1840336,551947,13,4,2017
+689,Landwärme,49.3,Germany,Energy & Utilities,806587650,242321698,113,49,2007
+690,Autenti,49.2,Poland,IT & Software,4865771,1394346,65,30,2012
+691,Tosla Nutricosmetics,49.1,Slovenia,Manufacturing,19578220,5908600,28,9,2014
+692,Matchingham Games,49,United Kingdom of Great Britain and Northern Ireland,IT & Software,41432828,12131973,64,5,2020
+693,Place des Energies,49,France,Energy & Utilities,7216356,2182972,30,15,2013
+694,Epassi,49,Finland,"Fintech, Financial Services & Insurance",678601894,205312456,232,77,2007
+695,Calicantus,48.9,Italy,Ecommerce,22980000,6964561,31,24,2007
+696,Arcipelago,48.9,Italy,Energy & Utilities,118139229,35807373,112,58,1999
+697,my Boo,48.8,Germany,Ecommerce,15512612,4706126,117,59,2013
+698,F4 Ingegneria Future 4 Engineering,48.8,Italy,Construction & Engineering,4384586,1332129,12,6,2012
+699,Active Technologies,48.7,Italy,Manufacturing,3784624,1150109,13,11,2003
+700,Wolf & Badger,48.7,United Kingdom of Great Britain and Northern Ireland,Ecommerce,39358013,11604665,100,55,2010
+701,Arlettie,48.7,France,Apparel & Fashion,89058000,27109000,66,43,2004
+702,Esco Gas,48.7,Italy,Energy & Utilities,1568873,477622,8,7,2012
+703,Mirror,48.5,Italy,Advertising & Marketing,4838511,1476507,35,8,2011
+704,Living Quarter,48.4,Germany,Health Care & Life Sciences,16437134,5026515,154,42,2015
+705,RedAbissi,48.3,Italy,IT & Software,1683000,516000,11,3,2018
+706,European Tech Recruit,48.3,United Kingdom of Great Britain and Northern Ireland,Employment Services,28976979,8609681,50,39,2009
+707,Adrex,48.2,Germany,Energy & Utilities,21660800,6657600,41,19,2011
+708,Zenz Technologies,48.1,"Netherlands, Kingdom of the",IT & Software,4022484,1237236,19,10,2013
+709,Journi App,48,Austria,IT & Software,22215918,6851838,52,24,2014
+710,Inova Semiconductors,48,Germany,Electrical Manufacturing,56937200,17569200,44,36,1999
+711,Storeis,48,Italy,Advertising & Marketing,5508457,1699831,66,21,2018
+712,Aeroporto Guglielmo Marconi di Bologna,47.9,Italy,Logistics & Transportation,107413712,33172148,542,443,1981
+713,Akajoule,47.9,France,Energy & Utilities,2949420,912041,46,19,2010
+714,SOMI,47.9,Germany,Employment Services,26237843,8113807,193,65,2010
+715,Intendo,47.8,Italy,IT & Software,1532385,474184,9,4,2017
+716,RoomRaccoon,47.8,"Netherlands, Kingdom of the",IT & Software,5317785,1645850,96,40,2017
+717,89up,47.6,United Kingdom of Great Britain and Northern Ireland,Advertising & Marketing,6024230,1814236,45,26,2009
+718,JK-Concepts,47.5,Germany,Automotive,18680878,5816353,1,1,2011
+719,Masque Milano,47.5,Italy,Wholesale,1573266,490155,3,1,2010
+720,Łukasz Borzęcki,47.5,Poland,IT & Software,11756969,3486194,44,18,2004
+721,I'Mprinting,47.5,Italy,IT & Software,28493033,8881962,20,10,2017
+722,Ciocomiti,47.5,Italy,Food & Beverages,2527840,788000,23,8,2016
+723,T'a Milano,47.4,Italy,Food & Beverages,12560781,3920729,96,44,2008
+724,Solarservice Norddeutschland,47.2,Germany,Energy & Utilities,12984000,4069000,64,27,2015
+725,Prolific,47.2,United Kingdom of Great Britain and Northern Ireland,IT & Software,16251832,4939037,143,41,2014
+726,Pro Contact,47.1,"Netherlands, Kingdom of the",Employment Services,6125229,1922536,52,34,2012
+727,Hackmann Hotels,47.1,Germany,Hospitality & Travel,11416000,3585000,155,90,1986
+728,Hostersi,47.1,Poland,IT & Software,10858477,3244424,42,36,2007
+729,PAIR Finance,47.1,Germany,"Fintech, Financial Services & Insurance",29365000,9226000,250,92,2016
+730,DS GLASS,47,Italy,Wholesale,27907440,8777797,12,10,2013
+731,WordUnited,47,United Kingdom of Great Britain and Northern Ireland,Ecommerce,10821548,3299809,25,14,2013
+732,ClubFunding Group,46.8,France,"Fintech, Financial Services & Insurance",41350000,13072000,191,72,2005
+733,Seenovate,46.6,France,IT & Software,26405034,8374023,159,69,2009
+734,Pilastro,46.6,Italy,Logistics & Transportation,9550219,3030760,6,6,2009
+735,ins-pi,46.6,Germany,IT & Software,5616542,1783370,35,10,2015
+736,power2Cloud,46.6,Italy,IT & Software,2199832,698634,10,7,2016
+737,Exceed,46.5,United Kingdom of Great Britain and Northern Ireland,Energy & Utilities,32795005,10101993,76,42,2005
+738,Monogrid,46.5,Italy,IT & Software,4302748,1368668,53,12,2016
+739,Linking Talents,46.5,France,Employment Services,37420000,11907000,261,75,2018
+740,MijnWerkgever.nl,46.4,"Netherlands, Kingdom of the","Fintech, Financial Services & Insurance",6887104,2193483,8,1,2018
+741,Liqid Investment,46.4,Germany,"Fintech, Financial Services & Insurance",10904257,3474991,109,76,2015
+742,Sinay,46.4,France,IT & Software,6224644,1984574,88.08,49.94,2008
+743,LA-Grossküchenservice,46.3,Germany,Wholesale,2974012,948867,9,3,2013
+744,Rets,46.3,Poland,Real Estate,17150191,5206024,263,98,2014
+745,AP Italian Luxury,46.3,Italy,Apparel & Fashion,13457533,4301033,16,6,2016
+746,Emma,46.2,Italy,Food & Beverages,4200167,1343399,34,30,2013
+747,Errevi Automation,46.2,Italy,Logistics & Transportation,24094155,7709167,124,77,1992
+748,Caria Holidays,46.2,United Kingdom of Great Britain and Northern Ireland,Hospitality & Travel,10277486,3186471,20,12,2015
+749,Web al Chilo,46.2,Italy,Ecommerce,8068199,2582348,17,10,2013
+750,MCO (MyComplianceOffice),46.2,Ireland,"Fintech, Financial Services & Insurance",40706011,11767453,322,117,1998
+751,OCM,46.1,United Kingdom of Great Britain and Northern Ireland,Advertising & Marketing,15081971,4831625,45,17,2014
+752,Alchemy Global Solutions,46,Ireland,IT & Software,658999380,211651563,310,66,2017
+753,Intellienergy Tech,46,Italy,IT & Software,5816587,1869890,11,9,2015
+754,ITDS,45.8,Poland,IT & Software,28063064,8608108,377,62,2015
+755,Comer Industries,45.6,Italy,Manufacturing,1223938000,396207000,3693,1335,1970
+756,Tessiant,45.6,United Kingdom of Great Britain and Northern Ireland,Management consulting,5744600,1802639,16,5,2019
+757,Myconnect,45.5,France,IT & Software,4596113,1490596,15,10,2014
+758,MC Energy GTS,45.5,Italy,Energy & Utilities,2609584,846407,8,7,2011
+759,Coopemploi,45.3,France,Employment Services,63618340,20724154,1270,1090,2016
+760,Gusti d'Italia,45.3,Italy,Food & Beverages,8749765,2851207,2,3,2009
+761,Logen,45.3,Italy,Energy & Utilities,2776254,904725,14,2,2008
+762,HEADFOUND,45.3,Germany,Employment Services,6452708,2104032,54,12,2018
+763,Soldats Films,45.3,France,Advertising & Marketing,7113856,2320653,6,4,2012
+764,Ecovadis,45.2,France,Management consulting,137747000,45003000,1690,689,2007
+765,Elemental CoSec,45.2,United Kingdom of Great Britain and Northern Ireland,Legal & Accounting Services,6997027,2216389,45,22,2011
+766,SECUSTAFF,45.1,Germany,IT & Software,6349124,2076711,25,8,2018
+767,eila consulting,45.1,Germany,"Professional, Scientific & Technical Services",19174990,6275569,40,40,2013
+768,grüum,45.1,United Kingdom of Great Britain and Northern Ireland,Ecommerce,8200760,2600567,46,15,2015
+769,Simoneschi,45.1,Italy,Construction & Engineering,3190623,1044793,19,16,1978
+770,CLIQ Digital,45,Germany,Advertising & Marketing,326355000,106953000,170,83,2005
+771,CDF Logistica,45,Italy,Logistics & Transportation,38116370,12511000,400,300,1992
+772,AIIC Group,44.9,United Kingdom of Great Britain and Northern Ireland,Legal & Accounting Services,96425365,30678058,680,569,2015
+773,Nord Est Elevatori,44.9,Italy,Mechanical & Plant Engineering,12809527,4210539,23,13,2010
+774,SwipBox,44.8,Denmark,Logistics & Transportation,28431399,9385312,62,38,2012
+775,IPSES,44.8,Italy,Mechanical & Plant Engineering,2708179,892689,18,13,2003
+776,GEVA Group,44.7,Germany,IT & Software,14563105,4801942,85,43,2013
+777,HoSt Group,44.7,"Netherlands, Kingdom of the",Construction & Engineering,153100000,50500000,450,180,1991
+778,energie+agrar,44.7,Germany,Energy & Utilities,8638000,2853900,14,8,2018
+779,secida,44.7,Germany,IT & Software,3713406,1226882,19,8,2019
+780,Hydeale,44.6,Italy,Energy & Utilities,6623000,2188900,131,37,2009
+781,Netalia,44.6,Italy,IT & Software,5246230,1735084,30,5,2010
+782,Italtekno,44.6,Italy,Energy & Utilities,2495888,825754,10,3,2008
+783,Dal Prete Engineering,44.4,Italy,Manufacturing,3931313,1304807,14,8,1998
+784,Constellation,44.4,France,IT & Software,185935369,61775248,723,215,2016
+785,Axil Integrated Services,44.3,United Kingdom of Great Britain and Northern Ireland,Waste Management & recycling,37233690,11997174,197,81,2014
+786,A.M.I. Audit Management Integration,44.3,France,IT & Software,2965886,986693,12,7,2018
+787,DES Composites,44.3,Italy,Automotive,2125532,707394,24,13,2014
+788,Expotrans,44.3,Germany,Logistics & Transportation,14200899,4727271,68,38,2010
+789,Qred,44.3,Sweden,"Fintech, Financial Services & Insurance",67272065,24817234,214,71,2015
+790,Laser Wire Solutions,44.2,United Kingdom of Great Britain and Northern Ireland,Manufacturing,8849201,2860596,58,27,2011
+791,BIT Mobility,44.1,Italy,IT & Software,8330000,2786000,104,69,2019
+792,Vuba Chemical Innovations,44,United Kingdom of Great Britain and Northern Ireland,Manufacturing,21742739,7057584,52,19,2010
+793,Digital Angels,43.9,Italy,Advertising & Marketing,19500147,6550814,73,32,2007
+794,OrangeSmile,43.8,"Netherlands, Kingdom of the",Wholesale,4974902,1673219,7,2,2019
+795,CarPlanner,43.8,Italy,Advertising & Marketing,3191948,1074094,8,8,2017
+796,PySENSE,43.7,Poland,IT & Software,5981139,1916934,22,14,2017
+797,The Housing Network,43.7,United Kingdom of Great Britain and Northern Ireland,Public Sector & Infrastructure,23252815,7592417,155,45,2014
+798,Opéra Energie,43.6,France,Energy & Utilities,33234702,11221491,147,96,2014
+799,Mardruk opakowania,43.5,Poland,Manufacturing,10023913,3226640,110,46,2015
+800,Smart Partners,43.5,France,Management consulting,5382337,1823209,20,10,2019
+801,MRPeasy,43.4,Estonia,IT & Software,4698918,1592256,27,11,2014
+802,The Wave Studio,43.4,Italy,IT & Software,1758151,595867,23,6,2019
+803,SolarXpert,43.4,Germany,Energy & Utilities,3705207,1257048,20,10,2017
+804,EsPiù,43.4,Italy,"Professional, Scientific & Technical Services",2225520,755163,31,12,2012
+805,Nethive,43.3,Italy,IT & Software,11643374,3960770,52,23,2013
+806,Reformed IT,43.2,United Kingdom of Great Britain and Northern Ireland,IT & Software,1616377,532820,11,6,2019
+807,Claudio Milan,43.2,Italy,Automotive,28148749,9579292,296,144,2005
+808,LCS,43.2,Italy,Construction & Engineering,17811522,6064820,48,41,1998
+809,Brio Group,43.2,Italy,Logistics & Transportation,40394665,13766472,685,335,2006
+810,Storage Share,43,"Netherlands, Kingdom of the",Real Estate,4108890,1403928,10,5,2017
+811,Les Constructeurs du Bois,43,France,Real Estate,14887989,5087783,16,10,2011
+812,Edilizia e tecnologia,42.9,Italy,Construction & Engineering,3274156,1121578,13,9,2017
+813,Centro Caravans Barassi,42.9,Italy,Retail,14879859,5102016,5,2,1978
+814,GARDEON,42.9,Slovakia,Construction & Engineering,10702058,3670694,40,30,2013
+815,Kiwus Consulting,42.7,Germany,Management consulting,1858000,639000,12,5,2019
+816,Autopuzz,42.7,France,Automotive,54407112,18743001,78,54,2014
+817,Tuum,42.5,Estonia,IT & Software,3682185,1273312,83,15,2019
+818,Looping.nl,42.4,"Netherlands, Kingdom of the",Automotive,4091865,1415930,21,11,2019
+819,Xilia,42.4,Italy,Construction & Engineering,3559072,1232359,9,4,2017
+820,P3 Security,42.4,Germany,"Professional, Scientific & Technical Services",5330120,1846134,189,46,2014
+821,The Source,42.4,France,Advertising & Marketing,8468978,2934746,45,26,2017
+822,Ifom,42.3,Italy,Education & Social Services,1655728,574058,7,7,2015
+823,Reschimica,42.3,Italy,Ecommerce,2446902,848381,5,4,1986
+824,S&G Solar,42.3,Bulgaria,Energy & Utilities,11459585,3980919,13,10,2014
+825,Ceetadel,42.2,France,Advertising & Marketing,17275000,6003000,130,65,2003
+826,Workrate Security Group,42.2,"Netherlands, Kingdom of the","Professional, Scientific & Technical Services",101548000,35311000,1950,850,2003
+827,Agryco,42.2,France,"Agriculture, Forestry & Fishing",107115460,37248117,116,62,2014
+828,CRMpartners,42.2,Italy,IT & Software,4138556,1440495,36,12,2015
+829,Schropp,42.2,Germany,Wholesale,11150030,3881655,3,2,2019
+830,Garage Raw,42.1,Italy,Advertising & Marketing,2025417,705349,19,15,2017
+831,Eversports,42.1,Austria,IT & Software,9247968,3222485,88,67,2013
+832,PRO TEMPORE,42,Sweden,Management consulting,20567647,7956643,36,30,2018
+833,Sallustio,41.9,Italy,Construction & Engineering,22312346,7801220,55,33,1979
+834,Interim Search,41.9,Sweden,"Professional, Scientific & Technical Services",38421902,14890605,49,27,2012
+835,Neofollics Hair Technology,41.9,"Netherlands, Kingdom of the",Pharmaceuticals & Cosmetics,2719000,951000,12,3,2015
+836,NB Baumaschinen,41.9,Germany,Waste Management & recycling,12059090,4219224,46,16,2019
+837,Equativ,41.9,France,IT & Software,377424216,132134415,548,273,2005
+838,Arctic Stream,41.8,Romania,IT & Software,25768905,9031590,30,8,2017
+839,Carreira Industrial Personnel,41.8,Germany,Employment Services,12241500,4292000,165,92,2010
+840,Inventya,41.8,United Kingdom of Great Britain and Northern Ireland,Management consulting,5621332,1910793,54,29,2010
+841,Meds Apotek,41.8,Sweden,Retail,57481144,22353027,98,60,2017
+842,drjve,41.7,Germany,IT & Software,8654295,3040908,46,25,2019
+843,Equal Education,41.7,United Kingdom of Great Britain and Northern Ireland,Education & Social Services,2715052,924239,19,11,2012
+844,Kinga Mathe,41.7,Germany,Ecommerce,5854966,2057731,18,4,2008
+845,Tradeco,41.5,Italy,Construction & Engineering,17976249,6341169,25,11,2016
+846,Amexbois,41.5,France,Construction & Engineering,4808993,1696818,34,16,2007
+847,Smart Battery Solutions,41.4,Germany,Electrical Manufacturing,28547450,10100000,110,65,2010
+848,DVision Architecture,41.3,Italy,Construction & Engineering,11152460,3955994,10,3,2015
+849,TECS Tranchina Energy Control Services,41.2,Italy,Energy & Utilities,2448701,868942,15,8,2016
+850,Comenovo,41.2,Italy,Ecommerce,14184804,5039013,13,8,2019
+851,La Mercurio,41.2,Italy,"Professional, Scientific & Technical Services",4040934,1436898,19,9,2016
+852,Secret Key Agency,41.1,Italy,Advertising & Marketing,2983000,1061247,22,10,2013
+853,The Claw Models,41.1,France,Leisure & Entertainment,5304692,1888399,19,12,2018
+854,Dulàc Farmaceutici 1982,41.1,Italy,Pharmaceuticals & Cosmetics,11376365,4053791,13,4,2014
+855,Fachzentrum Finanzen  - Dieter Homburg,41,Germany,"Fintech, Financial Services & Insurance",1849377,659445,10,4,1999
+856,RTT,41,Italy,IT & Software,10242198,3652361,66,35,2005
+857,Avalo,41,Finland,IT & Software,2140459,763350,17,10,2015
+858,Comal,40.9,Italy,Energy & Utilities,58515751,20935119,267,88,2001
+859,Krulo Automaterialen,40.8,"Netherlands, Kingdom of the",Automotive,3059683,1097070,14,4,2019
+860,Aptic,40.7,France,Employment Services,7484906,2687617,46,13,2016
+861,Vo2 Group,40.7,France,IT & Software,83374000,29945000,720,300,2011
+862,Impre.DO,40.7,Italy,Construction & Engineering,69051124,24808572,177,69,2014
+863,Ad's up Consulting,40.4,France,Advertising & Marketing,25984554,9380801,135,130,2012
+864,Moneyfarm,40.4,United Kingdom of Great Britain and Northern Ireland,"Fintech, Financial Services & Insurance",18603667,6508375,193,138,2014
+865,ingage IR,40.4,United Kingdom of Great Britain and Northern Ireland,IT & Software,3378954,1182249,19,15,2013
+866,Bioburger,40.3,France,Hospitality & Travel,19681089,7131864,420,180,2011
+867,DEA,40.2,Italy,Manufacturing,16836996,6109275,71,37,2011
+868,NeoVAD,40.2,France,Wholesale,9999671,3629421,15,8,2015
+869,team,40.1,Germany,Wholesale,5694197000,2070531000,3327,3327,1999
+870,Kittle Group,40.1,United Kingdom of Great Britain and Northern Ireland,Management consulting,2242300,790758,28,12,2014
+871,UNLOQ,40,"Netherlands, Kingdom of the",Employment Services,3667571,1335496,26,8,2012
+872,BallereTTe,40,Italy,Apparel & Fashion,4512822,1643792,27,30,2014
+873,Bredbandsval.se,40,Sweden,Media & Telecommunications,2541013,1025674,4,3,2017
+874,Consorzio Stabile Agoraa,40,Italy,Construction & Engineering,33627510,12252831,16,11,2011
+875,Keytech,40,Italy,IT & Software,8759531,3192161,75,36,1989
+876,RA12 Registeraccountants,40,"Netherlands, Kingdom of the","Fintech, Financial Services & Insurance",3270015,1192066,24,11,2018
+877,Elsewhen,39.9,United Kingdom of Great Britain and Northern Ireland,IT & Software,13088176,4628675,79,32,2011
+878,Mondo Pavimenti,39.8,Italy,Wholesale,6163460,2254874,12,8,2011
+879,Discoup.com,39.8,Italy,Advertising & Marketing,5669000,2075112,20,12,2013
+880,Furlan Retail,39.7,Italy,Real Estate,4770014,1748875,1,1,2013
+881,DYM Resources,39.6,Germany,Energy & Utilities,48867668,17943119,11,8,2016
+882,La Financière d'Orion,39.6,France,"Fintech, Financial Services & Insurance",38948906,14318318,51,27,2009
+883,Fawkes & Reece,39.6,United Kingdom of Great Britain and Northern Ireland,Employment Services,69204807,24657394,138,69,2001
+884,TLM,39.6,Germany,Mechanical & Plant Engineering,3836967,1411714,20,8,1988
+885,Farmed,39.5,Italy,Pharmaceuticals & Cosmetics,16724135,6154307,11,4,2006
+886,Standard Fuel Oils,39.5,United Kingdom of Great Britain and Northern Ireland,Energy & Utilities,292797085,104490341,42,27,2011
+887,Horizon Technology Group,39.5,Italy,Construction & Engineering,8447758,3113343,27,18,2014
+888,Semes,39.3,Italy,Construction & Engineering,11230001,4152702,21,17,1962
+889,Legimi,39.2,Poland,Leisure & Entertainment,19860676,7007082,33,12,2009
+890,Morbio Costruzioni,39.1,Italy,Construction & Engineering,46585013,17290092,81,43,1981
+891,Energie3 Prowatt,39.1,France,Energy & Utilities,2920921,1084371,34,23,2012
+892,Billion Dollar Boy,39.1,United Kingdom of Great Britain and Northern Ireland,Advertising & Marketing,20664189,7434819,143,44,2014
+893,My Premium Consulting,39.1,France,Employment Services,1802882,669767,11,3,2018
+894,CyberIAM,39.1,United Kingdom of Great Britain and Northern Ireland,IT & Software,15652605,5639332,158,61,2017
+895,Růžový slon,39,Czechia,Ecommerce,8996202,3150892,63,22,2010
+896,Experium Consulting,39,France,IT & Software,3781319,1409354,17,11,2012
+897,Local Brand X,38.9,Germany,IT & Software,2936784,1095942,30,13.75,2017
+898,Tera Automation,38.8,Italy,Manufacturing,13366515,4996589,37,23,2008
+899,Guldberg,38.8,Germany,Employment Services,10774100,4029600,126,54,2017
+900,MoreToTrade,38.8,Italy,Ecommerce,2687135,1005087,6,4,2014
+901,Non-Stop dogwear,38.8,Norway,Retail,17445066,7046795,56,23,2009
+902,AppFollow,38.8,Finland,IT & Software,5905487,2210636,81,73,2015
+903,Kumulus Vape,38.7,France,Ecommerce,60029733,22491253,64,46,2012
+904,Ingénierie Bois Noroy (IBN),38.7,France,Construction & Engineering,3210320,1203125,19,9,2013
+905,Easy Rent Bulgaria,38.7,Bulgaria,Automotive,4801668,1801054,38,18,2013
+906,Guzzini & Fontana Projects,38.6,Italy,Construction & Engineering,7359725,2762888,35,16,2015
+907,MPB Group,38.6,United Kingdom of Great Britain and Northern Ireland,Ecommerce,199104359,72503213,454,190,2011
+908,Ultra Premium Direct,38.6,France,Food & Beverages,55274180,20779890,154,80,2013
+909,Sic Europe,38.5,Italy,Logistics & Transportation,38285302,14413543,573,107,2015
+910,Litwin Heizung Sanitär,38.5,Germany,Construction & Engineering,3610992,1360088,20,18,2017
+911,Deghi,38.4,Italy,Ecommerce,140194212,52846413,356,123,2011
+912,Bail Art,38.4,France,Leisure & Entertainment,16523347,6232828,11,5,2009
+913,Filippo Uecher,38.4,Italy,Manufacturing,10086406,3807318,22,15,2015
+914,NSS,38.2,Italy,Advertising & Marketing,4675824,1770495,22,14,2014
+915,Sphera Service,38.2,Italy,IT & Software,2150000,814107,30,15,2016
+916,Gruppo Ingegneria,38.2,Italy,Management consulting,5986729,2268558,3,1,1996
+917,Booster Box,38.1,Italy,Advertising & Marketing,5364170,2036674,52,25,2016
+918,Latitude Investment Management,38,United Kingdom of Great Britain and Northern Ireland,"Fintech, Financial Services & Insurance",4751596,1750465,7,5,2016
+919,Novaxia,37.9,France,Real Estate,65639000,25006223,133,58,2006
+920,Sonar,37.8,Switzerland,IT & Software,220227000,84114000,504,195,2008
+921,Magnitude,37.8,France,Management consulting,4144402,1583314,41,19,2018
+922,Pomilio Blumm,37.8,Italy,Advertising & Marketing,44530274,17013929,70,49,1991
+923,Gyada Cosmetics,37.8,Italy,Retail,4786372,1829196,10,10,2017
+924,Ekom,37.8,Italy,Waste Management & recycling,5747716,2197393,5,2,2015
+925,Garibaldi Hotels,37.8,Italy,Hospitality & Travel,13228526,5060420,104,41,2013
+926,Chianti Restorations Srl,37.7,Italy,Construction & Engineering,11018849,4215834,37,16,2017
+927,Walz Haustechnik,37.7,Germany,Construction & Engineering,3937000,1506646,27,10,1988
+928,Hiflylabs,37.6,Hungary,IT & Software,6835566,2771840,44,14,2012
+929,ZANATTA media group,37.6,Germany,Advertising & Marketing,21842434,8383589,18,12,2008
+930,Boond Manager,37.6,France,IT & Software,9676000,3715631,75,32,2009
+931,Seingim,37.6,Italy,Construction & Engineering,35991293,13824313,365,160,1999
+932,elite,37.6,Spain,Construction & Engineering,15774131,6060147,62,34,2012
+933,Worldwide Fishing Company,37.5,Spain,Food & Beverages,365398648,140442674,66,36,2016
+934,Audensiel,37.5,France,"Professional, Scientific & Technical Services",141021000,54266189,1288,630,2013
+935,STRATO Personal,37.4,Germany,Employment Services,13141856,5061870,150,98,2010
+936,Besharp,37.4,Italy,IT & Software,5895934,2271038,44,24,2011
+937,Submarine Burger,37.4,Croatia,Food & Beverages,15255430,5876790,228,119,2014
+938,Joytek,37.4,Italy,Mechanical & Plant Engineering,5781897,2227624,40,10,2016
+939,Vitamail,37.4,Norway,Ecommerce,14153464,5890268,18,20,2009
+940,Wikicasa,37.3,Italy,IT & Software,3621000,1399206,49,17,2016
+941,Grupa Blix,37.3,Poland,Advertising & Marketing,11208035,4121074,46,31,2012
+942,Pegaso Security,37.2,Italy,"Professional, Scientific & Technical Services",23000000,8900000,800,150,2017
+943,Phronema,37.2,Italy,Pharmaceuticals & Cosmetics,3630917,1406405,7,4,2011
+944,Strobl Pumpen,37.1,Germany,Mechanical & Plant Engineering,6288800,2442800,14,11,2006
+945,Frankfurter Vermögen,37,Germany,"Fintech, Financial Services & Insurance",2891764,1124737,20,11,2017
+946,PIK,37,Germany,Electrical Manufacturing,31630000,12312243,134,71,1999
+947,Conexio Telecom,36.9,France,Media & Telecommunications,4901052,1908600,34,11,2017
+948,Clearcycle,36.9,United Kingdom of Great Britain and Northern Ireland,Retail,5763822,2176367,45,11,2015
+949,Etienne Coffee & Shop,36.8,France,Hospitality & Travel,3550045,1385208,11,8,2012
+950,Exacon,36.8,Italy,IT & Software,1936750,756108,40,18,2007
+951,Anacours,36.8,France,Health Care & Life Sciences,5020297,1962005,55,36,1999
+952,Atida eFarma,36.8,Italy,Ecommerce,51547440,20150767,90,31,2017
+953,Epidemic Sound,36.7,Sweden,IT & Software,132174963,57280620,506,376,2009
+954,SoftFluent,36.7,France,IT & Software,15665473,6128460,112,55,2005
+955,Effezeta System,36.7,Italy,Construction & Engineering,13624264,5333554,123,47,2009
+956,SOS Accessoire,36.7,France,Ecommerce,37489439,14690408,95,44,2007
+957,Humans.Tech,36.6,Italy,IT & Software,2171582,851672,40,11,2015
+958,Elmeco,36.6,Italy,Manufacturing,9894888,3883776,22,16,1961
+959,Ecocert,36.5,"Netherlands, Kingdom of the","Professional, Scientific & Technical Services",1868000,734000,15,8,2011
+960,Novigos Tecno,36.4,Italy,"Professional, Scientific & Technical Services",4020327,1582926,9,10,2017
+961,Fimarsud,36.3,Italy,Retail,6019076,2377993,11,8,2012
+962,Jifmar Group,36.1,France,Logistics & Transportation,98545000,39056000,371,273,2005
+963,O My Bag Amsterdam,36,"Netherlands, Kingdom of the",Apparel & Fashion,6895227,2738220,40,19,2010
+964,La Lucerna Educational,36,Italy,Wholesale,5681263,2258075,13,12,1954
+965,Meivcore,36,Portugal,"Professional, Scientific & Technical Services",94066738,37393207,308,262,2013
+966,Nipe Design,35.9,Italy,Wholesale,3836449,1527058,4,4,2017
+967,M.K. Trading,35.9,Italy,Food & Beverages,7742390,3087838,1,1,2013
+968,Maraelite,35.8,Hungary,Retail,3144837,1326102,6,4,2016
+969,Performa,35.8,Italy,Construction & Engineering,3738368,1492045,15,10,2015
+970,2A Engineering,35.8,Italy,"Professional, Scientific & Technical Services",7141722,2850880,53,14,2007
+971,Visage Technologies,35.8,Sweden,IT & Software,12830112,5677655,186,99,2002
+972,ShopForward,35.8,"Netherlands, Kingdom of the",Advertising & Marketing,8378920,3346853,15,4,2018
+973,Covi,35.7,Italy,Manufacturing,8679701,3471550,66,30,2008
+974,Pace Automobili,35.7,Italy,Automotive,4579400,1832829,3,2,2019
+975,Hydro Pipe Solutions (HPS),35.7,France,Wholesale,9634420,3856171,4,2,2020
+976,Facility Management & Construction,35.7,Germany,Construction & Engineering,34810738,13942784,111,90,2011
+977,C.G.M. Gruppi Elettrogeni,35.7,Italy,Mechanical & Plant Engineering,52304459,20950990,102,85,2001
+978,Nanga Systems,35.6,Germany,IT & Software,8150000,3270000,26,20,2014
+979,R&K Ingenieure,35.6,Germany,Construction & Engineering,13686740,5493336,51,16,2016
+980,Values.Media,35.6,France,Advertising & Marketing,16639210,6680655,54,33,1990
+981,SVS,35.5,Italy,Construction & Engineering,24142795,9694308,20,8,2016
+982,Cohérence,35.5,France,Advertising & Marketing,10720000,4305000,63,35,2015
+983,Rocksteady Music School,35.5,United Kingdom of Great Britain and Northern Ireland,Education & Social Services,15899277,6190861,336,200,2012
+984,Semwerkt,35.5,"Netherlands, Kingdom of the",Advertising & Marketing,2793037,1123371,22,15,2014
+985,Parinox,35.5,France,Wholesale,8182326,3292533,42,20,2010
+986,MultiBel,35.4,"Netherlands, Kingdom of the",IT & Software,4283673,1725544,26,11,1995
+987,Aravati,35.4,France,Employment Services,16559585,6671000,69,50,2004
+988,COMAN Software,35.3,Germany,IT & Software,2487113,1003374,27,17,2018
+989,Soundtrack Technologies,35.3,Sweden,IT & Software,23967820,10718595,84,69,2014
+990,I-Tracing,35.3,France,IT & Software,112093206,45275200,538,234,2005
+991,Babylino Sensitive,35.2,Italy,Ecommerce,7046107,2851844,8,4,2016
+992,Flash Battery,35.2,Italy,Manufacturing,34375250,13916578,108,81,2020
+993,Adopt Parfums,35.2,France,Retail,118250786,47880145,590,520,1986
+994,Skills,35.1,Italy,Employment Services,28711555,11654138,200,100,2011
+995,IMT Partners,35,France,Employment Services,26697986,10839978,23,12,2013
+996,ROUVY,35,Czechia,IT & Software,10621046,4058291,102,38,2013
+997,Tappx,35,Spain,Advertising & Marketing,18831108,7656269,82,45,2013
+998,Ottica Lipari,35,Italy,Retail,4315021,1754459,10,11,2014
+999,Sun Finance,35,Latvia,"Fintech, Financial Services & Insurance",298332820,121306296,1333,819,2017
+1000,Deliverti,35,Italy,Ecommerce,3429941,1394703,13,10,2016
