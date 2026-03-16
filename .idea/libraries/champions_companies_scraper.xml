@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="champions-companies-scraper">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/champions-companies-scraper.zip!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

@@ -22,7 +22,13 @@ INTERNAL DATA MODEL (map TO these fields — use exact field names):
   "foundation_year": "number | null — year the company was founded",
   "employees_start": "number | null — employee count at start of measurement period",
   "employees_end": "number | null — employee count at end of measurement period",
-  "is_listed": "boolean | null — whether the company is publicly traded on a stock exchange"
+  "is_listed": "boolean | null — whether the company is publicly traded on a stock exchange",
+  "contact_name": "string | null — name of the primary contact person at the company",
+  "contact_role": "string | null — job title or role of the contact (e.g. CFO, CEO, Finance Manager, Owner)",
+  "contact_linkedin": "string | null — LinkedIn profile URL of the contact",
+  "contact_email": "string | null — email address of the contact",
+  "contact_phone": "string | null — phone number of the contact",
+  "contact_confidence": "string | null — confidence level: 'high', 'medium', or 'low'"
 }
 
 SPECIAL TARGET "extra_data":
@@ -171,13 +177,24 @@ function shouldSkipTransformForGrowthRate(
   return source.includes("pct") || source.includes("percent") || source.includes("%");
 }
 
+/** Alias map: generic contact_* names (used in LLM prompt) → cfo_* DB columns */
+const CONTACT_ALIAS_MAP: Record<string, string> = {
+  contact_name: "cfo_nome",
+  contact_role: "cfo_ruolo",
+  contact_linkedin: "cfo_linkedin",
+  contact_email: "cfo_email",
+  contact_phone: "cfo_phone",
+  contact_confidence: "cfo_confidenza",
+};
+
 /** Known internal column names (everything except extra_data) */
 const KNOWN_COLUMNS = new Set([
   "name", "website", "growth_rate", "sector", "region", "city",
   "national_rank", "source_key", "revenue_a", "revenue_b", "year",
   "description", "foundation_year", "employees_start", "employees_end", "is_listed",
-  // CFO enrichment columns
+  // Contact / enrichment columns
   "cfo_nome", "cfo_ruolo", "cfo_linkedin", "cfo_confidenza", "cfo_ruolo_category",
+  "cfo_email", "cfo_phone",
 ]);
 
 // ── CFO role categorisation (mirrors clean_data.py:normalize_role) ───────────
@@ -278,18 +295,21 @@ export function applyMapping(
     const { target, transform } = entry;
     if (!target) continue; // skip
 
-    const effectiveTransform = shouldSkipTransformForGrowthRate(sourceField, target, transform)
+    // Resolve contact_* aliases to cfo_* DB column names
+    const resolvedTarget = CONTACT_ALIAS_MAP[target] ?? target;
+
+    const effectiveTransform = shouldSkipTransformForGrowthRate(sourceField, resolvedTarget, transform)
       ? null
       : transform;
     const value = applyTransformHint(flatRecord[sourceField], effectiveTransform);
 
-    if (target.startsWith("extra_data.")) {
-      const key = target.slice("extra_data.".length);
+    if (resolvedTarget.startsWith("extra_data.")) {
+      const key = resolvedTarget.slice("extra_data.".length);
       (result.extra_data as Record<string, unknown>)[key] = value;
-    } else if (KNOWN_COLUMNS.has(target)) {
+    } else if (KNOWN_COLUMNS.has(resolvedTarget)) {
       // First mapping wins on duplicate targets
-      if (result[target] === undefined) {
-        result[target] = value;
+      if (result[resolvedTarget] === undefined) {
+        result[resolvedTarget] = value;
       }
     }
   }

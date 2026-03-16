@@ -315,11 +315,14 @@ export default function CompanyTable({
     () => [
       columnHelper.accessor("rank", {
         header: "#",
-        cell: (info) => (
-          <span className="font-mono text-xs text-slate-400 tabular-nums">
-            {info.getValue()}
-          </span>
-        ),
+        cell: (info) => {
+          const val = info.getValue();
+          return (
+            <span className="font-mono text-xs text-slate-400 tabular-nums">
+              {val ?? "—"}
+            </span>
+          );
+        },
         size: 48,
       }),
       // Annotation status badges

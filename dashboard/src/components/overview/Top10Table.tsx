@@ -19,7 +19,7 @@ interface Top10TableProps {
 
 export default function Top10Table({ companies }: Top10TableProps) {
   const top10 = useMemo(
-    () => [...companies].sort((a, b) => a.rank - b.rank).slice(0, 10),
+    () => [...companies].sort((a, b) => (a.rank ?? Infinity) - (b.rank ?? Infinity)).slice(0, 10),
     [companies]
   );
 

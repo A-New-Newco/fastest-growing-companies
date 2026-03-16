@@ -21,7 +21,7 @@ export interface Annotation {
 
 export interface Company {
   id: string; // Supabase UUID
-  rank: number;
+  rank: number | null;
   azienda: string;
   tassoCrescita: number; // CAGR percentage (e.g. 503.37)
   ricavi2021: number; // thousands EUR
@@ -64,6 +64,7 @@ export interface FilterState {
   search: string;
   settori: string[];
   regioni: string[];
+  sourceNames: string[]; // filter by import source name
   confidenza: Confidenza[];
   minGrowth: number;
   maxGrowth: number;

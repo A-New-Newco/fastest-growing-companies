@@ -19,7 +19,7 @@ import type {
 // ── Type for the companies_full view row ──────────────────────────────────────
 interface CompanyFullRow {
   id: string;
-  rank: number;
+  rank: number | null;
   name: string;
   website: string | null;
   growth_rate: number | null;
@@ -141,7 +141,7 @@ function mapRow(row: CompanyFullRow): Company {
 
   return {
     id: row.id,
-    rank: row.rank,
+    rank: row.rank ?? null,
     azienda: row.name,
     tassoCrescita: row.growth_rate ?? 0,
     ricavi2021: row.financials?.revenue_start ?? 0,
@@ -255,6 +255,9 @@ export function filterCompanies(
     if (filters.regioni.length > 0 && !filters.regioni.includes(c.regione))
       return false;
 
+    if (filters.sourceNames.length > 0 && !filters.sourceNames.includes(c.sourceName ?? ""))
+      return false;
+
     if (filters.confidenza.length > 0) {
       if (!filters.confidenza.includes(c.confidenza)) return false;
     }
@@ -355,6 +358,10 @@ export function getUniqueSettori(companies: Company[]): string[] {
 
 export function getUniqueRegioni(companies: Company[]): string[] {
   return [...new Set(companies.map((c) => c.regione))].sort();
+}
+
+export function getUniqueSourceNames(companies: Company[]): string[] {
+  return [...new Set(companies.map((c) => c.sourceName).filter((s): s is string => !!s))].sort();
 }
 
 export function formatRevenue(thousands: number): string {

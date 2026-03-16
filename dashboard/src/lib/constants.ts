@@ -158,6 +158,12 @@ export const IMPORT_TARGET_FIELDS: Record<string, { label: string; required?: bo
   employees_start: { label: "Employees Start" },
   employees_end:   { label: "Employees End" },
   is_listed:       { label: "Publicly Listed" },
+  contact_name:       { label: "Contact Name" },
+  contact_role:       { label: "Contact Role / Title" },
+  contact_linkedin:   { label: "Contact LinkedIn" },
+  contact_email:      { label: "Contact Email" },
+  contact_phone:      { label: "Contact Phone" },
+  contact_confidence: { label: "Contact Confidence" },
   extra_data:      { label: "Extra Data (unmapped)" },
 };
 
@@ -185,6 +191,7 @@ export const DEFAULT_FILTER_STATE = {
   search: "",
   settori: [] as string[],
   regioni: [] as string[],
+  sourceNames: [] as string[],
   confidenza: [] as Confidenza[],
   minGrowth: 0,
   maxGrowth: 600,

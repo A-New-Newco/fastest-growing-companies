@@ -6,6 +6,7 @@ import {
   filterCompanies,
   getUniqueSettori,
   getUniqueRegioni,
+  getUniqueSourceNames,
 } from "@/lib/data";
 import type { Annotation, Company } from "@/types";
 import { useFilters } from "@/lib/filter-context";
@@ -148,6 +149,7 @@ export default function ExplorerPage() {
 
   const settori = useMemo(() => getUniqueSettori(companies), [companies]);
   const regioni = useMemo(() => getUniqueRegioni(companies), [companies]);
+  const sourceNames = useMemo(() => getUniqueSourceNames(companies), [companies]);
 
   const filtered = useMemo(
     () => filterCompanies(companies, filters),
@@ -166,6 +168,7 @@ export default function ExplorerPage() {
             onChange={setFilters}
             settori={settori}
             regioni={regioni}
+            sourceNames={sourceNames}
             resultCount={filtered.length}
             totalCount={companies.length}
           />

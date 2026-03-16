@@ -69,7 +69,8 @@
       "Bash(uv --version)",
       "Bash(uv init:*)",
       "Bash(uv add:*)",
-      "Bash(grep -r \"^import type { Annotation, Company }\" /Users/francescofiore/Coding/Reef/fastest-growing-companies/dashboard/src --include=\"*.ts\" --include=\"*.tsx\")"
+      "Bash(grep -r \"^import type { Annotation, Company }\" /Users/francescofiore/Coding/Reef/fastest-growing-companies/dashboard/src --include=\"*.ts\" --include=\"*.tsx\")",
+      "Read(//Users/francescofiore/Downloads/**)"
     ],
     "additionalDirectories": [
       "/Users/francescofiore/Coding/Reef/fastest-growing-companies/dashboard/src/app/campaigns",

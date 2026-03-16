@@ -12,6 +12,7 @@ interface SidebarFilterProps {
   onChange: (filters: FilterState) => void;
   settori: string[];
   regioni: string[];
+  sourceNames: string[];
   resultCount: number;
   totalCount: number;
 }
@@ -111,6 +112,12 @@ function ActiveChips({
     onRemove: () => onChange({ ...filters, regioni: filters.regioni.filter((x) => x !== r) }),
   }));
 
+  const sourceChips: Chip[] = filters.sourceNames.map((s) => ({
+    key: `source-${s}`,
+    label: s,
+    onRemove: () => onChange({ ...filters, sourceNames: filters.sourceNames.filter((x) => x !== s) }),
+  }));
+
   const otherChips: Chip[] = [];
 
   if (filters.search)
@@ -173,6 +180,7 @@ function ActiveChips({
     <div className="space-y-2 pt-1">
       <ChipGroup label="Sector" chips={settoriChips} />
       <ChipGroup label="Region" chips={regioniChips} />
+      <ChipGroup label="Source" chips={sourceChips} />
       {otherChips.length > 0 && (
         <div className="flex flex-wrap gap-1.5">
           {otherChips.map(({ key, label, onRemove }) => (
@@ -193,6 +201,7 @@ export default function SidebarFilter({
   onChange,
   settori,
   regioni,
+  sourceNames,
   resultCount,
   totalCount,
 }: SidebarFilterProps) {
@@ -200,6 +209,7 @@ export default function SidebarFilter({
     filters.search !== "" ||
     filters.settori.length > 0 ||
     filters.regioni.length > 0 ||
+    filters.sourceNames.length > 0 ||
     filters.confidenza.length > 0 ||
     filters.cfoFoundOnly ||
     filters.linkedinFilter !== "all" ||
@@ -279,6 +289,20 @@ export default function SidebarFilter({
           width="w-full"
         />
       </div>
+
+      {/* Source (import file) */}
+      {sourceNames.length > 0 && (
+        <div>
+          <SectionLabel>Source</SectionLabel>
+          <MultiSelectFilter
+            label="All sources"
+            options={sourceNames}
+            selected={filters.sourceNames}
+            onChange={(v) => onChange({ ...filters, sourceNames: v })}
+            width="w-full"
+          />
+        </div>
+      )}
 
       <hr className="border-slate-100" />
 

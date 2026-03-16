@@ -44,6 +44,7 @@ interface WizardState {
   skippedCount: number;
   totalRecords: number;
   importError: string | null;
+  importErrors: string[]; // batch-level errors from the run route
 }
 
 type Action =
@@ -59,7 +60,7 @@ type Action =
   | { type: "MAPPING_ERROR"; error: string }
   | { type: "FIELD_CHANGED"; sourceField: string; target: string | null }
   | { type: "IMPORT_STARTED" }
-  | { type: "IMPORT_DONE"; importedCount: number; skippedCount: number; totalRecords: number }
+  | { type: "IMPORT_DONE"; importedCount: number; skippedCount: number; totalRecords: number; errors: string[] }
   | { type: "IMPORT_ERROR"; error: string }
   | { type: "RESET" };
 
@@ -86,6 +87,7 @@ function initialState(): WizardState {
     skippedCount: 0,
     totalRecords: 0,
     importError: null,
+    importErrors: [],
   };
 }
 
@@ -125,6 +127,7 @@ function reducer(state: WizardState, action: Action): WizardState {
       importedCount: action.importedCount,
       skippedCount: action.skippedCount,
       totalRecords: action.totalRecords,
+      importErrors: action.errors,
     };
     case "IMPORT_ERROR":    return { ...state, importing: false, importError: action.error };
     case "RESET":           return initialState();
@@ -284,6 +287,7 @@ export default function FileUploadWizard({ open, onClose, onImportComplete }: Fi
         importedCount: result.importedCount,
         skippedCount: result.skippedCount,
         totalRecords: result.totalRecords,
+        errors: result.errors ?? [],
       });
     } catch (e) {
       dispatch({ type: "IMPORT_ERROR", error: String(e) });
@@ -539,6 +543,13 @@ export default function FileUploadWizard({ open, onClose, onImportComplete }: Fi
                     <p className="text-xs text-slate-400 mt-0.5">
                       {state.skippedCount} skipped (duplicates or errors)
                     </p>
+                  )}
+                  {state.importErrors.length > 0 && (
+                    <div className="mt-2 max-w-md text-left">
+                      {state.importErrors.map((err, i) => (
+                        <p key={i} className="text-[11px] text-red-500 font-mono break-all">{err}</p>
+                      ))}
+                    </div>
                   )}
                 </div>
                 <div className="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
