@@ -10,10 +10,10 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Loader2, X, Check } from "lucide-react";
+import { Search, Loader2, X, Check, Cloud, Monitor } from "lucide-react";
 import { ALL_COUNTRIES_VALUE, normalizeCountryCode } from "@/lib/constants";
 import { useFilters } from "@/lib/filter-context";
-import type { EnrichmentSession } from "@/types";
+import type { EnrichmentSession, EnrichmentMode } from "@/types";
 
 // ── State ──────────────────────────────────────────────────────────────────────
 
@@ -31,6 +31,7 @@ const DEFAULT_WORKERS = 3;
 interface State {
   step: 1 | 2;
   name: string;
+  enrichmentMode: EnrichmentMode;
   numWorkers: number;
   searchQuery: string;
   results: CompanyRow[];
@@ -42,6 +43,7 @@ interface State {
 
 type Action =
   | { type: "SET_NAME"; value: string }
+  | { type: "SET_MODE"; value: EnrichmentMode }
   | { type: "SET_WORKERS"; value: number }
   | { type: "SET_STEP"; step: 1 | 2 }
   | { type: "SET_SEARCH"; value: string }
@@ -56,6 +58,7 @@ type Action =
 function reducer(state: State, action: Action): State {
   switch (action.type) {
     case "SET_NAME": return { ...state, name: action.value };
+    case "SET_MODE": return { ...state, enrichmentMode: action.value };
     case "SET_WORKERS": return { ...state, numWorkers: action.value };
     case "SET_STEP": return { ...state, step: action.step };
     case "SET_SEARCH": return { ...state, searchQuery: action.value };
@@ -80,6 +83,7 @@ function reducer(state: State, action: Action): State {
 const initialState: State = {
   step: 1,
   name: "",
+  enrichmentMode: "remote",
   numWorkers: DEFAULT_WORKERS,
   searchQuery: "",
   results: [],
@@ -163,8 +167,16 @@ export default function CreateSessionModal({ open, onClose, onCreated }: Props) 
             companyCountry: c.country,
           })),
           modelConfig: {
-            models: ["compound-beta", "llama-3.3-70b-versatile", "llama-3.1-8b-instant"],
-            current_model_index: 0,
+            enrichmentMode: state.enrichmentMode,
+            ...(state.enrichmentMode === "remote"
+              ? {
+                  models: ["compound-beta", "llama-3.3-70b-versatile", "llama-3.1-8b-instant"],
+                  current_model_index: 0,
+                }
+              : {
+                  models: [],
+                  current_model_index: 0,
+                }),
             numWorkers: state.numWorkers,
           },
         }),
@@ -218,6 +230,48 @@ export default function CreateSessionModal({ open, onClose, onCreated }: Props) 
             </div>
 
             <div className="space-y-1.5">
+              <label className="text-xs font-medium text-slate-600 uppercase tracking-wider">
+                Enrichment Engine
+              </label>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => dispatch({ type: "SET_MODE", value: "remote" })}
+                  className={`flex items-center gap-2 rounded-lg border px-3 py-2.5 text-left transition-colors ${
+                    state.enrichmentMode === "remote"
+                      ? "border-indigo-300 bg-indigo-50 ring-1 ring-indigo-200"
+                      : "border-slate-200 hover:border-slate-300"
+                  }`}
+                >
+                  <Cloud className={`w-4 h-4 shrink-0 ${state.enrichmentMode === "remote" ? "text-indigo-600" : "text-slate-400"}`} />
+                  <div>
+                    <p className={`text-sm font-medium ${state.enrichmentMode === "remote" ? "text-indigo-700" : "text-slate-700"}`}>
+                      Cloud
+                    </p>
+                    <p className="text-xs text-slate-400">Groq API</p>
+                  </div>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => dispatch({ type: "SET_MODE", value: "local" })}
+                  className={`flex items-center gap-2 rounded-lg border px-3 py-2.5 text-left transition-colors ${
+                    state.enrichmentMode === "local"
+                      ? "border-indigo-300 bg-indigo-50 ring-1 ring-indigo-200"
+                      : "border-slate-200 hover:border-slate-300"
+                  }`}
+                >
+                  <Monitor className={`w-4 h-4 shrink-0 ${state.enrichmentMode === "local" ? "text-indigo-600" : "text-slate-400"}`} />
+                  <div>
+                    <p className={`text-sm font-medium ${state.enrichmentMode === "local" ? "text-indigo-700" : "text-slate-700"}`}>
+                      Local
+                    </p>
+                    <p className="text-xs text-slate-400">Claude Agent</p>
+                  </div>
+                </button>
+              </div>
+            </div>
+
+            <div className="space-y-1.5">
               <div className="flex items-center justify-between">
                 <label className="text-xs font-medium text-slate-600 uppercase tracking-wider">
                   Parallel Workers
@@ -243,7 +297,9 @@ export default function CreateSessionModal({ open, onClose, onCreated }: Props) 
                 ))}
               </div>
               <p className="text-xs text-slate-400">
-                compound-beta is limited to 30 req/min — keep ≤ 5 to avoid rate limits
+                {state.enrichmentMode === "remote"
+                  ? "compound-beta is limited to 30 req/min — keep \u2264 5 to avoid rate limits"
+                  : "Claude agent concurrency — higher values process faster"}
               </p>
             </div>
 

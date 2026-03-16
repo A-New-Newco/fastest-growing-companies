@@ -347,9 +347,13 @@ export interface FieldMappingResult {
 export type EnrichmentSessionStatus = "pending" | "running" | "paused" | "completed" | "failed";
 export type EnrichmentCompanyStatus = "pending" | "running" | "done" | "failed" | "skipped";
 
+export type EnrichmentMode = "remote" | "local";
+
 export interface EnrichmentModelConfig {
+  enrichmentMode?: EnrichmentMode; // default "remote"
   models: string[];
   current_model_index: number;
+  numWorkers?: number;
 }
 
 export interface EnrichmentSession {

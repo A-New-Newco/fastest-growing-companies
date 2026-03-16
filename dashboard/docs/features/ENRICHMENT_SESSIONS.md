@@ -20,7 +20,7 @@ Key differences from outreach **Campaigns**:
 | team_id | UUID FK→teams | RLS scope |
 | name | TEXT | user-provided label |
 | status | ENUM | `pending / running / paused / completed / failed` |
-| model_config | JSONB | `{ models: [...], current_model_index: N }` — rolling state |
+| model_config | JSONB | `{ enrichmentMode?, models: [...], current_model_index: N, numWorkers? }` — rolling state |
 | tokens_input / tokens_output / tokens_total | BIGINT | aggregate token usage |
 | total_companies / completed_count / found_count / failed_count | INT | denormalized progress counters |
 | started_at / completed_at / last_heartbeat | TIMESTAMPTZ | `last_heartbeat` updated every 15s; stale > 5 min = crashed |
@@ -99,20 +99,22 @@ dashboard/docs/architecture/DATABASE.md
 
 ### 1. Create Session
 1. User clicks "New Session" → `CreateSessionModal` opens
-2. **Step 1**: Enter session name
+2. **Step 1**: Enter session name, choose enrichment engine (Cloud/Local), set workers
 3. **Step 2**: Search and select companies (reuses `/api/companies/search`)
 4. Submit → `POST /api/enrichment-sessions` → creates `enrichment_sessions` row + all `enrichment_session_companies` rows with `status='pending'`
 5. Redirect to session detail page
+
+**Enrichment Modes** (stored in `model_config.enrichmentMode`):
+- **Remote / Cloud** (default): Uses Groq API with model rolling — runs entirely server-side in the Next.js stream route
+- **Local**: Delegates to the `cfo-enricher` Python server (port 8765) which uses Claude Haiku 4.5 with WebSearch + WebFetch. The stream route proxies SSE from the local server and writes results to Supabase.
 
 ### 2. Start / Resume Session
 1. User clicks "Start" or "Resume" on session detail page
 2. `EnrichmentMonitor` calls `start()` from `useEnrichmentStream`
 3. Hook opens `EventSource` to `GET /api/enrichment-sessions/[id]/stream`
-4. Server:
-   - Resets any stuck `running` companies to `pending`
-   - Marks session as `running`
-   - Processes companies sequentially with Groq model rolling
-   - Streams SSE events as each company is processed
+4. Server checks `model_config.enrichmentMode`:
+   - **Remote**: Resets stuck companies, processes with Groq model rolling, streams SSE events
+   - **Local**: POSTs companies to `cfo-enricher/api/enrichment/start-inline`, proxies SSE from Python server, translates events to dashboard format, updates Supabase rows as results arrive
 
 ### 3. Real-time Monitoring
 The SSE stream emits these events:
@@ -138,6 +140,20 @@ The `LogPanel` component auto-scrolls as `log` events arrive for running compani
 - **Apply Single**: `POST /api/enrichment-sessions/[id]/companies/[companyRowId]/apply`
 - For `imported` companies: updates `imported_companies.cfo_nome/ruolo/linkedin/confidenza`
 - For `curated` companies: marks as applied but does not overwrite scraped data (source is read-only)
+
+---
+
+## Local Enrichment (cfo-enricher)
+
+When `enrichmentMode === "local"`:
+1. Stream route sends `POST http://localhost:8765/api/enrichment/start-inline` with `{ session_id, companies: [{rank, company_name, website, country}], max_concurrency }`
+2. Python server (`cfo-enricher/monitor_server.py`) converts to internal format and calls `run_enrichment(companies=..., output_dir=sessions/{session_id}/)`
+3. `run_enrichment` in `agent_enricher.py` accepts either `input_path` (file) or `companies` (inline list)
+4. SSE events from port 8765 are proxied and translated: `company` → `company_done`, `progress` → `session_progress`, `done` → `session_complete`
+5. Position (1-based) in the session maps to rank in the cfo-enricher, enabling result correlation
+6. On client disconnect, the proxy calls `POST /api/enrichment/stop` to cancel the Python run
+
+Env var: `CFO_ENRICHER_URL` (default `http://localhost:8765`)
 
 ---
 
@@ -183,10 +199,12 @@ Located in `src/lib/cfo-finder-prompt.ts`:
 
 ## Future Roadmap
 
+- [x] Dual enrichment mode (Cloud / Local) with mode selector in CreateSessionModal
+- [x] Configurable concurrency (numWorkers in model_config, 1-8 workers)
 - [ ] Support importing from a Campaign (enrich all contacts in a campaign at once)
-- [ ] Configurable concurrency (currently sequential per session to respect rate limits)
 - [ ] Model priority drag-and-drop in `CreateSessionModal`
 - [ ] Export enrichment results as CSV
 - [ ] `cfo_overrides` table to apply enrichment results to curated companies
 - [ ] Token usage charts per session over time
 - [ ] Webhook notifications on session completion
+- [ ] Local server health check indicator before starting local enrichment

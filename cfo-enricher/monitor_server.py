@@ -13,6 +13,7 @@ Endpoints:
     POST /api/enrichment/stop     — cancel current run
     GET  /api/enrichment/stream   — SSE event stream
 """
+
 from __future__ import annotations
 
 import asyncio
@@ -64,11 +65,12 @@ DATASETS = [
         "id": "de_2026",
         "label": "Germany 2026 — Wachstumschampions (JSONL)",
         "input_path": str(
-            PARENT_DIR / "focus-wachstumschampions" / "output" / "wachstumschampions_companies.compact.en.jsonl"
+            PARENT_DIR
+            / "focus-wachstumschampions"
+            / "output"
+            / "wachstumschampions_companies.compact.en.jsonl"
         ),
-        "output_dir": str(
-            PARENT_DIR / "focus-wachstumschampions" / "output" / "enriched"
-        ),
+        "output_dir": str(PARENT_DIR / "focus-wachstumschampions" / "output" / "enriched"),
         "country_code": "DE",
         "year": 2026,
     },
@@ -80,11 +82,26 @@ DATASETS = [
 
 
 class StartRequest(BaseModel):
-    dataset_id: str | None = None      # preset ID from DATASETS
-    input_path: str | None = None      # override: custom input file path
-    output_dir: str | None = None      # override: custom output directory
+    dataset_id: str | None = None  # preset ID from DATASETS
+    input_path: str | None = None  # override: custom input file path
+    output_dir: str | None = None  # override: custom output directory
     max_concurrency: int = 8
     reset: bool = False
+
+
+class InlineCompany(BaseModel):
+    rank: int
+    company_name: str
+    website: str | None = None
+    country: str = "IT"
+
+
+class StartInlineRequest(BaseModel):
+    """Start enrichment with inline company data (from dashboard sessions)."""
+
+    session_id: str
+    companies: list[InlineCompany]
+    max_concurrency: int = 8
 
 
 # ---------------------------------------------------------------------------
@@ -198,18 +215,20 @@ def _on_company_done(outcome: CompanyOutcome, completed: int, total: int) -> Non
 
     # Push two events: per-company result + aggregate progress
     state.event_queue.put_nowait({"type": "company", "data": company_event})
-    state.event_queue.put_nowait({
-        "type": "progress",
-        "data": {
-            "completed": state.completed,
-            "total": state.total,
-            "found": state.found,
-            "not_found": state.not_found,
-            "rate_limits": state.rate_limits,
-            "total_cost_usd": round(state.total_cost_usd, 6),
-            "elapsed_s": round(time.monotonic() - state.start_time, 1),
-        },
-    })
+    state.event_queue.put_nowait(
+        {
+            "type": "progress",
+            "data": {
+                "completed": state.completed,
+                "total": state.total,
+                "found": state.found,
+                "not_found": state.not_found,
+                "rate_limits": state.rate_limits,
+                "total_cost_usd": round(state.total_cost_usd, 6),
+                "elapsed_s": round(time.monotonic() - state.start_time, 1),
+            },
+        }
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -301,18 +320,82 @@ async def start_enrichment(req: StartRequest) -> dict:
                 rs.state.total = sum(1 for line in f if line.strip())
         else:
             import csv
+
             with input_path.open("r", encoding="utf-8-sig") as f:
                 rs.state.total = sum(1 for _ in csv.DictReader(f))
     except Exception:
         rs.state.total = 0
 
     # Launch background task
-    task = asyncio.create_task(
-        _run_task(input_path, output_dir, req.max_concurrency, req.reset)
-    )
+    task = asyncio.create_task(_run_task(input_path, output_dir, req.max_concurrency, req.reset))
     rs.state._task = task
 
     return {"status": "started", "input_path": str(input_path), "total": rs.state.total}
+
+
+@app.post("/api/enrichment/start-inline")
+async def start_inline_enrichment(req: StartInlineRequest) -> dict:
+    """Start enrichment with inline company data from a dashboard session."""
+    if rs.state.status == "running":
+        raise HTTPException(status_code=409, detail="A run is already in progress")
+    if not req.companies:
+        raise HTTPException(status_code=400, detail="No companies provided")
+
+    # Convert inline companies to the dict format expected by run_enrichment
+    company_dicts = [
+        {
+            "RANK": str(c.rank),
+            "AZIENDA": c.company_name,
+            "SITO WEB": c.website or "",
+            "COUNTRY": c.country,
+        }
+        for c in req.companies
+    ]
+
+    output_dir = SCRIPT_DIR / "output" / "sessions" / req.session_id
+
+    # Reset state
+    rs.state.reset()
+    rs.state.status = "running"
+    rs.state.input_path = f"inline:{req.session_id}"
+    rs.state.output_dir = str(output_dir)
+    rs.state.dataset_id = f"session:{req.session_id}"
+    rs.state.country_code = req.companies[0].country if req.companies else "IT"
+    rs.state.year = 0
+    rs.state.total = len(req.companies)
+    rs.state.start_time = time.monotonic()
+
+    # Launch background task
+    task = asyncio.create_task(_run_inline_task(company_dicts, output_dir, req.max_concurrency))
+    rs.state._task = task
+
+    return {"status": "started", "total": len(req.companies)}
+
+
+async def _run_inline_task(
+    companies: list[dict[str, str]], output_dir: Path, max_concurrency: int
+) -> None:
+    state = rs.state
+    try:
+        summary = await run_enrichment(
+            companies=companies,
+            output_dir=output_dir,
+            reset=True,
+            max_concurrency=max_concurrency,
+            on_company_done=_on_company_done,
+        )
+        state.status = "completed"
+        state.elapsed_s = summary.get("elapsed_s", 0.0)
+        state.event_queue.put_nowait({"type": "done", "data": summary})
+    except asyncio.CancelledError:
+        state.status = "idle"
+        state.event_queue.put_nowait({"type": "done", "data": {"cancelled": True}})
+    except Exception as exc:
+        state.status = "error"
+        state.error_message = str(exc)
+        state.event_queue.put_nowait({"type": "error", "data": {"message": str(exc)}})
+    finally:
+        state.start_time = 0.0
 
 
 @app.post("/api/enrichment/stop")
@@ -400,6 +483,7 @@ async def _reprocess_task(companies: list[ReprocessCompany]) -> None:
         if output_dir:
             from agent_enricher import EnrichmentResult
             from datetime import date
+
             # Overwrite by appending (load_checkpoint uses last occurrence)
             save_checkpoint_row(
                 output_dir,
