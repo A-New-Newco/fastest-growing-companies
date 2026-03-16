@@ -22,9 +22,12 @@ export async function GET(req: NextRequest) {
       ? normalizeCountryCode(rawCountry)
       : null;
 
+  const hasCfo = req.nextUrl.searchParams.get("hasCfo") === "true";
+  const noLinkedin = req.nextUrl.searchParams.get("noLinkedin") === "true";
+
   let query = supabase
-    .from("companies_full")
-    .select("id, name, sector, region, country, cfo_nome, cfo_ruolo, cfo_linkedin")
+    .from("all_companies")
+    .select("id, name, sector, region, country, website, cfo_nome, cfo_ruolo, cfo_linkedin, data_origin")
     .eq("year", year)
     .order("rank", { ascending: true })
     .limit(limit);
@@ -35,6 +38,14 @@ export async function GET(req: NextRequest) {
 
   if (q.trim()) {
     query = query.ilike("name", `%${q.trim()}%`);
+  }
+
+  if (hasCfo) {
+    query = query.not("cfo_nome", "is", null);
+  }
+
+  if (noLinkedin) {
+    query = query.is("cfo_linkedin", null);
   }
 
   const { data, error } = await query;
@@ -50,9 +61,11 @@ export async function GET(req: NextRequest) {
       settore: row.sector,
       regione: row.region,
       country: row.country,
+      sito_web: row.website ?? null,
       cfo_nome: row.cfo_nome,
       cfo_ruolo: row.cfo_ruolo,
       cfo_linkedin: row.cfo_linkedin,
+      data_origin: row.data_origin ?? "curated",
     }))
   );
 }

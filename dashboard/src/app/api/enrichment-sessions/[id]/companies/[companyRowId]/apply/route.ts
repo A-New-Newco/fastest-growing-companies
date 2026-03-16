@@ -25,17 +25,31 @@ export async function POST(_req: NextRequest, { params }: Params) {
 
   if (rowErr || !row) return NextResponse.json({ error: "Not found" }, { status: 404 });
   if (row.status !== "done") return NextResponse.json({ error: "Company not yet enriched" }, { status: 409 });
-  if (!row.result_nome) return NextResponse.json({ error: "No result to apply (not found)" }, { status: 422 });
+
+  // Determine category from parent session
+  const { data: session } = await supabase
+    .from("enrichment_sessions")
+    .select("enrichment_category")
+    .eq("id", params.id)
+    .single();
+
+  const isLinkedin = session?.enrichment_category === "linkedin";
+  const hasResult = isLinkedin ? !!row.result_linkedin : !!row.result_nome;
+  if (!hasResult) return NextResponse.json({ error: "No result to apply (not found)" }, { status: 422 });
 
   if (row.company_origin === "imported") {
+    const updateFields = isLinkedin
+      ? { cfo_linkedin: row.result_linkedin }
+      : {
+          cfo_nome: row.result_nome,
+          cfo_ruolo: row.result_ruolo ?? null,
+          cfo_linkedin: row.result_linkedin ?? null,
+          cfo_confidenza: row.result_confidenza ?? null,
+        };
+
     const { error } = await admin
       .from("imported_companies")
-      .update({
-        cfo_nome: row.result_nome,
-        cfo_ruolo: row.result_ruolo ?? null,
-        cfo_linkedin: row.result_linkedin ?? null,
-        cfo_confidenza: row.result_confidenza ?? null,
-      })
+      .update(updateFields)
       .eq("id", row.company_id);
 
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });

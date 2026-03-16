@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, Calendar, Building2 } from "lucide-react";
+import { ArrowRight, Calendar, Building2, UserSearch, Linkedin } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import SessionStatusBadge from "./SessionStatusBadge";
 import TokenUsageBadge from "./TokenUsageBadge";
@@ -23,9 +23,20 @@ export default function EnrichmentSessionCard({ session }: Props) {
         <CardContent className="p-5 flex flex-col gap-4">
           <div className="flex items-start justify-between gap-2">
             <div className="min-w-0">
-              <h3 className="font-semibold text-slate-900 text-sm leading-tight truncate group-hover:text-indigo-600 transition-colors">
-                {session.name}
-              </h3>
+              <div className="flex items-center gap-1.5">
+                {session.enrichmentCategory === "linkedin" ? (
+                  <span className="inline-flex items-center gap-1 rounded bg-sky-50 border border-sky-200 px-1.5 py-0.5 text-[10px] font-medium text-sky-700 uppercase tracking-wide shrink-0">
+                    <Linkedin className="w-2.5 h-2.5" /> LinkedIn
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1 rounded bg-violet-50 border border-violet-200 px-1.5 py-0.5 text-[10px] font-medium text-violet-700 uppercase tracking-wide shrink-0">
+                    <UserSearch className="w-2.5 h-2.5" /> CFO
+                  </span>
+                )}
+                <h3 className="font-semibold text-slate-900 text-sm leading-tight truncate group-hover:text-indigo-600 transition-colors">
+                  {session.name}
+                </h3>
+              </div>
               <div className="flex items-center gap-2 mt-1">
                 <TokenUsageBadge tokensTotal={session.tokensTotal} />
               </div>

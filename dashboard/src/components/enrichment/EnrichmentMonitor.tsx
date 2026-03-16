@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Play, Pause, CheckCheck, Loader2, AlertTriangle, Zap, Cloud, Monitor } from "lucide-react";
+import { Play, Pause, CheckCheck, Loader2, AlertTriangle, Zap, Cloud, Monitor, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import SessionStatusBadge from "./SessionStatusBadge";
 import TokenUsageBadge from "./TokenUsageBadge";
@@ -15,13 +15,15 @@ interface Props {
 }
 
 export default function EnrichmentMonitor({ initialSession, initialCompanies }: Props) {
-  const { state, start, pause } = useEnrichmentStream({
+  const { state, start, pause, retryFailed, resetAll } = useEnrichmentStream({
     sessionId: initialSession.id,
     initialSession,
     initialCompanies,
   });
 
   const [applyingAll, setApplyingAll] = useState(false);
+  const [retrying, setRetrying] = useState(false);
+  const [resetting, setResetting] = useState(false);
 
   const session = state.session ?? initialSession;
   const isRunning = state.isConnected;
@@ -38,6 +40,8 @@ export default function EnrichmentMonitor({ initialSession, initialCompanies }: 
   const canStart = !isRunning && !state.isComplete && session.status !== "failed";
   const canPause = isRunning;
   const canApply = state.isComplete || session.status === "completed";
+  const canRetry = !isRunning && failed > 0 && (state.isComplete || session.status === "completed" || session.status === "failed");
+  const canReset = !isRunning && (completed > 0 || session.status === "failed");
 
   async function handleApplyAll() {
     setApplyingAll(true);
@@ -52,6 +56,25 @@ export default function EnrichmentMonitor({ initialSession, initialCompanies }: 
     await fetch(`/api/enrichment-sessions/${session.id}/companies/${companyRowId}/apply`, {
       method: "POST",
     });
+  }
+
+  async function handleResetAll() {
+    if (!confirm("Reset all companies and start over? This clears all results.")) return;
+    setResetting(true);
+    try {
+      await resetAll();
+    } finally {
+      setResetting(false);
+    }
+  }
+
+  async function handleRetryFailed() {
+    setRetrying(true);
+    try {
+      await retryFailed();
+    } finally {
+      setRetrying(false);
+    }
   }
 
   // Stale session detection (last_heartbeat > 5 min ago while status=running)
@@ -105,7 +128,31 @@ export default function EnrichmentMonitor({ initialSession, initialCompanies }: 
               >
                 {applyingAll
                   ? <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Applying…</>
-                  : <><CheckCheck className="w-3.5 h-3.5" /> Apply All Results</>}
+                  : <><CheckCheck className="w-3.5 h-3.5" /> {session.enrichmentCategory === "linkedin" ? "Apply All LinkedIn URLs" : "Apply All Results"}</>}
+              </Button>
+            )}
+            {canRetry && (
+              <Button
+                variant="outline"
+                onClick={handleRetryFailed}
+                disabled={retrying}
+                className="gap-1.5 text-amber-600 border-amber-200 hover:bg-amber-50"
+              >
+                {retrying
+                  ? <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Retrying…</>
+                  : <><RotateCcw className="w-3.5 h-3.5" /> Retry Failed ({failed})</>}
+              </Button>
+            )}
+            {canReset && (
+              <Button
+                variant="outline"
+                onClick={handleResetAll}
+                disabled={resetting}
+                className="gap-1.5 text-red-600 border-red-200 hover:bg-red-50"
+              >
+                {resetting
+                  ? <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Resetting…</>
+                  : <><RotateCcw className="w-3.5 h-3.5" /> Reset All</>}
               </Button>
             )}
           </div>
@@ -156,6 +203,7 @@ export default function EnrichmentMonitor({ initialSession, initialCompanies }: 
       {/* Company table */}
       <CompanyEnrichmentTable
         companies={state.companies}
+        enrichmentCategory={session.enrichmentCategory}
         isRunning={isRunning}
         onApplySingle={handleApplySingle}
       />

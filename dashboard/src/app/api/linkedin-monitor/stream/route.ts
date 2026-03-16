@@ -91,7 +91,8 @@ export async function POST(req: NextRequest) {
         let linkedinUrl: string | null = null;
 
         try {
-          linkedinUrl = await findLinkedIn(contact.azienda, contact.nome, key, signal);
+          const result = await findLinkedIn(contact.azienda, contact.nome, key, signal);
+          linkedinUrl = result.url;
         } catch {
           // Non-fatal — treat as not found
         }

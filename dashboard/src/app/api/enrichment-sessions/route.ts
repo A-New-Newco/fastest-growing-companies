@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
   if (!membership) return NextResponse.json({ error: "Not a team member" }, { status: 403 });
 
   const body: CreateEnrichmentSessionInput = await req.json();
-  const { name, companies, modelConfig } = body;
+  const { name, enrichmentCategory, companies, modelConfig } = body;
 
   if (!name?.trim()) return NextResponse.json({ error: "name is required" }, { status: 400 });
   if (!companies?.length) return NextResponse.json({ error: "companies must not be empty" }, { status: 400 });
@@ -62,6 +62,7 @@ export async function POST(req: NextRequest) {
     .insert({
       team_id: membership.team_id,
       name: name.trim(),
+      enrichment_category: enrichmentCategory ?? "cfo",
       status: "pending",
       model_config: modelConfig ?? {
         models: ["compound-beta", "llama-3.3-70b-versatile", "llama-3.1-8b-instant"],
@@ -85,6 +86,8 @@ export async function POST(req: NextRequest) {
     company_name: c.companyName,
     company_website: c.companyWebsite ?? null,
     company_country: c.companyCountry ?? null,
+    contact_nome: c.contactNome ?? null,
+    contact_ruolo: c.contactRuolo ?? null,
     status: "pending" as const,
     position: i + 1,
   }));
@@ -109,6 +112,7 @@ function toSessionShape(row: Record<string, unknown>) {
     id: row.id,
     teamId: row.team_id,
     name: row.name,
+    enrichmentCategory: row.enrichment_category ?? "cfo",
     status: row.status,
     modelConfig: row.model_config,
     tokensInput: row.tokens_input,

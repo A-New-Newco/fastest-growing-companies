@@ -36,6 +36,7 @@
 - [x] Step 16: Campaigns client hardening — validazione `res.ok` + shape checks sulle fetch `/api/campaigns*`, messaggi d'errore espliciti, fix crash `campaigns.filter is not a function`
 - [x] Step 17: Campaigns schema root-fix — aggiunta migration `006_campaign_outreach_columns.sql` per garantire le colonne outreach (`connection_note_template`, `quota_policy`, `pause_reason`, `integration_mode`) in tutti gli ambienti
 - [x] Step 18: Plugin outreach schema root-fix — aggiunta migration `007_plugin_outreach_backfill.sql` per riallineare anche claim metadata su `campaign_contacts` (`claimed_by`, `claim_expires_at`, `last_attempt_at`, `last_error_code`) e oggetti plugin correlati
+- [x] Step 19: Enrichment categories — migration `012_enrichment_category.sql`, `enrichment_category` column on sessions (`cfo` | `linkedin`), `contact_nome`/`contact_ruolo` input fields on session companies, category selector in CreateSessionModal, stream/apply routes branch by category, search API gains `hasCfo`/`noLinkedin` filters, `findLinkedIn()` returns structured `{ url, tokensInput, tokensOutput, modelUsed }` → see `docs/features/ENRICHMENT_CATEGORIES.md`
 
 ---
 

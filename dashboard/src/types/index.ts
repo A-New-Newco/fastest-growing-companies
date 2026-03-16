@@ -349,6 +349,7 @@ export type EnrichmentSessionStatus = "pending" | "running" | "paused" | "comple
 export type EnrichmentCompanyStatus = "pending" | "running" | "done" | "failed" | "skipped";
 
 export type EnrichmentMode = "remote" | "local";
+export type EnrichmentCategory = "cfo" | "linkedin";
 
 export interface EnrichmentModelConfig {
   enrichmentMode?: EnrichmentMode; // default "remote"
@@ -361,6 +362,7 @@ export interface EnrichmentSession {
   id: string;
   teamId: string;
   name: string;
+  enrichmentCategory: EnrichmentCategory;
   status: EnrichmentSessionStatus;
   modelConfig: EnrichmentModelConfig;
   tokensInput: number;
@@ -396,6 +398,8 @@ export interface EnrichmentSessionCompany {
   companyName: string;
   companyWebsite: string | null;
   companyCountry: string | null;
+  contactNome: string | null;
+  contactRuolo: string | null;
   status: EnrichmentCompanyStatus;
   resultNome: string | null;
   resultRuolo: string | null;
@@ -415,12 +419,15 @@ export interface EnrichmentSessionCompany {
 
 export interface CreateEnrichmentSessionInput {
   name: string;
+  enrichmentCategory?: EnrichmentCategory;
   companies: Array<{
     companyId: string;
     companyOrigin: "curated" | "imported";
     companyName: string;
     companyWebsite: string | null;
     companyCountry: string | null;
+    contactNome?: string | null;
+    contactRuolo?: string | null;
   }>;
   modelConfig?: EnrichmentModelConfig;
 }

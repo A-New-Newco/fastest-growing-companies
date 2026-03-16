@@ -28,12 +28,19 @@ export function extractLinkedInUrl(text: string): string | null {
   return `https://www.linkedin.com/in/${slug}`;
 }
 
+export interface LinkedInFinderResult {
+  url: string | null;
+  tokensInput: number;
+  tokensOutput: number;
+  modelUsed: string | null;
+}
+
 export async function findLinkedIn(
   companyName: string,
   contactName: string,
   apiKey: string,
   signal?: AbortSignal
-): Promise<string | null> {
+): Promise<LinkedInFinderResult> {
   const cleanCompanyName = stripLegalSuffix(companyName);
   const query = `${cleanCompanyName} ${contactName} site:linkedin.com`;
 
@@ -81,15 +88,21 @@ export async function findLinkedIn(
         break;
       }
 
-      if (!groqRes.ok) return null;
+      if (!groqRes.ok) return { url: null, tokensInput: 0, tokensOutput: 0, modelUsed: model };
 
       const groqJson = await groqRes.json();
       const rawText: string = groqJson.choices?.[0]?.message?.content ?? "";
-      return extractLinkedInUrl(rawText);
+      const usage = groqJson.usage;
+      return {
+        url: extractLinkedInUrl(rawText),
+        tokensInput: usage?.prompt_tokens ?? 0,
+        tokensOutput: usage?.completion_tokens ?? 0,
+        modelUsed: model,
+      };
     }
   }
 
   // All models exhausted
   console.warn("[linkedin-finder] all models exhausted, giving up");
-  return null;
+  return { url: null, tokensInput: 0, tokensOutput: 0, modelUsed: null };
 }

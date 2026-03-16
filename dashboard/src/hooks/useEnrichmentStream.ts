@@ -38,7 +38,9 @@ type StreamAction =
   | { type: "COMPANY_DONE"; data: SSECompanyDone }
   | { type: "SESSION_PROGRESS"; data: SSESessionProgress }
   | { type: "SET_ERROR"; message: string }
-  | { type: "CLEAR_ERROR" };
+  | { type: "CLEAR_ERROR" }
+  | { type: "RESET_FOR_RETRY"; retriedCount: number }
+  | { type: "RESET_ALL"; resetCount: number };
 
 function reducer(state: StreamState, action: StreamAction): StreamState {
   switch (action.type) {
@@ -116,6 +118,74 @@ function reducer(state: StreamState, action: StreamAction): StreamState {
       return { ...state, error: action.message };
     case "CLEAR_ERROR":
       return { ...state, error: null };
+    case "RESET_FOR_RETRY": {
+      const retried = action.retriedCount;
+      return {
+        ...state,
+        isComplete: false,
+        error: null,
+        companies: state.companies.map((c) =>
+          c.status === "failed"
+            ? { ...c, status: "pending" as const, errorMessage: null, resultNome: null, resultRuolo: null, resultLinkedin: null, resultConfidenza: null, tokensInput: 0, tokensOutput: 0, modelUsed: null, logs: [] }
+            : c
+        ),
+        session: state.session
+          ? {
+              ...state.session,
+              status: "pending" as const,
+              completedCount: Math.max(0, state.session.completedCount - retried),
+              failedCount: 0,
+              completedAt: null,
+            }
+          : state.session,
+        progress: state.progress
+          ? {
+              ...state.progress,
+              completed: Math.max(0, state.progress.completed - retried),
+              failed: 0,
+            }
+          : state.progress,
+      };
+    }
+    case "RESET_ALL": {
+      return {
+        ...state,
+        isComplete: false,
+        error: null,
+        companies: state.companies.map((c) => ({
+          ...c,
+          status: "pending" as const,
+          errorMessage: null,
+          resultNome: null,
+          resultRuolo: null,
+          resultLinkedin: null,
+          resultConfidenza: null,
+          tokensInput: 0,
+          tokensOutput: 0,
+          modelUsed: null,
+          logs: [],
+        })),
+        session: state.session
+          ? {
+              ...state.session,
+              status: "pending" as const,
+              completedCount: 0,
+              foundCount: 0,
+              failedCount: 0,
+              tokensTotal: 0,
+              startedAt: null,
+              completedAt: null,
+            }
+          : state.session,
+        progress: {
+          completed: 0,
+          total: state.progress?.total ?? state.session?.totalCompanies ?? 0,
+          found: 0,
+          failed: 0,
+          tokensTotal: 0,
+        },
+      };
+    }
     default:
       return state;
   }
@@ -254,5 +324,31 @@ export function useEnrichmentStream({
     } catch { /* ignore */ }
   }, [sessionId, state.session]);
 
-  return { state, start, pause };
+  const resetAll = useCallback(async () => {
+    const resp = await fetch(`/api/enrichment-sessions/${sessionId}/reset`, {
+      method: "POST",
+    });
+    if (!resp.ok) {
+      const body = await resp.json().catch(() => ({ error: "Reset failed" }));
+      dispatch({ type: "SET_ERROR", message: body.error ?? "Reset failed" });
+      return;
+    }
+    const { resetCount } = await resp.json();
+    dispatch({ type: "RESET_ALL", resetCount });
+  }, [sessionId]);
+
+  const retryFailed = useCallback(async () => {
+    const resp = await fetch(`/api/enrichment-sessions/${sessionId}/retry`, {
+      method: "POST",
+    });
+    if (!resp.ok) {
+      const body = await resp.json().catch(() => ({ error: "Retry failed" }));
+      dispatch({ type: "SET_ERROR", message: body.error ?? "Retry failed" });
+      return;
+    }
+    const { retriedCount } = await resp.json();
+    dispatch({ type: "RESET_FOR_RETRY", retriedCount });
+  }, [sessionId]);
+
+  return { state, start, pause, retryFailed, resetAll };
 }

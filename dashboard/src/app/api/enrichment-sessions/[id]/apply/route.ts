@@ -17,12 +17,13 @@ export async function POST(_req: NextRequest, { params }: Params) {
   // Verify session is accessible (RLS enforces team scope)
   const { data: session } = await supabase
     .from("enrichment_sessions")
-    .select("id, status")
+    .select("id, status, enrichment_category")
     .eq("id", params.id)
     .single();
 
   if (!session) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
+  const isLinkedin = session.enrichment_category === "linkedin";
   const admin = createAdminSupabaseClient();
 
   // Fetch all done, not-yet-applied rows
@@ -42,20 +43,26 @@ export async function POST(_req: NextRequest, { params }: Params) {
   const now = new Date().toISOString();
 
   for (const row of pending) {
-    if (!row.result_nome) {
+    // For LinkedIn sessions, the success criterion is result_linkedin; for CFO it's result_nome
+    const hasResult = isLinkedin ? !!row.result_linkedin : !!row.result_nome;
+    if (!hasResult) {
       skipped++;
       continue;
     }
 
     if (row.company_origin === "imported") {
+      const updateFields = isLinkedin
+        ? { cfo_linkedin: row.result_linkedin }
+        : {
+            cfo_nome: row.result_nome,
+            cfo_ruolo: row.result_ruolo ?? null,
+            cfo_linkedin: row.result_linkedin ?? null,
+            cfo_confidenza: row.result_confidenza ?? null,
+          };
+
       const { error } = await admin
         .from("imported_companies")
-        .update({
-          cfo_nome: row.result_nome,
-          cfo_ruolo: row.result_ruolo ?? null,
-          cfo_linkedin: row.result_linkedin ?? null,
-          cfo_confidenza: row.result_confidenza ?? null,
-        })
+        .update(updateFields)
         .eq("id", row.company_id);
 
       if (error) {

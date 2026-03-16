@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "GROQ_API_KEY not configured" }, { status: 500 });
   }
 
-  const linkedinUrl = await findLinkedIn(companyName, contactName, apiKey);
+  const { url: linkedinUrl } = await findLinkedIn(companyName, contactName, apiKey);
 
   // Save to DB if found and companyId provided
   if (linkedinUrl && companyId) {

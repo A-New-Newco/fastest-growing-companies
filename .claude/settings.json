@@ -70,7 +70,20 @@
       "Bash(uv init:*)",
       "Bash(uv add:*)",
       "Bash(grep -r \"^import type { Annotation, Company }\" /Users/francescofiore/Coding/Reef/fastest-growing-companies/dashboard/src --include=\"*.ts\" --include=\"*.tsx\")",
-      "Read(//Users/francescofiore/Downloads/**)"
+      "Read(//Users/francescofiore/Downloads/**)",
+      "Bash(grep -E \"\\\\.\\(py|sh|md|json\\)$|^d\")",
+      "Bash(ls -la /Users/francescofiore/Coding/Reef/fastest-growing-companies/dashboard/src/app/api/enrichment-sessions/[id]/)",
+      "Bash(find /Users/francescofiore/Coding/Reef/fastest-growing-companies/dashboard/src/app/api/enrichment-sessions/[id] -type f -name \"*.ts\")",
+      "Bash(find /Users/francescofiore/Coding/Reef/fastest-growing-companies/dashboard/src -type f -name *enrichment* -o -name *cfo*monitor*)",
+      "Bash(grep -E \"\\\\.\\(tsx?|mdx?\\)$\")",
+      "Bash(grep -E \"\\\\.\\(toml|lock\\)$\")",
+      "Bash(find /Users/francescofiore/Coding/Reef/fastest-growing-companies/dashboard/src/app -type f -path \"*/\\(enrichment|cfo-monitor|linkedin\\)*\" -name *.tsx)",
+      "Bash(find /Users/francescofiore/Coding/Reef/fastest-growing-companies/dashboard/src/components -type f -name *[Ee]nrichment* -o -name *session*)",
+      "Bash(wc -l /Users/francescofiore/Coding/Reef/fastest-growing-companies/dashboard/src/app/api/enrichment-sessions/[id]/stream/route.ts)",
+      "Bash(grep -E \"\\\\.\\(ts|tsx\\)$\")",
+      "Bash(ls /Users/francescofiore/Coding/Reef/fastest-growing-companies/dashboard/src/app/api/enrichment-sessions/[id]/)",
+      "Bash(ls /Users/francescofiore/Coding/Reef/fastest-growing-companies/dashboard/src/app/api/enrichment-sessions/[id]/reset/)",
+      "Bash(xargs ls:*)"
     ],
     "additionalDirectories": [
       "/Users/francescofiore/Coding/Reef/fastest-growing-companies/dashboard/src/app/campaigns",

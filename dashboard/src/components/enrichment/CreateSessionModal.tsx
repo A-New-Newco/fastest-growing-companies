@@ -10,10 +10,10 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Loader2, X, Check, Cloud, Monitor } from "lucide-react";
+import { Search, Loader2, X, Check, Cloud, Monitor, UserSearch, Linkedin } from "lucide-react";
 import { ALL_COUNTRIES_VALUE, normalizeCountryCode } from "@/lib/constants";
 import { useFilters } from "@/lib/filter-context";
-import type { EnrichmentSession, EnrichmentMode } from "@/types";
+import type { EnrichmentSession, EnrichmentMode, EnrichmentCategory } from "@/types";
 
 // ── State ──────────────────────────────────────────────────────────────────────
 
@@ -22,6 +22,9 @@ interface CompanyRow {
   azienda: string;
   country: string;
   sitoWeb: string | null;
+  cfoNome: string | null;
+  cfoRuolo: string | null;
+  dataOrigin: "curated" | "imported";
   selected: boolean;
 }
 
@@ -31,6 +34,7 @@ const DEFAULT_WORKERS = 3;
 interface State {
   step: 1 | 2;
   name: string;
+  enrichmentCategory: EnrichmentCategory;
   enrichmentMode: EnrichmentMode;
   numWorkers: number;
   searchQuery: string;
@@ -43,6 +47,7 @@ interface State {
 
 type Action =
   | { type: "SET_NAME"; value: string }
+  | { type: "SET_CATEGORY"; value: EnrichmentCategory }
   | { type: "SET_MODE"; value: EnrichmentMode }
   | { type: "SET_WORKERS"; value: number }
   | { type: "SET_STEP"; step: 1 | 2 }
@@ -58,6 +63,7 @@ type Action =
 function reducer(state: State, action: Action): State {
   switch (action.type) {
     case "SET_NAME": return { ...state, name: action.value };
+    case "SET_CATEGORY": return { ...state, enrichmentCategory: action.value, selected: [], results: [] };
     case "SET_MODE": return { ...state, enrichmentMode: action.value };
     case "SET_WORKERS": return { ...state, numWorkers: action.value };
     case "SET_STEP": return { ...state, step: action.step };
@@ -83,6 +89,7 @@ function reducer(state: State, action: Action): State {
 const initialState: State = {
   step: 1,
   name: "",
+  enrichmentCategory: "cfo",
   enrichmentMode: "remote",
   numWorkers: DEFAULT_WORKERS,
   searchQuery: "",
@@ -104,6 +111,7 @@ interface Props {
 export default function CreateSessionModal({ open, onClose, onCreated }: Props) {
   const [state, dispatch] = useReducer(reducer, initialState);
   const { filters } = useFilters();
+  const isLinkedin = state.enrichmentCategory === "linkedin";
 
   const fetchCompanies = useCallback(async (q: string) => {
     dispatch({ type: "SET_LOADING", value: true });
@@ -112,6 +120,10 @@ export default function CreateSessionModal({ open, onClose, onCreated }: Props) 
       if (filters.country !== ALL_COUNTRIES_VALUE) {
         params.set("country", normalizeCountryCode(filters.country));
       }
+      if (isLinkedin) {
+        params.set("hasCfo", "true");
+        params.set("noLinkedin", "true");
+      }
       const res = await fetch(`/api/companies/search?${params}`);
       if (!res.ok) throw new Error("Search failed");
       const data: Array<{
@@ -119,6 +131,9 @@ export default function CreateSessionModal({ open, onClose, onCreated }: Props) 
         azienda: string;
         country: string;
         sito_web: string | null;
+        cfo_nome: string | null;
+        cfo_ruolo: string | null;
+        data_origin: string;
       }> = await res.json();
       dispatch({
         type: "SET_RESULTS",
@@ -127,13 +142,16 @@ export default function CreateSessionModal({ open, onClose, onCreated }: Props) 
           azienda: c.azienda,
           country: c.country ?? "IT",
           sitoWeb: c.sito_web ?? null,
+          cfoNome: c.cfo_nome ?? null,
+          cfoRuolo: c.cfo_ruolo ?? null,
+          dataOrigin: (c.data_origin === "imported" ? "imported" : "curated") as "curated" | "imported",
           selected: false,
         })),
       });
     } catch {
       dispatch({ type: "SET_LOADING", value: false });
     }
-  }, [filters.country]);
+  }, [filters.country, isLinkedin]);
 
   useEffect(() => {
     if (state.step === 2) {
@@ -159,12 +177,14 @@ export default function CreateSessionModal({ open, onClose, onCreated }: Props) 
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: state.name.trim(),
+          enrichmentCategory: state.enrichmentCategory,
           companies: state.selected.map((c) => ({
             companyId: c.id,
-            companyOrigin: "curated",
+            companyOrigin: c.dataOrigin,
             companyName: c.azienda,
             companyWebsite: c.sitoWeb,
             companyCountry: c.country,
+            ...(isLinkedin ? { contactNome: c.cfoNome, contactRuolo: c.cfoRuolo } : {}),
           })),
           modelConfig: {
             enrichmentMode: state.enrichmentMode,
@@ -208,20 +228,64 @@ export default function CreateSessionModal({ open, onClose, onCreated }: Props) 
           <DialogTitle>
             New Enrichment Session
             {state.step === 2 && (
-              <span className="ml-2 text-sm font-normal text-slate-400">— Add Companies</span>
+              <span className="ml-2 text-sm font-normal text-slate-400">
+                — {isLinkedin ? "Select Contacts" : "Add Companies"}
+              </span>
             )}
           </DialogTitle>
         </DialogHeader>
 
-        {/* Step 1: name + workers */}
+        {/* Step 1: category + name + mode + workers */}
         {state.step === 1 && (
           <div className="space-y-4 py-2">
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-slate-600 uppercase tracking-wider">
+                Enrichment Type
+              </label>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => dispatch({ type: "SET_CATEGORY", value: "cfo" })}
+                  className={`flex items-center gap-2 rounded-lg border px-3 py-2.5 text-left transition-colors ${
+                    state.enrichmentCategory === "cfo"
+                      ? "border-indigo-300 bg-indigo-50 ring-1 ring-indigo-200"
+                      : "border-slate-200 hover:border-slate-300"
+                  }`}
+                >
+                  <UserSearch className={`w-4 h-4 shrink-0 ${state.enrichmentCategory === "cfo" ? "text-indigo-600" : "text-slate-400"}`} />
+                  <div>
+                    <p className={`text-sm font-medium ${state.enrichmentCategory === "cfo" ? "text-indigo-700" : "text-slate-700"}`}>
+                      CFO Search
+                    </p>
+                    <p className="text-xs text-slate-400">Find finance head</p>
+                  </div>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => dispatch({ type: "SET_CATEGORY", value: "linkedin" })}
+                  className={`flex items-center gap-2 rounded-lg border px-3 py-2.5 text-left transition-colors ${
+                    state.enrichmentCategory === "linkedin"
+                      ? "border-indigo-300 bg-indigo-50 ring-1 ring-indigo-200"
+                      : "border-slate-200 hover:border-slate-300"
+                  }`}
+                >
+                  <Linkedin className={`w-4 h-4 shrink-0 ${state.enrichmentCategory === "linkedin" ? "text-indigo-600" : "text-slate-400"}`} />
+                  <div>
+                    <p className={`text-sm font-medium ${state.enrichmentCategory === "linkedin" ? "text-indigo-700" : "text-slate-700"}`}>
+                      LinkedIn Search
+                    </p>
+                    <p className="text-xs text-slate-400">Find LinkedIn URL</p>
+                  </div>
+                </button>
+              </div>
+            </div>
+
             <div className="space-y-1.5">
               <label className="text-xs font-medium text-slate-600 uppercase tracking-wider">
                 Session Name
               </label>
               <Input
-                placeholder="e.g. CFO Enrichment — DE 2026"
+                placeholder={isLinkedin ? "e.g. LinkedIn — IT contacts" : "e.g. CFO Enrichment — DE 2026"}
                 value={state.name}
                 onChange={(e) => dispatch({ type: "SET_NAME", value: e.target.value })}
                 onKeyDown={(e) => e.key === "Enter" && state.name.trim() && dispatch({ type: "SET_STEP", step: 2 })}
@@ -304,7 +368,9 @@ export default function CreateSessionModal({ open, onClose, onCreated }: Props) 
             </div>
 
             <p className="text-xs text-slate-500">
-              You&apos;ll select companies in the next step.
+              {isLinkedin
+                ? "Next: select contacts with CFO data but no LinkedIn."
+                : "You\u2019ll select companies in the next step."}
             </p>
             {state.error && (
               <p className="rounded-md bg-red-50 px-3 py-2 text-xs text-red-700">{state.error}</p>
@@ -312,7 +378,7 @@ export default function CreateSessionModal({ open, onClose, onCreated }: Props) 
           </div>
         )}
 
-        {/* Step 2: company selector */}
+        {/* Step 2: company/contact selector */}
         {state.step === 2 && (
           <div className="space-y-3 py-2">
             {/* Selected chips */}
@@ -323,7 +389,7 @@ export default function CreateSessionModal({ open, onClose, onCreated }: Props) 
                     key={c.id}
                     className="inline-flex items-center gap-1 rounded-full bg-white border border-indigo-200 px-2 py-0.5 text-xs text-indigo-700"
                   >
-                    {c.azienda}
+                    {isLinkedin ? `${c.cfoNome} @ ${c.azienda}` : c.azienda}
                     <button
                       onClick={() => dispatch({ type: "REMOVE_SELECTED", id: c.id })}
                       className="text-indigo-400 hover:text-indigo-600"
@@ -340,7 +406,7 @@ export default function CreateSessionModal({ open, onClose, onCreated }: Props) 
               <Search className="absolute left-2.5 top-2.5 w-3.5 h-3.5 text-slate-400" />
               <Input
                 className="pl-8 text-sm"
-                placeholder="Search companies…"
+                placeholder={isLinkedin ? "Search contacts without LinkedIn\u2026" : "Search companies\u2026"}
                 value={state.searchQuery}
                 onChange={(e) => dispatch({ type: "SET_SEARCH", value: e.target.value })}
                 autoFocus
@@ -355,7 +421,9 @@ export default function CreateSessionModal({ open, onClose, onCreated }: Props) 
                 </div>
               )}
               {!state.loadingSearch && state.results.length === 0 && (
-                <p className="text-sm text-slate-400 text-center py-6">No companies found</p>
+                <p className="text-sm text-slate-400 text-center py-6">
+                  {isLinkedin ? "No contacts without LinkedIn found" : "No companies found"}
+                </p>
               )}
               {!state.loadingSearch && state.results.map((c) => {
                 const isSelected = selectedIds.has(c.id);
@@ -369,7 +437,13 @@ export default function CreateSessionModal({ open, onClose, onCreated }: Props) 
                   >
                     <div>
                       <p className="text-sm font-medium text-slate-800">{c.azienda}</p>
-                      <p className="text-xs text-slate-400">{c.country}</p>
+                      {isLinkedin && c.cfoNome ? (
+                        <p className="text-xs text-slate-500">
+                          {c.cfoNome}{c.cfoRuolo ? ` \u00B7 ${c.cfoRuolo}` : ""} \u00B7 {c.country}
+                        </p>
+                      ) : (
+                        <p className="text-xs text-slate-400">{c.country}</p>
+                      )}
                     </div>
                     {isSelected && <Check className="w-4 h-4 text-indigo-600 shrink-0" />}
                   </button>
@@ -378,7 +452,7 @@ export default function CreateSessionModal({ open, onClose, onCreated }: Props) 
             </div>
 
             <p className="text-xs text-slate-500">
-              {state.selected.length} compan{state.selected.length === 1 ? "y" : "ies"} selected
+              {state.selected.length} {isLinkedin ? "contact" : "compan"}{state.selected.length === 1 ? (isLinkedin ? "" : "y") : (isLinkedin ? "s" : "ies")} selected
             </p>
 
             {state.error && (
@@ -395,7 +469,7 @@ export default function CreateSessionModal({ open, onClose, onCreated }: Props) 
                 onClick={() => dispatch({ type: "SET_STEP", step: 2 })}
                 disabled={!state.name.trim()}
               >
-                Next: Add Companies
+                Next: {isLinkedin ? "Select Contacts" : "Add Companies"}
               </Button>
             </>
           ) : (
@@ -408,7 +482,7 @@ export default function CreateSessionModal({ open, onClose, onCreated }: Props) 
                 disabled={state.selected.length === 0 || state.saving}
               >
                 {state.saving ? (
-                  <><Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" /> Creating…</>
+                  <><Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" /> Creating&hellip;</>
                 ) : (
                   `Create Session (${state.selected.length})`
                 )}

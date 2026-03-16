@@ -2,7 +2,9 @@
 
 ## Context and Purpose
 
-Enrichment Sessions allow users to run AI-powered CFO / head-of-finance research for a curated set of companies. Unlike the existing Python `cfo-enricher` tool (which processes entire years in batch), sessions are user-controlled, observable in real-time, and integrated directly into the dashboard.
+Enrichment Sessions allow users to run AI-powered research for a curated set of companies. Sessions support two **enrichment categories**: CFO (discover finance contacts) and LinkedIn (find LinkedIn URLs for known contacts). See [ENRICHMENT_CATEGORIES.md](./ENRICHMENT_CATEGORIES.md) for the category system details.
+
+Unlike the existing Python `cfo-enricher` tool (which processes entire years in batch), sessions are user-controlled, observable in real-time, and integrated directly into the dashboard.
 
 Key differences from outreach **Campaigns**:
 - Campaigns = *who to contact* (LinkedIn outreach tracking)
@@ -19,6 +21,7 @@ Key differences from outreach **Campaigns**:
 | id | UUID PK | |
 | team_id | UUID FK→teams | RLS scope |
 | name | TEXT | user-provided label |
+| enrichment_category | TEXT NOT NULL DEFAULT 'cfo' | `'cfo'` or `'linkedin'` (migration 012) |
 | status | ENUM | `pending / running / paused / completed / failed` |
 | model_config | JSONB | `{ enrichmentMode?, models: [...], current_model_index: N, numWorkers? }` — rolling state |
 | tokens_input / tokens_output / tokens_total | BIGINT | aggregate token usage |
@@ -36,6 +39,8 @@ Key differences from outreach **Campaigns**:
 | company_id | UUID | polymorphic (curated or imported) |
 | company_origin | TEXT CHECK | `'curated'` or `'imported'` |
 | company_name / company_website / company_country | TEXT | snapshot at creation |
+| contact_nome | TEXT nullable | known contact name — input for LinkedIn sessions (migration 012) |
+| contact_ruolo | TEXT nullable | known contact role — input for LinkedIn sessions (migration 012) |
 | status | ENUM | `pending / running / done / failed / skipped` |
 | result_nome / result_ruolo / result_linkedin / result_confidenza | TEXT | enrichment results |
 | logs | JSONB | array of `{ts, event, data}` — max 200 entries |
@@ -44,7 +49,9 @@ Key differences from outreach **Campaigns**:
 | applied_at / applied_by | TIMESTAMPTZ / UUID | set when result is written back to source |
 | position | INT | ordering within session (1-based) |
 
-Migration: `dashboard/supabase/migrations/005_enrichment_sessions.sql`
+Migrations:
+- `dashboard/supabase/migrations/005_enrichment_sessions.sql` — base tables
+- `dashboard/supabase/migrations/012_enrichment_category.sql` — category column + contact input fields
 
 ---
 
@@ -65,6 +72,8 @@ dashboard/src/app/api/enrichment-sessions/
   [id]/apply/route.ts               — POST apply all results
   [id]/companies/route.ts           — GET paginated company rows
   [id]/companies/[companyRowId]/apply/route.ts — POST apply single result
+  [id]/retry/route.ts               — POST retry failed companies
+  [id]/reset/route.ts               — POST reset all companies (re-run from scratch)
 
 dashboard/src/lib/
   cfo-finder-prompt.ts              — System prompt, user message builder, result extractor
@@ -135,7 +144,24 @@ The `LogPanel` component auto-scrolls as `log` events arrive for running compani
 - **Resume**: same as "Start" — opens a new SSE connection, server processes remaining `pending` rows.
 - **Crash recovery**: if `last_heartbeat` is stale >5 min and status is `running`, monitor shows a warning banner.
 
-### 5. Apply Results
+### 5. Reset All (Re-run from Scratch)
+1. When a session has any completed companies and is not running, a "Reset All" button appears (red outline)
+2. User clicks "Reset All" → browser confirmation dialog
+3. On confirm → `POST /api/enrichment-sessions/[id]/reset`
+4. Server resets ALL non-pending `enrichment_session_companies` rows to `pending` (clears results, tokens, logs, errors)
+5. Session counters zeroed (`completed/found/failed/tokens = 0`), status set to `pending`, `started_at`/`completed_at` cleared
+6. Client-side state is updated via `RESET_ALL` reducer action — all companies show as pending, progress bar resets to 0
+7. User can then click "Start" to re-process all companies from scratch
+
+### 6. Retry Failed Companies
+1. When a session has completed/failed with some companies in `failed` status, a "Retry Failed (N)" button appears
+2. User clicks "Retry Failed" → `POST /api/enrichment-sessions/[id]/retry`
+3. Server resets all `failed` companies to `pending` (clears error, results, tokens, logs), adjusts session counters (`completed -= failedCount`, `failed = 0`), sets session status back to `pending`
+4. Client-side state is updated via `RESET_FOR_RETRY` reducer action
+5. User can then click "Start" to re-run the stream, which picks up the reset `pending` companies
+6. The stream route allows starting from `completed`/`failed` sessions if there are pending companies
+
+### 7. Apply Results
 - **Apply All**: `POST /api/enrichment-sessions/[id]/apply` — writes results for all `done` + `applied_at IS NULL` rows to source tables.
 - **Apply Single**: `POST /api/enrichment-sessions/[id]/companies/[companyRowId]/apply`
 - For `imported` companies: updates `imported_companies.cfo_nome/ruolo/linkedin/confidenza`
@@ -201,6 +227,8 @@ Located in `src/lib/cfo-finder-prompt.ts`:
 
 - [x] Dual enrichment mode (Cloud / Local) with mode selector in CreateSessionModal
 - [x] Configurable concurrency (numWorkers in model_config, 1-8 workers)
+- [x] Retry failed companies (reset to pending + re-run)
+- [x] Reset all companies (re-run session from scratch)
 - [ ] Support importing from a Campaign (enrich all contacts in a campaign at once)
 - [ ] Model priority drag-and-drop in `CreateSessionModal`
 - [ ] Export enrichment results as CSV

@@ -101,6 +101,7 @@ function toSessionShape(row: Record<string, unknown>) {
     id: row.id,
     teamId: row.team_id,
     name: row.name,
+    enrichmentCategory: row.enrichment_category ?? "cfo",
     status: row.status,
     modelConfig: row.model_config,
     tokensInput: row.tokens_input,

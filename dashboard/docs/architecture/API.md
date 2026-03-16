@@ -1,7 +1,7 @@
 # API Routes
 
 > Tutti i route sono in `src/app/api/`. Pattern comune: auth check → team resolution → admin client per le mutazioni.
-> Aggiornato al: 2026-03-11
+> Aggiornato al: 2026-03-16
 
 ---
 
@@ -153,8 +153,12 @@ Ricerca aziende nella `companies_full` view per nome. Usato da `AddContactsModal
 | `limit` | number | `30` (max 100) |
 | `year` | number | `2026` |
 | `country` | query string | opzionale (`IT`, `DE`, ... oppure `all`) |
+| `hasCfo` | `"true"` | opzionale — filtra `cfo_nome IS NOT NULL` |
+| `noLinkedin` | `"true"` | opzionale — filtra `cfo_linkedin IS NULL` |
 
 **Returns**: array di `{ id, azienda, settore, regione, country, cfo_nome, cfo_ruolo, cfo_linkedin }`
+
+> `hasCfo` + `noLinkedin` sono usati da `CreateSessionModal` in modalita LinkedIn per mostrare solo aziende con contatto noto ma senza LinkedIn.
 
 ---
 
@@ -173,19 +177,23 @@ Gestisce anche il refresh automatico del token Supabase via `supabase.auth.getUs
 
 ---
 
-## Enrichment Sessions (aggiunto 2026-03-11)
+## Enrichment Sessions (aggiunto 2026-03-11, category support 2026-03-16)
 
 | Method | Route | Purpose |
 |---|---|---|
 | GET | `/api/enrichment-sessions` | List team's sessions with progress counters |
-| POST | `/api/enrichment-sessions` | Create session + company rows |
+| POST | `/api/enrichment-sessions` | Create session + company rows (accepts `enrichmentCategory`: `"cfo"` or `"linkedin"`) |
 | GET | `/api/enrichment-sessions/[id]` | Session detail |
 | PATCH | `/api/enrichment-sessions/[id]` | Update name / status (pause) / model_config |
 | DELETE | `/api/enrichment-sessions/[id]` | Delete (blocked if running) |
 | GET | `/api/enrichment-sessions/[id]/companies` | Paginated company rows with logs |
-| **GET** | **`/api/enrichment-sessions/[id]/stream`** | **SSE — runs enrichment, streams events** |
-| POST | `/api/enrichment-sessions/[id]/apply` | Apply all done results to source tables |
-| POST | `/api/enrichment-sessions/[id]/companies/[companyRowId]/apply` | Apply single result |
+| **GET** | **`/api/enrichment-sessions/[id]/stream`** | **SSE — runs enrichment, streams events (branches by category)** |
+| POST | `/api/enrichment-sessions/[id]/apply` | Apply all done results to source tables (branches by category) |
+| POST | `/api/enrichment-sessions/[id]/retry` | Reset failed companies to pending, adjust counters, allow re-run |
+| POST | `/api/enrichment-sessions/[id]/reset` | Reset ALL companies to pending, zero all counters, allow full re-run |
+| POST | `/api/enrichment-sessions/[id]/companies/[companyRowId]/apply` | Apply single result (branches by category) |
+
+**Category-aware routing**: The stream and apply routes read `enrichment_category` from the session. CFO sessions use `cfo-finder-prompt.ts` / port 8765 (local). LinkedIn sessions use `findLinkedIn()` from `linkedin-finder.ts` / port 8766 (local). See `dashboard/docs/features/ENRICHMENT_CATEGORIES.md`.
 
 ### SSE stream events
 `session_start`, `company_start`, `log`, `company_done`, `session_progress`, `heartbeat`, `session_complete`, `session_paused`, `error`

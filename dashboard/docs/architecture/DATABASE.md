@@ -1,7 +1,7 @@
 # Database — Schema e RLS
 
 > Supabase (PostgreSQL) con Row-Level Security team-scoped.
-> Aggiornato al: 2026-03-11
+> Aggiornato al: 2026-03-16
 
 ---
 
@@ -13,6 +13,8 @@
 | `002_team_scoped_annotations.sql` | aggiunge `team_id` ad annotations, riscrive RLS |
 | `003_campaigns.sql` | campaigns, campaign_contacts, enum campaign_status/contact_status |
 | `004_country_support.sql` | aggiunge `country` a `sources` e `companies` per supporto multi-country |
+| `005_enrichment_sessions.sql` | enrichment_sessions, enrichment_session_companies, enums |
+| `012_enrichment_category.sql` | `enrichment_category` su sessions, `contact_nome`/`contact_ruolo` su session companies |
 
 ---
 
@@ -195,13 +197,18 @@ Vista materializzata che combina company data + contacts enrichment + annotation
 | Admin (service role) | `src/lib/supabase/admin.ts` | Scritture in API routes, bypassa RLS |
 | Client (anon) | `src/lib/supabase/client.ts` | Letture dirette nei componenti, RLS attiva |
 
-| `005_enrichment_sessions.sql` | enrichment_sessions, enrichment_session_companies, enum enrichment_session_status/enrichment_company_status |
-
 ### `enrichment_sessions`
 Team-scoped table. Tracks an enrichment run with aggregate progress counters and Groq model pool state.
 
+Added in migration 012:
+- `enrichment_category` — `TEXT NOT NULL DEFAULT 'cfo'`, CHECK `('cfo', 'linkedin')`. Discriminates CFO discovery vs LinkedIn URL lookup.
+
 ### `enrichment_session_companies`
 Per-company rows within a session. Stores snapshots (name/website/country), status, enrichment results, per-company logs (JSONB array), token usage, and whether the result has been applied back to the source record.
+
+Added in migration 012:
+- `contact_nome` — `TEXT` nullable. Known contact name (input for LinkedIn sessions).
+- `contact_ruolo` — `TEXT` nullable. Known contact role (input for LinkedIn sessions).
 
 RLS: both tables scoped via `enrichment_sessions.team_id → team_memberships`.
 

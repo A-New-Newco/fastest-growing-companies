@@ -34,6 +34,7 @@ const SSE_HEADERS = {
 // ── CFO-Enricher local server ────────────────────────────────────────────────
 
 const LOCAL_ENRICHER_BASE = process.env.CFO_ENRICHER_URL ?? "http://localhost:8765";
+const LINKEDIN_ENRICHER_BASE = process.env.LINKEDIN_ENRICHER_URL ?? "http://localhost:8766";
 
 // ── GET /api/enrichment-sessions/[id]/stream ──────────────────────────────────
 
@@ -58,12 +59,23 @@ export async function GET(req: NextRequest, { params }: Params) {
     return new Response("Not found", { status: 404 });
   }
 
-  if (session.status === "completed") {
-    return new Response("Session already completed", { status: 409 });
-  }
+  if (session.status === "completed" || session.status === "failed") {
+    // Check if there are pending companies (e.g. after a retry reset)
+    const admin = createAdminSupabaseClient();
+    const { count } = await admin
+      .from("enrichment_session_companies")
+      .select("id", { count: "exact", head: true })
+      .eq("session_id", params.id)
+      .eq("status", "pending");
 
-  if (session.status === "failed") {
-    return new Response("Session failed — create a new session", { status: 409 });
+    if (!count || count === 0) {
+      return new Response(
+        session.status === "completed"
+          ? "Session already completed"
+          : "Session failed — retry failed companies or create a new session",
+        { status: 409 }
+      );
+    }
   }
 
   const modelConfig = session.model_config as {
@@ -74,6 +86,14 @@ export async function GET(req: NextRequest, { params }: Params) {
   } | null;
 
   const enrichmentMode = modelConfig?.enrichmentMode ?? "remote";
+  const enrichmentCategory = (session.enrichment_category as string) ?? "cfo";
+
+  if (enrichmentCategory === "linkedin") {
+    if (enrichmentMode === "local") {
+      return handleLinkedInLocalStream(req, session, params);
+    }
+    return handleLinkedInRemoteStream(req, session, params, modelConfig);
+  }
 
   if (enrichmentMode === "local") {
     return handleLocalStream(req, session, params);
@@ -598,7 +618,8 @@ async function handleRemoteStream(
               entry: { ts: new Date().toISOString(), event: "think", data: { text: "LinkedIn not found in enrichment — running fallback search..." } },
             });
             try {
-              resolvedLinkedin = await findLinkedIn(row.company_name, callResult.result.nome, key, signal);
+              const liResult = await findLinkedIn(row.company_name, callResult.result.nome, key, signal);
+              resolvedLinkedin = liResult.url;
             } catch {
               // Non-critical — continue without LinkedIn
             }
@@ -733,4 +754,452 @@ async function handleRemoteStream(
   });
 
   return new Response(stream, { headers: SSE_HEADERS });
+}
+
+// ── LINKEDIN REMOTE mode: Groq-based LinkedIn search ─────────────────────────
+
+async function handleLinkedInRemoteStream(
+  req: NextRequest,
+  session: Record<string, unknown>,
+  params: Params["params"],
+  modelConfig: {
+    enrichmentMode?: "remote" | "local";
+    models?: string[];
+    current_model_index?: number;
+    numWorkers?: number;
+  } | null,
+) {
+  const apiKey = process.env.GROQ_API_KEY;
+  if (!apiKey) {
+    return new Response("GROQ_API_KEY not configured", { status: 500 });
+  }
+  const key: string = apiKey;
+
+  const admin = createAdminSupabaseClient();
+
+  await admin
+    .from("enrichment_session_companies")
+    .update({ status: "pending" })
+    .eq("session_id", params.id)
+    .eq("status", "running");
+
+  const { data: pendingRows } = await admin
+    .from("enrichment_session_companies")
+    .select("*")
+    .eq("session_id", params.id)
+    .eq("status", "pending")
+    .order("position", { ascending: true });
+
+  const pending = pendingRows ?? [];
+  const numWorkers = Math.min(8, Math.max(1, modelConfig?.numWorkers ?? 3));
+
+  await admin.from("enrichment_sessions").update({
+    status: "running",
+    started_at: session.started_at ?? new Date().toISOString(),
+  }).eq("id", params.id);
+
+  const { signal } = req;
+
+  let sessionTokensInput = Number(session.tokens_input ?? 0);
+  let sessionTokensOutput = Number(session.tokens_output ?? 0);
+  let completedCount = Number(session.completed_count ?? 0);
+  let foundCount = Number(session.found_count ?? 0);
+  let failedCount = Number(session.failed_count ?? 0);
+  const totalCompanies = Number(session.total_companies ?? 0);
+
+  const linkedInStream = new ReadableStream({
+    async start(controller) {
+      function enqueue(event: string, data: unknown) {
+        try {
+          controller.enqueue(new TextEncoder().encode(sseEvent(event, data)));
+        } catch { /* closed */ }
+      }
+
+      const heartbeatInterval = setInterval(() => {
+        enqueue("heartbeat", { ts: new Date().toISOString() });
+        admin.from("enrichment_sessions")
+          .update({ last_heartbeat: new Date().toISOString() })
+          .eq("id", params.id)
+          .then(() => {});
+      }, 15_000);
+
+      let counterLock = Promise.resolve();
+      function flushCounters() {
+        counterLock = counterLock.then(async () => {
+          await admin.from("enrichment_sessions").update({
+            tokens_input: sessionTokensInput,
+            tokens_output: sessionTokensOutput,
+            tokens_total: sessionTokensInput + sessionTokensOutput,
+            completed_count: completedCount,
+            found_count: foundCount,
+            failed_count: failedCount,
+            last_heartbeat: new Date().toISOString(),
+          }).eq("id", params.id);
+        });
+      }
+
+      type PendingRow = NonNullable<typeof pendingRows>[number];
+
+      async function processContact(row: PendingRow) {
+        if (signal.aborted) return;
+
+        const contactNome = (row.contact_nome as string | null) ?? "";
+        const contactRuolo = (row.contact_ruolo as string | null) ?? null;
+
+        if (!contactNome) {
+          completedCount++;
+          failedCount++;
+          await admin.from("enrichment_session_companies").update({
+            status: "failed",
+            error_message: "No contact name provided",
+          }).eq("id", row.id);
+          enqueue("company_done", {
+            companyRowId: row.id,
+            status: "failed",
+            errorMessage: "No contact name provided",
+            tokensInput: 0, tokensOutput: 0, modelUsed: null,
+          });
+          flushCounters();
+          enqueue("session_progress", {
+            completed: completedCount, total: totalCompanies,
+            found: foundCount, failed: failedCount,
+            tokensTotal: sessionTokensInput + sessionTokensOutput,
+          });
+          return;
+        }
+
+        enqueue("company_start", {
+          companyRowId: row.id,
+          position: row.position,
+          companyName: row.company_name,
+          model: "linkedin-finder",
+        });
+
+        await admin.from("enrichment_session_companies")
+          .update({ status: "running" })
+          .eq("id", row.id);
+
+        let liResult;
+        try {
+          liResult = await findLinkedIn(row.company_name as string, contactNome, key, signal);
+        } catch (err) {
+          if (signal.aborted) {
+            await admin.from("enrichment_session_companies").update({ status: "pending" }).eq("id", row.id);
+            return;
+          }
+          completedCount++;
+          failedCount++;
+          const errMsg = err instanceof Error ? err.message : String(err);
+          await admin.from("enrichment_session_companies").update({
+            status: "failed", error_message: errMsg.slice(0, 500),
+          }).eq("id", row.id);
+          enqueue("company_done", {
+            companyRowId: row.id, status: "failed",
+            errorMessage: errMsg.slice(0, 200),
+            tokensInput: 0, tokensOutput: 0, modelUsed: null,
+          });
+          flushCounters();
+          enqueue("session_progress", {
+            completed: completedCount, total: totalCompanies,
+            found: foundCount, failed: failedCount,
+            tokensTotal: sessionTokensInput + sessionTokensOutput,
+          });
+          return;
+        }
+
+        if (signal.aborted) {
+          await admin.from("enrichment_session_companies").update({ status: "pending" }).eq("id", row.id);
+          return;
+        }
+
+        sessionTokensInput += liResult.tokensInput;
+        sessionTokensOutput += liResult.tokensOutput;
+        completedCount++;
+        if (liResult.url) foundCount++;
+        else failedCount++;
+
+        await admin.from("enrichment_session_companies").update({
+          status: "done",
+          result_nome: contactNome,
+          result_ruolo: contactRuolo,
+          result_linkedin: liResult.url,
+          result_confidenza: liResult.url ? "medium" : null,
+          model_used: liResult.modelUsed ?? "linkedin-finder",
+          tokens_input: liResult.tokensInput,
+          tokens_output: liResult.tokensOutput,
+          logs: [],
+          error_message: null,
+        }).eq("id", row.id);
+
+        enqueue("company_done", {
+          companyRowId: row.id,
+          status: "done",
+          result: {
+            nome: contactNome,
+            ruolo: contactRuolo,
+            linkedin: liResult.url,
+            confidenza: liResult.url ? "medium" : null,
+          },
+          tokensInput: liResult.tokensInput,
+          tokensOutput: liResult.tokensOutput,
+          modelUsed: liResult.modelUsed ?? "linkedin-finder",
+        });
+
+        flushCounters();
+        enqueue("session_progress", {
+          completed: completedCount, total: totalCompanies,
+          found: foundCount, failed: failedCount,
+          tokensTotal: sessionTokensInput + sessionTokensOutput,
+        });
+      }
+
+      try {
+        enqueue("session_start", {
+          sessionId: params.id, totalCompanies,
+          resumedAt: totalCompanies - pending.length, numWorkers,
+        });
+
+        const queue = [...pending];
+        async function runWorker() {
+          while (!signal.aborted) {
+            const row = queue.shift();
+            if (!row) break;
+            await processContact(row);
+          }
+        }
+
+        const workerCount = Math.min(numWorkers, pending.length);
+        await Promise.all(Array.from({ length: workerCount }, () => runWorker()));
+        await counterLock;
+        clearInterval(heartbeatInterval);
+
+        if (signal.aborted) {
+          await admin.from("enrichment_sessions").update({ status: "paused" }).eq("id", params.id);
+          enqueue("session_paused", { sessionId: params.id, completedSoFar: completedCount, reason: "client_disconnect" });
+        } else {
+          await admin.from("enrichment_sessions").update({ status: "completed", completed_at: new Date().toISOString() }).eq("id", params.id);
+          enqueue("session_complete", { sessionId: params.id, found: foundCount, failed: failedCount, total: totalCompanies, tokensTotal: sessionTokensInput + sessionTokensOutput });
+        }
+      } catch (err) {
+        clearInterval(heartbeatInterval);
+        await admin.from("enrichment_sessions").update({ status: "failed" }).eq("id", params.id);
+        enqueue("error", { message: err instanceof Error ? err.message : String(err) });
+      } finally {
+        try { controller.close(); } catch { /* already closed */ }
+      }
+    },
+  });
+
+  return new Response(linkedInStream, { headers: SSE_HEADERS });
+}
+
+// ── LINKEDIN LOCAL mode: proxy SSE from linkedin-enricher Python server ──────
+
+async function handleLinkedInLocalStream(
+  req: NextRequest,
+  session: Record<string, unknown>,
+  params: Params["params"],
+) {
+  const admin = createAdminSupabaseClient();
+  const sessionId = params.id;
+
+  await admin
+    .from("enrichment_session_companies")
+    .update({ status: "pending" })
+    .eq("session_id", sessionId)
+    .eq("status", "running");
+
+  const { data: pendingRows } = await admin
+    .from("enrichment_session_companies")
+    .select("*")
+    .eq("session_id", sessionId)
+    .eq("status", "pending")
+    .order("position", { ascending: true });
+
+  const pending = pendingRows ?? [];
+  if (pending.length === 0) {
+    return new Response("No pending companies", { status: 409 });
+  }
+
+  // Build id → row mapping for translating events
+  const idToRow = new Map<string, { rowId: string; contact_nome: string | null; contact_ruolo: string | null }>();
+  for (const row of pending) {
+    idToRow.set(row.id as string, {
+      rowId: row.id as string,
+      contact_nome: (row.contact_nome as string | null) ?? null,
+      contact_ruolo: (row.contact_ruolo as string | null) ?? null,
+    });
+  }
+
+  const modelConfig = session.model_config as { numWorkers?: number } | null;
+  const numWorkers = Math.min(8, Math.max(1, modelConfig?.numWorkers ?? 8));
+  const totalCompanies = Number(session.total_companies ?? 0);
+
+  await admin.from("enrichment_sessions").update({
+    status: "running",
+    started_at: session.started_at ?? new Date().toISOString(),
+  }).eq("id", sessionId);
+
+  // Build contacts payload for linkedin-enricher
+  const contacts = pending.map((row) => ({
+    id: row.id as string,
+    nome: (row.contact_nome as string | null) ?? "",
+    ruolo: (row.contact_ruolo as string | null) ?? undefined,
+    azienda: row.company_name as string,
+    sito_web: (row.company_website as string | null) ?? undefined,
+  }));
+
+  let startOk = false;
+  try {
+    const startRes = await fetch(`${LINKEDIN_ENRICHER_BASE}/api/linkedin/start`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ contacts, max_concurrency: numWorkers, reset: true }),
+    });
+    if (!startRes.ok) {
+      const err = await startRes.json().catch(() => ({}));
+      const detail = (err as { detail?: string }).detail ?? `LinkedIn server error: ${startRes.status}`;
+      await admin.from("enrichment_sessions").update({ status: "failed" }).eq("id", sessionId);
+      return new Response(detail, { status: 502 });
+    }
+    startOk = true;
+  } catch {
+    await admin.from("enrichment_sessions").update({ status: "failed" }).eq("id", sessionId);
+    return new Response("Cannot reach LinkedIn enrichment server. Is linkedin-enricher running?", { status: 502 });
+  }
+
+  if (!startOk) {
+    return new Response("Failed to start LinkedIn enrichment", { status: 502 });
+  }
+
+  const { signal } = req;
+  let completedCount = Number(session.completed_count ?? 0);
+  let foundCount = Number(session.found_count ?? 0);
+  let failedCount = Number(session.failed_count ?? 0);
+
+  const linkedInLocalStream = new ReadableStream({
+    async start(controller) {
+      function enqueue(event: string, data: unknown) {
+        try { controller.enqueue(new TextEncoder().encode(sseEvent(event, data))); } catch { /* closed */ }
+      }
+
+      const heartbeatInterval = setInterval(() => {
+        enqueue("heartbeat", { ts: new Date().toISOString() });
+        admin.from("enrichment_sessions").update({ last_heartbeat: new Date().toISOString() }).eq("id", sessionId).then(() => {});
+      }, 15_000);
+
+      let counterLock = Promise.resolve();
+      function flushCounters() {
+        counterLock = counterLock.then(async () => {
+          await admin.from("enrichment_sessions").update({
+            completed_count: completedCount, found_count: foundCount, failed_count: failedCount,
+            last_heartbeat: new Date().toISOString(),
+          }).eq("id", sessionId);
+        });
+      }
+
+      enqueue("session_start", { sessionId, totalCompanies, resumedAt: totalCompanies - pending.length, numWorkers });
+
+      try {
+        const sseRes = await fetch(`${LINKEDIN_ENRICHER_BASE}/api/linkedin/stream`, { signal });
+        if (!sseRes.ok || !sseRes.body) throw new Error(`LinkedIn SSE connection failed: ${sseRes.status}`);
+
+        const reader = sseRes.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = "";
+
+        while (!signal.aborted) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split("\n");
+          buffer = lines.pop() ?? "";
+
+          let currentEvent = "";
+          let currentData = "";
+
+          for (const line of lines) {
+            if (line.startsWith("event: ")) {
+              currentEvent = line.slice(7).trim();
+            } else if (line.startsWith("data: ")) {
+              currentData = line.slice(6);
+            } else if (line === "") {
+              if (currentEvent && currentData) {
+                try {
+                  const evData = JSON.parse(currentData) as Record<string, unknown>;
+
+                  if (currentEvent === "contact") {
+                    const contactId = evData.id as string;
+                    const rowInfo = idToRow.get(contactId);
+                    if (rowInfo) {
+                      const linkedinUrl = (evData.linkedin_url as string | null) ?? null;
+                      const confidenza = (evData.confidenza as string | null) ?? null;
+                      const succeeded = linkedinUrl !== null;
+
+                      await admin.from("enrichment_session_companies").update({
+                        status: "done",
+                        result_nome: rowInfo.contact_nome,
+                        result_ruolo: rowInfo.contact_ruolo,
+                        result_linkedin: linkedinUrl,
+                        result_confidenza: confidenza,
+                        model_used: "claude-haiku-4.5 (local)",
+                        tokens_input: (evData.input_tokens as number) ?? 0,
+                        tokens_output: (evData.output_tokens as number) ?? 0,
+                        logs: [], error_message: null,
+                      }).eq("id", rowInfo.rowId);
+
+                      completedCount++;
+                      if (succeeded) foundCount++;
+                      else failedCount++;
+
+                      enqueue("company_done", {
+                        companyRowId: rowInfo.rowId, status: "done",
+                        result: { nome: rowInfo.contact_nome, ruolo: rowInfo.contact_ruolo, linkedin: linkedinUrl, confidenza },
+                        tokensInput: (evData.input_tokens as number) ?? 0,
+                        tokensOutput: (evData.output_tokens as number) ?? 0,
+                        modelUsed: "claude-haiku-4.5 (local)",
+                      });
+
+                      flushCounters();
+                      enqueue("session_progress", {
+                        completed: completedCount, total: totalCompanies,
+                        found: foundCount, failed: failedCount, tokensTotal: 0,
+                      });
+                    }
+                  } else if (currentEvent === "error") {
+                    enqueue("error", { message: (evData.message as string) ?? "LinkedIn enricher error" });
+                  }
+                  // Ignore 'progress', 'done', 'ping' — we compute our own
+                } catch { /* parse error, skip */ }
+              }
+              currentEvent = "";
+              currentData = "";
+            }
+          }
+        }
+
+        await counterLock;
+        clearInterval(heartbeatInterval);
+
+        if (signal.aborted) {
+          try { await fetch(`${LINKEDIN_ENRICHER_BASE}/api/linkedin/stop`, { method: "POST" }); } catch { /* best effort */ }
+          await admin.from("enrichment_sessions").update({ status: "paused" }).eq("id", sessionId);
+          enqueue("session_paused", { sessionId, completedSoFar: completedCount, reason: "client_disconnect" });
+        } else {
+          await admin.from("enrichment_sessions").update({ status: "completed", completed_at: new Date().toISOString() }).eq("id", sessionId);
+          enqueue("session_complete", { sessionId, found: foundCount, failed: failedCount, total: totalCompanies, tokensTotal: 0 });
+        }
+      } catch (err) {
+        clearInterval(heartbeatInterval);
+        if (!signal.aborted) {
+          await admin.from("enrichment_sessions").update({ status: "failed" }).eq("id", sessionId);
+          enqueue("error", { message: err instanceof Error ? err.message : String(err) });
+        }
+      } finally {
+        try { controller.close(); } catch { /* already closed */ }
+      }
+    },
+  });
+
+  return new Response(linkedInLocalStream, { headers: SSE_HEADERS });
 }

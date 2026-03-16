@@ -23,6 +23,7 @@ function toSessionShape(row: Record<string, unknown>): EnrichmentSession {
     completedAt: row.completed_at as string | null,
     lastHeartbeat: row.last_heartbeat as string | null,
     createdBy: row.created_by as string,
+    enrichmentCategory: (row.enrichment_category as string ?? "cfo") as EnrichmentSession["enrichmentCategory"],
     createdAt: row.created_at as string,
     updatedAt: row.updated_at as string,
   };
@@ -49,6 +50,8 @@ function toCompanyShape(row: Record<string, unknown>): EnrichmentSessionCompany 
     errorMessage: row.error_message as string | null,
     appliedAt: row.applied_at as string | null,
     appliedBy: row.applied_by as string | null,
+    contactNome: row.contact_nome as string | null,
+    contactRuolo: row.contact_ruolo as string | null,
     position: Number(row.position ?? 0),
     createdAt: row.created_at as string,
     updatedAt: row.updated_at as string,

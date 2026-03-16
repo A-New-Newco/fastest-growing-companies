@@ -66,6 +66,8 @@ export async function POST(req: NextRequest, { params }: Params) {
       companyName: string;
       companyWebsite: string | null;
       companyCountry: string | null;
+      contactNome?: string | null;
+      contactRuolo?: string | null;
     }>;
   } = await req.json();
 
@@ -94,6 +96,8 @@ export async function POST(req: NextRequest, { params }: Params) {
     company_name: c.companyName,
     company_website: c.companyWebsite ?? null,
     company_country: c.companyCountry ?? null,
+    contact_nome: c.contactNome ?? null,
+    contact_ruolo: c.contactRuolo ?? null,
     status: "pending" as const,
     position: startPosition + i,
   }));
@@ -132,6 +136,8 @@ function toCompanyShape(row: Record<string, unknown>) {
     companyName: row.company_name,
     companyWebsite: row.company_website,
     companyCountry: row.company_country,
+    contactNome: row.contact_nome ?? null,
+    contactRuolo: row.contact_ruolo ?? null,
     status: row.status,
     resultNome: row.result_nome,
     resultRuolo: row.result_ruolo,
