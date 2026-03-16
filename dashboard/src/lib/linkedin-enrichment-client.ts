@@ -1,4 +1,5 @@
-// Types and SSE client for the LinkedIn Enricher monitoring server (port 8766).
+// Types and SSE client for the LinkedIn Enricher monitoring server (port 8766)
+// and the Cloud (Groq) LinkedIn stream.
 
 export interface ContactInput {
   id: string;
@@ -65,6 +66,8 @@ export interface LinkedinStartRequest {
   reset: boolean;
   run_id?: string;
 }
+
+export type LinkedinMonitorMode = "cloud" | "local";
 
 // ---------------------------------------------------------------------------
 // Base URLs
@@ -187,4 +190,85 @@ export function connectToLinkedinStream(
   });
 
   return es;
+}
+
+// ---------------------------------------------------------------------------
+// Cloud mode SSE — POST-based stream via dashboard API (no Python server)
+// ---------------------------------------------------------------------------
+
+export function connectToCloudLinkedinStream(
+  req: { contacts: ContactInput[]; max_concurrency: number },
+  handlers: LinkedinStreamHandlers,
+  signal?: AbortSignal,
+): void {
+  fetch("/api/linkedin-monitor/stream", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(req),
+    signal,
+  })
+    .then(async (res) => {
+      if (!res.ok || !res.body) {
+        handlers.onError?.(`Stream failed: ${res.status}`);
+        return;
+      }
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+
+      // eslint-disable-next-line no-constant-condition
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+
+        const lines = buffer.split("\n");
+        buffer = lines.pop() ?? "";
+
+        let currentEvent = "";
+        let currentData = "";
+
+        for (const line of lines) {
+          if (line.startsWith("event: ")) {
+            currentEvent = line.slice(7).trim();
+          } else if (line.startsWith("data: ")) {
+            currentData = line.slice(6);
+          } else if (line === "") {
+            if (currentEvent && currentData) {
+              try {
+                const parsed = JSON.parse(currentData);
+                switch (currentEvent) {
+                  case "progress":
+                    handlers.onProgress?.(parsed);
+                    break;
+                  case "contact":
+                    handlers.onContact?.(parsed);
+                    break;
+                  case "done":
+                    handlers.onDone?.(parsed);
+                    break;
+                  case "error":
+                    handlers.onError?.(
+                      (parsed as { message?: string }).message ?? "Unknown error"
+                    );
+                    break;
+                }
+              } catch {
+                // ignore malformed SSE data
+              }
+            }
+            currentEvent = "";
+            currentData = "";
+          }
+        }
+      }
+    })
+    .catch((err: unknown) => {
+      if (err instanceof DOMException && err.name === "AbortError") return;
+      handlers.onError?.(
+        err instanceof Error ? err.message : "Stream connection failed"
+      );
+    });
 }
