@@ -16,8 +16,10 @@ import {
   type ContactInput,
   type ContactResult,
   type LinkedinDoneEvent,
+  type LinkedinMonitorMode,
   type LinkedinProgressEvent,
   type LinkedinStatus,
+  connectToCloudLinkedinStream,
   connectToLinkedinStream,
   fetchLinkedinHistory,
   fetchLinkedinResults,
@@ -109,8 +111,10 @@ const PIE_COLORS: Record<string, string> = {
 export default function LinkedinMonitorPage() {
   // Config
   const { filters } = useFilters();
+  const [mode, setMode] = useState<LinkedinMonitorMode>("cloud");
   const [concurrency, setConcurrency] = useState<number>(8);
   const [doReset, setDoReset] = useState(false);
+  const cloudAbortRef = useRef<AbortController | null>(null);
 
   // Contact selection from DB
   const [dbCompanies, setDbCompanies] = useState<Company[]>([]);
@@ -159,34 +163,39 @@ export default function LinkedinMonitorPage() {
   // Boot: check server + load companies
   // ------------------------------------------------------------------
   useEffect(() => {
-    fetchLinkedinStatus()
-      .then((s) => {
-        setStatus(s);
-        setServerOnline(true);
-        if (s.completed > 0) {
-          fetchLinkedinResults()
-            .then((rs) => {
-              if (rs.length > 0) {
-                setLiveResults(rs);
-                setActiveTab("live");
-              }
+    if (mode === "local") {
+      fetchLinkedinStatus()
+        .then((s) => {
+          setStatus(s);
+          setServerOnline(true);
+          if (s.completed > 0) {
+            fetchLinkedinResults()
+              .then((rs) => {
+                if (rs.length > 0) {
+                  setLiveResults(rs);
+                  setActiveTab("live");
+                }
+              })
+              .catch(() => {});
+          }
+          if (s.status === "running") attachStream();
+
+          // Load history
+          fetchLinkedinHistory()
+            .then((h) => {
+              if (h.length > 0) setHistoryResults(h);
             })
             .catch(() => {});
-        }
-        if (s.status === "running") attachStream();
-
-        // Load history
-        fetchLinkedinHistory()
-          .then((h) => {
-            if (h.length > 0) setHistoryResults(h);
-          })
-          .catch(() => {});
-      })
-      .catch(() => setServerOnline(false));
+        })
+        .catch(() => setServerOnline(false));
+    } else {
+      // Cloud mode — no Python server needed
+      setServerOnline(null);
+    }
 
     loadContactsWithoutLinkedin();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loadContactsWithoutLinkedin]);
+  }, [loadContactsWithoutLinkedin, mode]);
 
   // ------------------------------------------------------------------
   // SSE stream
@@ -241,7 +250,10 @@ export default function LinkedinMonitorPage() {
     esRef.current = es;
   }, []);
 
-  useEffect(() => () => esRef.current?.close(), []);
+  useEffect(() => () => {
+    esRef.current?.close();
+    cloudAbortRef.current?.abort();
+  }, []);
 
   // ------------------------------------------------------------------
   // Controls
@@ -267,24 +279,93 @@ export default function LinkedinMonitorPage() {
       return;
     }
 
-    try {
-      await startLinkedinRun({
-        contacts,
-        max_concurrency: concurrency,
-        reset: doReset,
+    if (mode === "local") {
+      try {
+        await startLinkedinRun({
+          contacts,
+          max_concurrency: concurrency,
+          reset: doReset,
+        });
+        setStatus((prev) => (prev ? { ...prev, status: "running", total: contacts.length } : prev));
+        attachStream();
+      } catch (e: unknown) {
+        setErrorMsg(e instanceof Error ? e.message : "Failed to start");
+      }
+    } else {
+      // Cloud mode
+      setStatus({
+        status: "running",
+        output_dir: "",
+        total: contacts.length,
+        completed: 0,
+        found: 0,
+        not_found: 0,
+        rate_limits: 0,
+        total_cost_usd: 0,
+        elapsed_s: 0,
+        error_message: null,
       });
-      setStatus((prev) => (prev ? { ...prev, status: "running", total: contacts.length } : prev));
-      attachStream();
-    } catch (e: unknown) {
-      setErrorMsg(e instanceof Error ? e.message : "Failed to start");
+      setProgress(null);
+
+      const abort = new AbortController();
+      cloudAbortRef.current = abort;
+
+      connectToCloudLinkedinStream(
+        { contacts, max_concurrency: concurrency },
+        {
+          onProgress: (data: LinkedinProgressEvent) => {
+            setProgress(data);
+            setStatus((prev) =>
+              prev
+                ? {
+                    ...prev,
+                    completed: data.completed,
+                    found: data.found,
+                    not_found: data.not_found,
+                    total_cost_usd: data.total_cost_usd,
+                    elapsed_s: data.elapsed_s,
+                    rate_limits: data.rate_limits,
+                  }
+                : prev
+            );
+          },
+          onContact: (data: ContactResult) => {
+            setLiveResults((prev) => {
+              const existingIdx = prev.findIndex((r) => r.id === data.id);
+              if (existingIdx !== -1) {
+                const next = [...prev];
+                next[existingIdx] = data;
+                return next;
+              }
+              return [data, ...prev];
+            });
+          },
+          onDone: (data: LinkedinDoneEvent) => {
+            setStatus((prev) =>
+              prev
+                ? { ...prev, status: data.cancelled ? "idle" : "completed" }
+                : prev
+            );
+            cloudAbortRef.current = null;
+          },
+          onError: (msg: string) => setErrorMsg(msg),
+        },
+        abort.signal,
+      );
     }
   };
 
   const handleStop = async () => {
-    try {
-      await stopLinkedinRun();
-    } catch (e: unknown) {
-      setErrorMsg(e instanceof Error ? e.message : "Failed to stop");
+    if (mode === "local") {
+      try {
+        await stopLinkedinRun();
+      } catch (e: unknown) {
+        setErrorMsg(e instanceof Error ? e.message : "Failed to stop");
+      }
+    } else {
+      cloudAbortRef.current?.abort();
+      cloudAbortRef.current = null;
+      setStatus((prev) => (prev ? { ...prev, status: "idle" } : prev));
     }
   };
 
@@ -436,12 +517,12 @@ export default function LinkedinMonitorPage() {
         </h1>
         <p className="mt-1 text-sm text-slate-500">
           Find LinkedIn profiles for contacts missing LinkedIn URLs &mdash;
-          powered by Claude Agent
+          {mode === "cloud" ? " powered by Groq" : " powered by Claude Agent"}
         </p>
       </div>
 
-      {/* Server offline banner */}
-      {serverOnline === false && (
+      {/* Server offline banner (local mode only) */}
+      {mode === "local" && serverOnline === false && (
         <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
           Monitor server is offline. Run{" "}
           <code className="font-mono bg-red-100 rounded px-1 py-0.5">
@@ -470,6 +551,37 @@ export default function LinkedinMonitorPage() {
         </CardHeader>
         <CardContent className="space-y-5">
           <div className="flex flex-wrap gap-4 items-end">
+            {/* Mode toggle */}
+            <div className="w-48">
+              <label className="block text-xs font-medium text-slate-500 mb-1.5">
+                Mode
+              </label>
+              <div className="flex rounded-md border border-slate-200 overflow-hidden">
+                <button
+                  onClick={() => setMode("cloud")}
+                  disabled={isRunning}
+                  className={`flex-1 py-1.5 text-xs font-medium transition-colors ${
+                    mode === "cloud"
+                      ? "bg-indigo-600 text-white"
+                      : "bg-white text-slate-500 hover:bg-slate-50"
+                  }`}
+                >
+                  Cloud (Groq)
+                </button>
+                <button
+                  onClick={() => setMode("local")}
+                  disabled={isRunning}
+                  className={`flex-1 py-1.5 text-xs font-medium transition-colors ${
+                    mode === "local"
+                      ? "bg-indigo-600 text-white"
+                      : "bg-white text-slate-500 hover:bg-slate-50"
+                  }`}
+                >
+                  Local (Claude)
+                </button>
+              </div>
+            </div>
+
             {/* Contacts count */}
             <div className="flex-1 min-w-[200px]">
               <label className="block text-xs font-medium text-slate-500 mb-1.5">
@@ -500,30 +612,33 @@ export default function LinkedinMonitorPage() {
               />
             </div>
 
-            {/* Reset checkbox */}
-            <div className="flex items-center gap-2 pb-1">
-              <input
-                id="reset-chk"
-                type="checkbox"
-                checked={doReset}
-                onChange={(e) => setDoReset(e.target.checked)}
-                disabled={isRunning}
-                className="rounded border-slate-300 accent-indigo-600"
-              />
-              <label
-                htmlFor="reset-chk"
-                className="text-xs text-slate-500 cursor-pointer select-none"
-              >
-                Reset checkpoint
-              </label>
-            </div>
+            {/* Reset checkbox (local mode only — cloud has no checkpoint) */}
+            {mode === "local" && (
+              <div className="flex items-center gap-2 pb-1">
+                <input
+                  id="reset-chk"
+                  type="checkbox"
+                  checked={doReset}
+                  onChange={(e) => setDoReset(e.target.checked)}
+                  disabled={isRunning}
+                  className="rounded border-slate-300 accent-indigo-600"
+                />
+                <label
+                  htmlFor="reset-chk"
+                  className="text-xs text-slate-500 cursor-pointer select-none"
+                >
+                  Reset checkpoint
+                </label>
+              </div>
+            )}
 
             {/* Start / Stop */}
             {!isRunning ? (
               <Button
                 onClick={handleStart}
                 disabled={
-                  selectedIds.size === 0 || serverOnline === false
+                  selectedIds.size === 0 ||
+                  (mode === "local" && serverOnline === false)
                 }
                 className="h-9 bg-indigo-600 hover:bg-indigo-500 text-white"
               >
