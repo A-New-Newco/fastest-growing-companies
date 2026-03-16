@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Play, Pause, CheckCheck, Loader2, AlertTriangle, Zap } from "lucide-react";
+import { Play, Pause, CheckCheck, Loader2, AlertTriangle, Zap, Cloud, Monitor } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import SessionStatusBadge from "./SessionStatusBadge";
 import TokenUsageBadge from "./TokenUsageBadge";
@@ -25,7 +25,9 @@ export default function EnrichmentMonitor({ initialSession, initialCompanies }: 
 
   const session = state.session ?? initialSession;
   const isRunning = state.isConnected;
-  const numWorkers = (session.modelConfig as { numWorkers?: number } | null)?.numWorkers ?? 3;
+  const modelCfg = session.modelConfig as { numWorkers?: number; enrichmentMode?: "remote" | "local" } | null;
+  const numWorkers = modelCfg?.numWorkers ?? 3;
+  const enrichmentMode = modelCfg?.enrichmentMode ?? "remote";
   const total = session.totalCompanies;
   const completed = state.progress?.completed ?? session.completedCount;
   const found = state.progress?.found ?? session.foundCount;
@@ -68,6 +70,12 @@ export default function EnrichmentMonitor({ initialSession, initialCompanies }: 
             <div className="flex items-center gap-3 mt-1.5">
               <SessionStatusBadge status={isRunning ? "running" : session.status} />
               {tokensTotal > 0 && <TokenUsageBadge tokensTotal={tokensTotal} />}
+              <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-500">
+                {enrichmentMode === "local"
+                  ? <Monitor className="w-3 h-3" />
+                  : <Cloud className="w-3 h-3" />}
+                {enrichmentMode === "local" ? "Local" : "Cloud"}
+              </span>
               <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-500">
                 <Zap className="w-3 h-3" />
                 {numWorkers}w

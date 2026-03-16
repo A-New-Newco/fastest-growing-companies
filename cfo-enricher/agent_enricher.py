@@ -11,6 +11,7 @@ Model: claude-haiku-4-5-20251001
 Output format is fully compatible with enricher.py (same JSONL checkpoint + enriched.csv).
 Additionally writes a QA sidecar report: output/{year}/enrichment_quality_report.json.
 """
+
 from __future__ import annotations
 
 # ---------------------------------------------------------------------------
@@ -82,8 +83,8 @@ class EnrichmentResult:
     fonte: str  # always "agent" or "not_found"
     confidenza: str | None  # "high"|"medium"|"low" — used for post-run manual QA
     data_ricerca: str
-    cfo_email: str | None = None      # opportunistic — only if found incidentally
-    cfo_telefono: str | None = None   # opportunistic — only if found incidentally
+    cfo_email: str | None = None  # opportunistic — only if found incidentally
+    cfo_telefono: str | None = None  # opportunistic — only if found incidentally
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -108,11 +109,11 @@ class CompanyOutcome:
     had_rate_limit: bool
     attempts: int
     elapsed_s: float
-    cost_usd: float | None = None   # from ResultMessage.total_cost_usd (all agent calls)
-    usage: dict | None = None       # from ResultMessage.usage (input/output tokens)
-    tool_calls: int = 0             # from ResultMessage.num_turns (total across all agent calls)
-    website: str | None = None      # original "SITO WEB" — passed through for monitor events
-    country: str = "IT"             # "IT" or "DE" — from COUNTRY field
+    cost_usd: float | None = None  # from ResultMessage.total_cost_usd (all agent calls)
+    usage: dict | None = None  # from ResultMessage.usage (input/output tokens)
+    tool_calls: int = 0  # from ResultMessage.num_turns (total across all agent calls)
+    website: str | None = None  # original "SITO WEB" — passed through for monitor events
+    country: str = "IT"  # "IT" or "DE" — from COUNTRY field
 
 
 # ---------------------------------------------------------------------------
@@ -478,7 +479,9 @@ def _derive_quality_flags(
 ) -> QualityFlags:
     role_class = _classify_role(result.cfo_ruolo)
     conf = _normalize_confidence(result.confidenza)
-    is_low_non_finance = bool(result.cfo_nome) and conf == "low" and role_class == "non_finance_fallback"
+    is_low_non_finance = (
+        bool(result.cfo_nome) and conf == "low" and role_class == "non_finance_fallback"
+    )
 
     linkedin_verified = False
     link_validation_error: str | None = None
@@ -624,6 +627,7 @@ def _log_block(block: Any) -> None:
 @dataclass
 class _AgentRun:
     """Result of a single agent query, including cost/usage metadata."""
+
     text: str
     cost_usd: float | None
     usage: dict | None
@@ -704,12 +708,18 @@ async def find_cfo(
     total_usage = discovery_run.usage
 
     if not data.get("nome"):
-        return data, QualityFlags(
-            linkedin_verified=False,
-            role_class="non_finance_fallback",
-            is_low_non_finance_fallback=False,
-            link_validation_error=parse_error,
-        ), total_cost, total_usage, total_turns
+        return (
+            data,
+            QualityFlags(
+                linkedin_verified=False,
+                role_class="non_finance_fallback",
+                is_low_non_finance_fallback=False,
+                link_validation_error=parse_error,
+            ),
+            total_cost,
+            total_usage,
+            total_turns,
+        )
 
     role_class = _classify_role(cast(str | None, data.get("ruolo")))
     confidenza = _normalize_confidence(data.get("confidenza"))
@@ -792,7 +802,16 @@ def save_checkpoint_row(output_dir: Path, result: EnrichmentResult) -> None:
 # CSV I/O — same columns as enricher.py
 # ---------------------------------------------------------------------------
 
-ENRICHMENT_COLS = ["CFO_NOME", "CFO_RUOLO", "CFO_LINKEDIN", "CFO_EMAIL", "CFO_TELEFONO", "FONTE", "CONFIDENZA", "DATA_RICERCA"]
+ENRICHMENT_COLS = [
+    "CFO_NOME",
+    "CFO_RUOLO",
+    "CFO_LINKEDIN",
+    "CFO_EMAIL",
+    "CFO_TELEFONO",
+    "FONTE",
+    "CONFIDENZA",
+    "DATA_RICERCA",
+]
 
 
 def load_input_csv(path: Path) -> list[dict[str, str]]:
@@ -812,17 +831,19 @@ def load_input_jsonl(path: Path) -> list[dict[str, str]]:
                 rec = json.loads(line)
             except json.JSONDecodeError:
                 continue
-            rows.append({
-                "RANK": str(rec.get("national_rank", "")),
-                "AZIENDA": rec.get("company_name", ""),
-                "SITO WEB": rec.get("website", "") or "",
-                "RICAVI_RAW": str(rec.get("revenue_year_b_eur", "")),  # EUR, not k€
-                "SETTORE": rec.get("sector", ""),
-                "REGIONE": rec.get("region", ""),
-                "COUNTRY": rec.get("country", "DE"),
-                "CITY": rec.get("city", ""),
-                "TASSO DI CRESCITA": str(rec.get("growth_rate_pa_pct", "")),
-            })
+            rows.append(
+                {
+                    "RANK": str(rec.get("national_rank", "")),
+                    "AZIENDA": rec.get("company_name", ""),
+                    "SITO WEB": rec.get("website", "") or "",
+                    "RICAVI_RAW": str(rec.get("revenue_year_b_eur", "")),  # EUR, not k€
+                    "SETTORE": rec.get("sector", ""),
+                    "REGIONE": rec.get("region", ""),
+                    "COUNTRY": rec.get("country", "DE"),
+                    "CITY": rec.get("city", ""),
+                    "TASSO DI CRESCITA": str(rec.get("growth_rate_pa_pct", "")),
+                }
+            )
     return rows
 
 
@@ -1017,13 +1038,13 @@ def _parse_revenue(company: dict[str, str]) -> int | None:
     if raw:
         try:
             return int(float(raw)) // 1000
-        except (ValueError, TypeError):
+        except ValueError, TypeError:
             pass
     for key in sorted(company.keys(), reverse=True):
         if key.startswith("RICAVI"):
             try:
                 return int(company[key])
-            except (ValueError, TypeError):
+            except ValueError, TypeError:
                 pass
     return None
 
@@ -1162,11 +1183,10 @@ async def find_linkedin(
 # ---------------------------------------------------------------------------
 
 
-
-
 async def run_enrichment(
-    input_path: Path,
-    output_dir: Path,
+    input_path: Path | None = None,
+    output_dir: Path = Path("output"),
+    companies: list[dict[str, str]] | None = None,
     reset: bool = False,
     max_concurrency: int = RUN_MAX_CONCURRENCY,
     max_retries: int = RUN_MAX_RETRIES,
@@ -1174,14 +1194,19 @@ async def run_enrichment(
     on_company_done: Callable[[CompanyOutcome, int, int], None] | None = None,
 ) -> dict[str, Any]:
     """
-    Run enrichment on input_path, writing output to output_dir.
+    Run enrichment on input_path or inline companies list, writing output to output_dir.
     Calls on_company_done(outcome, completed, total) after each company completes.
     Returns a summary dict with cost, timing, and result counts.
     """
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    companies = load_input_file(input_path)
-    print(f"Caricate {len(companies)} aziende da {input_path}")
+    if companies is None:
+        if input_path is None:
+            raise ValueError("Either input_path or companies must be provided")
+        companies = load_input_file(input_path)
+        print(f"Caricate {len(companies)} aziende da {input_path}")
+    else:
+        print(f"Ricevute {len(companies)} aziende inline")
     print(f"Modello: {MODEL}")
     print(f"Worker paralleli: {max_concurrency}")
 
@@ -1250,7 +1275,9 @@ async def run_enrichment(
                     f"{cost_str}{tokens_str}{turns_str}"
                 )
             else:
-                print(f"  => [{n}/{total}] Rank {outcome.rank} non trovato{cost_str}{tokens_str}{turns_str}")
+                print(
+                    f"  => [{n}/{total}] Rank {outcome.rank} non trovato{cost_str}{tokens_str}{turns_str}"
+                )
 
             if on_company_done:
                 on_company_done(outcome, progress["completed"], len(pending))
