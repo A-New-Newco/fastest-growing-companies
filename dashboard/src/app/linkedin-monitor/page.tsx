@@ -27,6 +27,7 @@ import {
   stopLinkedinRun,
 } from "@/lib/linkedin-enrichment-client";
 import { loadCompanies } from "@/lib/data";
+import { useFilters } from "@/lib/filter-context";
 import type { Company } from "@/types";
 
 // ---------------------------------------------------------------------------
@@ -107,6 +108,7 @@ const PIE_COLORS: Record<string, string> = {
 
 export default function LinkedinMonitorPage() {
   // Config
+  const { filters } = useFilters();
   const [concurrency, setConcurrency] = useState<number>(8);
   const [doReset, setDoReset] = useState(false);
 
@@ -126,6 +128,11 @@ export default function LinkedinMonitorPage() {
   const [serverOnline, setServerOnline] = useState<boolean | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
+  // Import state
+  const [selectedResultIds, setSelectedResultIds] = useState<Set<string>>(new Set());
+  const [importing, setImporting] = useState(false);
+  const [importMsg, setImportMsg] = useState<string | null>(null);
+
   const esRef = useRef<EventSource | null>(null);
 
   // ------------------------------------------------------------------
@@ -134,18 +141,19 @@ export default function LinkedinMonitorPage() {
   const loadContactsWithoutLinkedin = useCallback(async () => {
     setDbLoading(true);
     try {
-      const companies = await loadCompanies();
+      const companies = await loadCompanies(2026, filters.country);
       // Filter: has CFO name but no LinkedIn
       const withoutLinkedin = companies.filter(
         (c) => c.cfoNome && !c.cfoLinkedin
       );
       setDbCompanies(withoutLinkedin);
+      setSelectedIds(new Set());
     } catch {
       setDbCompanies([]);
     } finally {
       setDbLoading(false);
     }
-  }, []);
+  }, [filters.country]);
 
   // ------------------------------------------------------------------
   // Boot: check server + load companies
@@ -178,7 +186,7 @@ export default function LinkedinMonitorPage() {
 
     loadContactsWithoutLinkedin();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [loadContactsWithoutLinkedin]);
 
   // ------------------------------------------------------------------
   // SSE stream
@@ -243,7 +251,7 @@ export default function LinkedinMonitorPage() {
     setLiveResults([]);
     setActiveTab("live");
 
-    const contacts: ContactInput[] = dbCompanies
+    const contacts: ContactInput[] = filteredDbCompanies
       .filter((c) => selectedIds.has(c.id))
       .map((c) => ({
         id: c.id,
@@ -281,6 +289,55 @@ export default function LinkedinMonitorPage() {
   };
 
   // ------------------------------------------------------------------
+  // Import LinkedIn results to DB
+  // ------------------------------------------------------------------
+  const handleImport = async (targets: ContactResult[]) => {
+    const withUrl = targets.filter((r) => r.linkedin_url);
+    if (withUrl.length === 0) return;
+    setImporting(true);
+    setImportMsg(null);
+    try {
+      const res = await fetch("/api/linkedin-monitor/import", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          items: withUrl.map((r) => ({ id: r.id, linkedin_url: r.linkedin_url })),
+        }),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error((err as { error?: string }).error ?? `Import failed: ${res.status}`);
+      }
+      const data = (await res.json()) as { updated: number };
+      setImportMsg(`Saved ${data.updated} LinkedIn URLs to DB`);
+    } catch (e: unknown) {
+      setImportMsg(e instanceof Error ? e.message : "Import failed");
+    } finally {
+      setImporting(false);
+    }
+  };
+
+  // ------------------------------------------------------------------
+  // Result selection helpers
+  // ------------------------------------------------------------------
+  const toggleResultSelect = (id: string) => {
+    setSelectedResultIds((prev) => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  };
+
+  const toggleSelectAllResults = () => {
+    const withUrl = displayedResults.filter((r) => r.linkedin_url);
+    if (selectedResultIds.size === withUrl.length) {
+      setSelectedResultIds(new Set());
+    } else {
+      setSelectedResultIds(new Set(withUrl.map((r) => r.id)));
+    }
+  };
+
+  // ------------------------------------------------------------------
   // Selection helpers
   // ------------------------------------------------------------------
   const toggleSelect = (id: string) => {
@@ -292,10 +349,10 @@ export default function LinkedinMonitorPage() {
   };
 
   const selectAll = () => {
-    if (selectedIds.size === dbCompanies.length) {
+    if (selectedIds.size === filteredDbCompanies.length) {
       setSelectedIds(new Set());
     } else {
-      setSelectedIds(new Set(dbCompanies.map((c) => c.id)));
+      setSelectedIds(new Set(filteredDbCompanies.map((c) => c.id)));
     }
   };
 
@@ -316,7 +373,28 @@ export default function LinkedinMonitorPage() {
       ? Math.round(((total - completed) * elapsed) / completed)
       : null;
 
+  // Exclude contacts already processed (in history or live) without a LinkedIn URL found
+  const alreadySearchedIds = useMemo(() => {
+    const ids = new Set<string>();
+    for (const r of historyResults) {
+      if (!r.linkedin_url) ids.add(r.id);
+    }
+    for (const r of liveResults) {
+      if (!r.linkedin_url) ids.add(r.id);
+    }
+    return ids;
+  }, [historyResults, liveResults]);
+
+  const filteredDbCompanies = useMemo(
+    () => dbCompanies.filter((c) => !alreadySearchedIds.has(c.id)),
+    [dbCompanies, alreadySearchedIds]
+  );
+
   const displayedResults = activeTab === "live" ? liveResults : historyResults;
+  const importableResults = displayedResults.filter((r) => r.linkedin_url);
+  const selectedImportResults = importableResults.filter((r) => selectedResultIds.has(r.id));
+  const allResultsSelected = importableResults.length > 0 && selectedResultIds.size === importableResults.length;
+  const someResultsSelected = selectedResultIds.size > 0 && !allResultsSelected;
 
   const pieData = useMemo(
     () =>
@@ -400,7 +478,7 @@ export default function LinkedinMonitorPage() {
               <div className="h-9 flex items-center px-3 text-sm border border-slate-200 rounded-md bg-slate-50 text-slate-700">
                 {selectedIds.size > 0
                   ? `${selectedIds.size} selected`
-                  : `${dbCompanies.length} available without LinkedIn`}
+                  : `${filteredDbCompanies.length} available without LinkedIn`}
               </div>
             </div>
 
@@ -551,7 +629,7 @@ export default function LinkedinMonitorPage() {
                       : "Live"}
                   <span className="tabular-nums opacity-60">
                     {tab === "select"
-                      ? dbCompanies.length
+                      ? filteredDbCompanies.length
                       : tab === "history"
                         ? historyResults.length
                         : liveResults.length}
@@ -559,8 +637,8 @@ export default function LinkedinMonitorPage() {
                 </button>
               ))}
 
-              {activeTab === "select" && (
-                <div className="ml-auto flex items-center gap-2">
+              <div className="ml-auto flex items-center gap-2">
+                {activeTab === "select" && (
                   <Button
                     size="sm"
                     variant="outline"
@@ -570,9 +648,38 @@ export default function LinkedinMonitorPage() {
                   >
                     {dbLoading ? "Loading…" : "Refresh"}
                   </Button>
-                </div>
-              )}
+                )}
+                {activeTab !== "select" && importableResults.length > 0 && (
+                  <>
+                    {selectedImportResults.length > 0 && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="h-7 text-xs border-indigo-200 text-indigo-600 hover:bg-indigo-50"
+                        disabled={importing}
+                        onClick={() => handleImport(selectedImportResults)}
+                      >
+                        {importing ? "Saving…" : `Save Selected (${selectedImportResults.length})`}
+                      </Button>
+                    )}
+                    <Button
+                      size="sm"
+                      className="h-7 text-xs bg-indigo-600 hover:bg-indigo-500 text-white"
+                      disabled={importing}
+                      onClick={() => handleImport(importableResults)}
+                    >
+                      {importing ? "Saving…" : `Save All (${importableResults.length})`}
+                    </Button>
+                  </>
+                )}
+              </div>
             </div>
+
+            {importMsg && (
+              <p className={`text-xs px-4 pt-2 ${importMsg.includes("failed") || importMsg.includes("Failed") ? "text-red-600" : "text-emerald-600"}`}>
+                {importMsg}
+              </p>
+            )}
 
             {/* Tab content */}
             <div className="overflow-x-auto max-h-[600px] overflow-y-auto">
@@ -585,8 +692,8 @@ export default function LinkedinMonitorPage() {
                         <input
                           type="checkbox"
                           checked={
-                            dbCompanies.length > 0 &&
-                            selectedIds.size === dbCompanies.length
+                            filteredDbCompanies.length > 0 &&
+                            selectedIds.size === filteredDbCompanies.length
                           }
                           onChange={selectAll}
                           className="rounded border-slate-300 accent-indigo-600"
@@ -599,7 +706,7 @@ export default function LinkedinMonitorPage() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">
-                    {dbCompanies.map((c) => (
+                    {filteredDbCompanies.map((c) => (
                       <tr
                         key={c.id}
                         className="hover:bg-slate-50/80 transition-colors"
@@ -626,7 +733,7 @@ export default function LinkedinMonitorPage() {
                         </td>
                       </tr>
                     ))}
-                    {dbCompanies.length === 0 && !dbLoading && (
+                    {filteredDbCompanies.length === 0 && !dbLoading && (
                       <tr>
                         <td
                           colSpan={5}
@@ -643,6 +750,15 @@ export default function LinkedinMonitorPage() {
                 <table className="w-full text-sm">
                   <thead className="bg-slate-50 sticky top-0 z-10">
                     <tr className="text-left text-xs text-slate-500 uppercase tracking-wider">
+                      <th className="px-4 py-2 w-10">
+                        <input
+                          type="checkbox"
+                          checked={allResultsSelected}
+                          ref={(el) => { if (el) el.indeterminate = someResultsSelected; }}
+                          onChange={toggleSelectAllResults}
+                          className="rounded border-slate-300 accent-indigo-600"
+                        />
+                      </th>
                       <th className="px-4 py-2">Contact</th>
                       <th className="px-4 py-2">Role</th>
                       <th className="px-4 py-2">Company</th>
@@ -658,6 +774,15 @@ export default function LinkedinMonitorPage() {
                         key={r.id}
                         className="hover:bg-slate-50/80 transition-colors"
                       >
+                        <td className="px-4 py-2">
+                          <input
+                            type="checkbox"
+                            checked={selectedResultIds.has(r.id)}
+                            onChange={() => toggleResultSelect(r.id)}
+                            disabled={!r.linkedin_url}
+                            className="rounded border-slate-300 accent-indigo-600"
+                          />
+                        </td>
                         <td className="px-4 py-2 font-medium text-slate-800">
                           {r.nome}
                         </td>
@@ -699,7 +824,7 @@ export default function LinkedinMonitorPage() {
                     {displayedResults.length === 0 && (
                       <tr>
                         <td
-                          colSpan={7}
+                          colSpan={8}
                           className="px-4 py-8 text-center text-slate-400 text-sm"
                         >
                           {activeTab === "live"

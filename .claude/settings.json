@@ -65,7 +65,11 @@
       "WebFetch(domain:www.ft.com)",
       "WebFetch(domain:rankings.statista.com)",
       "WebFetch(domain:datapao.com)",
-      "Bash(ls /Users/francescofiore/Coding/Reef/fastest-growing-companies/*.py)"
+      "Bash(ls /Users/francescofiore/Coding/Reef/fastest-growing-companies/*.py)",
+      "Bash(uv --version)",
+      "Bash(uv init:*)",
+      "Bash(uv add:*)",
+      "Bash(grep -r \"^import type { Annotation, Company }\" /Users/francescofiore/Coding/Reef/fastest-growing-companies/dashboard/src --include=\"*.ts\" --include=\"*.tsx\")"
     ],
     "additionalDirectories": [
       "/Users/francescofiore/Coding/Reef/fastest-growing-companies/dashboard/src/app/campaigns",

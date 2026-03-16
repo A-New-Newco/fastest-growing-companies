@@ -108,7 +108,10 @@ class ContactOutcome:
 
 LEGAL_SUFFIXES = re.compile(
     r"\s*\b(S\.r\.l\.?\s*SB|S\.r\.l\.?|S\.p\.A\.?|S\.a\.s\.?|S\.n\.c\.?|S\.S\.?|S\.r\.l\.s\.?"
-    r"|GmbH|AG|KG|UG|e\.K\.)\s*$",
+    r"|GmbH|AG|KG|UG|e\.K\."
+    r"|Inc\.?|LLC|Ltd\.?|Co\.?|Corp\.?|PLC|LLP|LP"
+    r"|SE|SA|SAS|SARL|BV|NV"
+    r")\s*\.?\s*$",
     re.IGNORECASE,
 )
 
